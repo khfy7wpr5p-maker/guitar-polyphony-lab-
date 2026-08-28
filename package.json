@@ -10,7 +10,7 @@
   "scripts": {
     "test": "node --test",
     "test:ci": "node --test",
-    "check": "node --check src/polyphony/measureTimeline.js && node --check src/musicxml/inputGate.js && node --check src/musicxml/partwiseParser.js && node --check src/guitar/fretboardCandidates.js"
+    "check": "node --check src/polyphony/measureTimeline.js && node --check src/musicxml/inputGate.js && node --check src/musicxml/partwiseParser.js && node --check src/guitar/fretboardCandidates.js && node --check src/guitar/sonorityAssignments.js"
   },
   "dependencies": {
     "saxes": "6.0.0"
