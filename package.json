@@ -10,6 +10,6 @@
   "scripts": {
     "test": "node --test",
     "test:ci": "node --test",
-    "check": "node --check src/polyphony/measureTimeline.js"
+    "check": "node --check src/polyphony/measureTimeline.js && node --check src/musicxml/inputGate.js"
   }
 }
