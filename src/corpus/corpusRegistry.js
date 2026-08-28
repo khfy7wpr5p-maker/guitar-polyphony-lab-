@@ -106,9 +106,6 @@ function validateFixture(rawFixture, index, seenIds, seenPaths) {
 
   assertPositiveInteger(rawFixture.expectedVoices, `${path}.expectedVoices`);
   assertPositiveInteger(rawFixture.expectedPeakPolyphony, `${path}.expectedPeakPolyphony`);
-  if (rawFixture.expectedPeakPolyphony < rawFixture.expectedVoices) {
-    throw invalid('Peak polyphony cannot be lower than the expected voice count.', { path });
-  }
 
   if (typeof rawFixture.expectedTies !== 'boolean') {
     throw invalid('expectedTies must be boolean.', { path: `${path}.expectedTies` });
