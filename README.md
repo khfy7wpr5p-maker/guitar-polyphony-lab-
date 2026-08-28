@@ -4,59 +4,57 @@ Experimental, evidence-first laboratory for sustained guitar polyphony from Musi
 
 This repository is intentionally **not** the production TAB authority. Its job is to isolate, test, and validate polyphonic timeline and guitar-state algorithms before any separately reviewed integration into `musicxml-to-guitar-tab-engine`.
 
-## Current stage: P0 — semantic polyphony core
+## Current stage: P1B — bounded MusicXML parser adapter
 
-P0 establishes a dependency-free semantic core for ordered MusicXML measure events:
+The current pipeline is:
 
-- `note`
-- `chord`
-- `backup`
-- `forward`
+```text
+untrusted MusicXML bytes/string
+    |
+    v
+P1A input gate
+    |
+    v
+P1B score-partwise parser adapter
+    |
+    v
+per-part / per-measure OrderedMeasureEvent[]
+    |
+    v
+P0 semantic timeline core
+    |
+    +--> note intervals
+    +--> sonority spans
+```
+
+P1B extracts the bounded semantics needed for polyphony evidence:
+
+- `divisions`
+- pitched `note`
 - `voice`
 - `staff`
 - `duration`
-- tie flags carried as evidence
+- `<chord/>`
+- rests as provenance-carrying cursor movement
+- `<backup>` / `<forward>`
+- tie/tied start-stop evidence
 
-The core converts ordered measure events into deterministic note intervals and active-note sonority spans. It does **not** parse untrusted XML yet.
+Unsupported semantics fail closed rather than inventing timing or pitch.
 
 ## Safety boundaries
 
-- `main` is treated as protected-by-process even when repository settings do not enforce protection.
+- `main` is treated as protected-by-process while repository settings still report it unprotected.
 - Development occurs on stage branches and through pull requests.
-- No PDF, OMR, Audiveris, renderer, UI, MIDI, AI, or production routing belongs in P0.
-- No external runtime dependency is introduced in P0.
-- Real XML parsing is a separate dependency/security review gate.
+- P1A remains authoritative for byte limits, UTF-8 validation, and rejection of DTD/entity/XInclude input.
+- `saxes` is exact-pinned at `6.0.0` behind the P1A gate; parser output is normalized through our adapter rather than exposed as project authority.
+- No PDF, OMR, Audiveris, renderer, UI, MIDI, AI, or production routing belongs in this repository stage.
 - Generated or private corpora must not be committed under tracked fixture paths.
-
-## Architecture
-
-```text
-MusicXML bytes
-    |
-    |  future parser boundary (untrusted input)
-    v
-Ordered Measure Events
-    |
-    v
-P0 Semantic Timeline Core
-    |
-    +--> Note intervals
-    |
-    +--> Sonority spans
-    |
-    v
-future: guitar candidate generation
-    |
-    v
-future: sustained path solver
-    |
-    v
-future: semantic validator
-```
 
 See:
 
 - `docs/ARCHITECTURE.md`
+- `docs/P1A-INPUT-GATE.md`
+- `docs/P1B-PARSER-ADAPTER.md`
 - `docs/POLYPHONY-MODEL.md`
 - `docs/SUPPORTED-MUSICXML.md`
 - `SECURITY.md`
@@ -65,6 +63,7 @@ See:
 
 ```bash
 npm ci --ignore-scripts
+npm run check
 npm test
 ```
 
@@ -72,8 +71,10 @@ Node.js 22 or newer is required.
 
 ## Roadmap
 
-- **P0:** semantic event contract + deterministic timeline + tests
-- **P1:** bounded MusicXML parser adapter after dependency/security review
+- **P0:** semantic event contract + deterministic timeline + tests — complete
+- **P1A:** untrusted MusicXML input gate — complete
+- **P1B:** bounded `score-partwise` parser adapter — current
+- **P1C:** exporter fixtures and compatibility matrix
 - **P2:** guitar fretboard candidate generation
 - **P3:** sustained polyphonic path solver harness
 - **P4:** semantic round-trip validator + golden corpus promotion protocol
