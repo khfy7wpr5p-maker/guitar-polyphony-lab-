@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "khfy7wpr5p-maker/musicxml-to-guitar-tab-engine",
+  "sourceRef": "0210976ffc74123df8a3c8c0fab2d3cf69067c32",
+  "fixtures": [
+    {
+      "path": "fixtures/compat/ps6-counterpoint-2v.musicxml",
+      "sourcePath": "tests/fixtures/ps6-counterpoint-2v.musicxml",
+      "blobSha": "290cd073a54223b48dc2d43d050746fef05df572",
+      "profile": "PS6_COUNTERPOINT_2V",
+      "expected": {
+        "parts": 1,
+        "measures": 1,
+        "maxVoices": 2,
+        "ties": false
+      }
+    },
+    {
+      "path": "fixtures/compat/ps6-counterpoint-4v-tie.musicxml",
+      "sourcePath": "tests/fixtures/ps6-counterpoint-4v-tie.musicxml",
+      "blobSha": "44c715e259d2c8322c69db93e0712155497826f9",
+      "profile": "PS6_COUNTERPOINT_4V_TIE",
+      "expected": {
+        "parts": 1,
+        "measures": 2,
+        "maxVoices": 4,
+        "ties": true
+      }
+    }
+  ]
+}
