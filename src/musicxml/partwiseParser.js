@@ -157,6 +157,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
   let currentNote = null;
   let currentMove = null;
   let capture = null;
+  let firstParserFailure = null;
 
   function context() {
     return {
@@ -164,6 +165,16 @@ export function parseMusicXmlPartwise(input, options = {}) {
       measureIndex: currentMeasure?.index,
       noteOrdinal: currentNote?.ordinal,
     };
+  }
+
+  function recordParserFailure(code, message, details = {}) {
+    if (firstParserFailure === null) {
+      firstParserFailure = new MusicXmlParseError(code, message, details);
+    }
+  }
+
+  function parserHasFailed() {
+    return firstParserFailure !== null;
   }
 
   function beginCapture(target, field, tag) {
@@ -231,7 +242,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
   });
 
   parser.on('error', (error) => {
-    fail('MALFORMED_XML', 'MusicXML is not well-formed XML.', {
+    recordParserFailure('MALFORMED_XML', 'MusicXML is not well-formed XML.', {
       line: parser.line,
       column: parser.column,
       cause: error instanceof Error ? error.message : String(error),
@@ -239,10 +250,15 @@ export function parseMusicXmlPartwise(input, options = {}) {
   });
 
   parser.on('doctype', () => {
-    fail('PARSER_DOCTYPE_REACHED', 'DOCTYPE reached the parser despite the input gate.');
+    recordParserFailure(
+      'PARSER_DOCTYPE_REACHED',
+      'DOCTYPE reached the parser despite the input gate.',
+    );
   });
 
   parser.on('opentag', (node) => {
+    if (parserHasFailed()) return;
+
     const name = node.name;
     const parent = stack.at(-1) ?? null;
     stack.push(name);
@@ -389,7 +405,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
   });
 
   parser.on('text', (text) => {
-    if (!capture) return;
+    if (parserHasFailed() || !capture) return;
     capture.text += text;
     if (capture.text.length > MAX_CAPTURE_LENGTH) {
       fail('CAPTURE_LIMIT_EXCEEDED', 'Relevant MusicXML text field exceeds parser limit.', {
@@ -401,7 +417,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
   });
 
   parser.on('cdata', (text) => {
-    if (!capture) return;
+    if (parserHasFailed() || !capture) return;
     capture.text += text;
     if (capture.text.length > MAX_CAPTURE_LENGTH) {
       fail('CAPTURE_LIMIT_EXCEEDED', 'Relevant MusicXML CDATA field exceeds parser limit.', {
@@ -413,6 +429,8 @@ export function parseMusicXmlPartwise(input, options = {}) {
   });
 
   parser.on('closetag', (node) => {
+    if (parserHasFailed()) return;
+
     const name = closeName(node);
     finishCapture(name);
 
@@ -524,6 +542,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
   try {
     parser.write(gated.xml).close();
   } catch (error) {
+    if (firstParserFailure) throw firstParserFailure;
     if (error instanceof MusicXmlParseError) throw error;
     fail('MALFORMED_XML', 'MusicXML parsing failed.', {
       line: parser.line,
@@ -532,6 +551,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
     });
   }
 
+  if (firstParserFailure) throw firstParserFailure;
   if (xmlDeclarationVersion && xmlDeclarationVersion !== '1.0') {
     fail('UNSUPPORTED_XML_VERSION', 'P1B supports XML 1.0 input only.', {
       version: xmlDeclarationVersion,
