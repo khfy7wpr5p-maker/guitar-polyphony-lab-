@@ -89,6 +89,14 @@ test('V1A corpus registry records current internal corpus semantics without inve
   }
 });
 
+test('V1A registry does not invent a voice-count to peak-polyphony ordering rule', async () => {
+  const manifest = await loadManifest();
+  manifest.fixtures[0].expectedVoices = 4;
+  manifest.fixtures[0].expectedPeakPolyphony = 2;
+
+  assert.doesNotThrow(() => validateCorpusRegistry(manifest));
+});
+
 test('V1A corpus registry fails closed on missing license, malformed hash, duplicate id or external source without https', async () => {
   const manifest = await loadManifest();
 
