@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 
 import {
   CORPUS_REGISTRY_SCHEMA_VERSION,
@@ -53,7 +52,7 @@ test('V1A corpus registry SHA-256 values match fixture bytes exactly', async () 
   const registry = validateCorpusRegistry(await loadManifest());
 
   for (const fixture of registry.fixtures) {
-    const fixtureUrl = new URL(`../${fixture.path}`, manifestUrl);
+    const fixtureUrl = new URL(`../../${fixture.path}`, manifestUrl);
     const bytes = await readFile(fixtureUrl);
     const observed = createHash('sha256').update(bytes).digest('hex');
     assert.equal(observed, fixture.sourceSha256, fixture.fixtureId);
