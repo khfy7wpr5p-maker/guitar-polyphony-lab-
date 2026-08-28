@@ -141,3 +141,24 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Project-local experiment output
+test-results/
+reports/
+artifacts/
+generated/
+.tmp/
+temp/
+
+# Local or private corpora
+fixtures/local/
+corpus/local/
+corpus/raw-private/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
