@@ -174,7 +174,7 @@ test('fails closed on microtonal alter values in the bounded P1B contract', () =
 });
 
 test('malformed XML is rejected and no partial semantic result is returned', () => {
-  const xml = '<score-partwise><part id="P1"><measure number="1"></part></score-partwise>';
+  const xml = '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>4</divisions></attributes></part></score-partwise>';
   assert.throws(
     () => parseMusicXmlPartwise(xml),
     (error) => error instanceof MusicXmlParseError && error.code === 'MALFORMED_XML',
