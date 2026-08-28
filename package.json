@@ -10,6 +10,9 @@
   "scripts": {
     "test": "node --test",
     "test:ci": "node --test",
-    "check": "node --check src/polyphony/measureTimeline.js && node --check src/musicxml/inputGate.js"
+    "check": "node --check src/polyphony/measureTimeline.js && node --check src/musicxml/inputGate.js && node --check src/musicxml/partwiseParser.js"
+  },
+  "dependencies": {
+    "saxes": "6.0.0"
   }
 }
