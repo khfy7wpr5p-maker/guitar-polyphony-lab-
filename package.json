@@ -1,0 +1,15 @@
+{
+  "name": "guitar-polyphony-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Evidence-first laboratory for sustained guitar polyphony from MusicXML semantics.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:ci": "node --test",
+    "check": "node --check src/polyphony/measureTimeline.js"
+  }
+}
