@@ -1,0 +1,67 @@
+{
+  "documentType": "TechniqueMetadataOnlyCompatibilityBenchmark",
+  "contractVersion": "1.0.0",
+  "stage": "LAB-TECH-04",
+  "authority": "RESEARCH_VERIFICATION_ONLY",
+  "determinismRuns": 2,
+  "requiredInvariants": [
+    "source pitch unchanged",
+    "source octave unchanged",
+    "source onset unchanged",
+    "source duration unchanged",
+    "source voice unchanged",
+    "source staff unchanged",
+    "source tie unchanged",
+    "source grace unchanged",
+    "source chord membership unchanged",
+    "solver input unchanged",
+    "fretboard candidate set unchanged",
+    "sonority assignment count and order unchanged",
+    "selected sustained physical result unchanged",
+    "deterministic repeated output"
+  ],
+  "clearedForBenchmark": [
+    "empty/unspecified technical harmonic marker",
+    "simple hammer-on source-form provenance",
+    "slide source-form provenance",
+    "natural harmonic base-pitch role provenance",
+    "note/play straight-mute provenance",
+    "technical string/fret/fingering/pluck provenance"
+  ],
+  "notCleared": [
+    {
+      "technique": "artificial harmonic pitch-role chord",
+      "reason": "solver-visible note identity risk has not been proven metadata-only"
+    },
+    {
+      "technique": "let-ring",
+      "reason": "producer marker does not prove scope or sounding duration"
+    },
+    {
+      "technique": "reused-number hammer-on chain automatic pairing",
+      "reason": "number alone is not a unique pair identity"
+    },
+    {
+      "technique": "pull-off",
+      "reason": "no retrieved Guitar Pro 7.6.0 producer example"
+    },
+    {
+      "technique": "bend",
+      "reason": "no retrieved Guitar Pro 7.6.0 producer example"
+    },
+    {
+      "technique": "palm-mute",
+      "reason": "no retrieved Guitar Pro 7.6.0 producer example"
+    },
+    {
+      "technique": "tap",
+      "reason": "no retrieved Guitar Pro 7.6.0 producer example"
+    }
+  ],
+  "execution": {
+    "module": "src/benchmarks/techniqueMetadataInvariance.js",
+    "test": "test/techniqueMetadataInvariance.test.js",
+    "ciCommand": "npm run check && npm test",
+    "passRule": "All invariance comparisons and both determinism runs must be byte-semantically equal after stable canonical serialization."
+  }
+}
