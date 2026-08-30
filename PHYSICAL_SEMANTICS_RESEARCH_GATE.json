@@ -1,0 +1,101 @@
+{
+  "documentType": "GuitarTechniquePhysicalSemanticsResearchGate",
+  "contractVersion": "1.0.0",
+  "stage": "LAB-TECH-05",
+  "authority": "RESEARCH_DECISION_ONLY",
+  "physicalIntegrationEnabled": false,
+  "requiresExplicitUserApprovalBeforeAnyPhysicalIntegration": true,
+  "rankingChangesAllowed": false,
+  "decisions": [
+    {
+      "technique": "empty/unspecified technical harmonic",
+      "decision": "KEEP_SAFE_METADATA_ONLY",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "The source marker does not identify natural/artificial type, harmonic node, sounding pitch, or physical string/fret authority."
+    },
+    {
+      "technique": "simple hammer-on source form",
+      "decision": "KEEP_SAFE_METADATA_ONLY",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "The notation proves technique provenance, but applying same-string or legato transition constraints would alter solver state and requires a separately approved physical contract."
+    },
+    {
+      "technique": "reused-number hammer-on chain",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "Guitar Pro reuses the same numeric marker across chained start/start+stop/stop events, so number alone cannot establish physical transition identity."
+    },
+    {
+      "technique": "slide",
+      "decision": "KEEP_SAFE_METADATA_ONLY",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "Some corpus endpoints carry same-string position evidence while others do not. A global same-string or path constraint cannot be inferred from the producer form alone."
+    },
+    {
+      "technique": "natural harmonic base-pitch role",
+      "decision": "KEEP_SAFE_METADATA_ONLY",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "Natural/base-pitch source roles do not by themselves establish harmonic node or sounding-pitch transformation for the physical solver."
+    },
+    {
+      "technique": "artificial harmonic pitch-role chord",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "Base/touching/sounding pitch-role notes are explicit, but mapping those roles into solver note identity or string/fret state requires architectural semantics not proven by the current contract."
+    },
+    {
+      "technique": "straight mute",
+      "decision": "KEEP_SAFE_METADATA_ONLY",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "The per-note mute marker proves performance provenance but does not prove duration, scope, or a change to distinct-string physical occupancy."
+    },
+    {
+      "technique": "let-ring",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "The producer processing instruction does not prove sounding duration or deterministic termination scope."
+    },
+    {
+      "technique": "technical string/fret position evidence",
+      "decision": "KEEP_SAFE_METADATA_ONLY_PENDING_EXPLICIT_PHYSICAL_STAGE",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "researchFinding": "When both source position and active GuitarConfiguration are explicit, pitch/position consistency can be validated without rewriting source facts.",
+      "reason": "Using source position as candidate authority or solver constraint would change the candidate set and therefore requires explicit approval in an isolated physical-semantics stage."
+    },
+    {
+      "technique": "fingering/pluck",
+      "decision": "KEEP_SAFE_METADATA_ONLY",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "Finger/pluck labels are source performance evidence and are not current solver target authority."
+    },
+    {
+      "technique": "pull-off",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "No retrieved Guitar Pro 7.6.0 producer example is available in the audited corpus subset."
+    },
+    {
+      "technique": "bend",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "No retrieved Guitar Pro 7.6.0 producer example is available; bend amount or sounding pitch must not be invented."
+    },
+    {
+      "technique": "palm-mute",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "No retrieved Guitar Pro 7.6.0 producer example is available."
+    },
+    {
+      "technique": "tap",
+      "decision": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "sourceAloneProvesPhysicalSolverSemantics": false,
+      "reason": "No retrieved Guitar Pro 7.6.0 producer example is available."
+    }
+  ],
+  "gateResult": {
+    "techniquesApprovedForPhysicalIntegration": [],
+    "automaticPhysicalImplementationAuthorized": false,
+    "nextAllowedAction": "Metadata-only production compatibility migration may proceed through PROD-TECH-01 onward after a fresh production read."
+  }
+}
