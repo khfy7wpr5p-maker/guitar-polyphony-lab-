@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtures": {
+    "ps6-counterpoint-2v.musicxml": {
+      "STANDARD": {
+        "candidateCount": 3,
+        "solvable": true,
+        "blocked": false,
+        "selectedPositions": ["E2@6:0", "A2@5:0"]
+      },
+      "DROP_D": {
+        "candidateCount": 3,
+        "solvable": true,
+        "blocked": false,
+        "selectedPositions": ["E2@6:2", "A2@5:0"]
+      },
+      "CUSTOM": {
+        "candidateCount": 3,
+        "solvable": true,
+        "blocked": false,
+        "selectedPositions": ["E2@6:4", "A2@5:2"]
+      }
+    },
+    "ps6-counterpoint-4v-tie.musicxml": {
+      "STANDARD": {
+        "candidateCount": 10,
+        "solvable": true,
+        "blocked": false,
+        "selectedPositions": ["E2@6:0", "A2@5:0", "D3@4:0", "G3@3:0"]
+      },
+      "DROP_D": {
+        "candidateCount": 10,
+        "solvable": true,
+        "blocked": false,
+        "selectedPositions": ["E2@6:2", "A2@5:0", "D3@4:0", "G3@3:0"]
+      },
+      "CUSTOM": {
+        "candidateCount": 10,
+        "solvable": true,
+        "blocked": false,
+        "selectedPositions": ["E2@6:4", "A2@5:2", "D3@4:2", "G3@3:2"]
+      }
+    }
+  },
+  "deterministicRerun": true,
+  "tieConsistency": "PASS",
+  "graceConsistency": "PASS"
+}
