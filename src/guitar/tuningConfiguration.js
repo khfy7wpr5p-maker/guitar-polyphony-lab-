@@ -2,8 +2,12 @@ import { types as utilTypes } from 'node:util';
 
 const { isProxy } = utilTypes;
 
-export const GUITAR_TUNING_CONFIGURATION_VERSION = '1.0.0';
+export const GUITAR_CONFIGURATION_VERSION = '2.0.0';
+export const GUITAR_TUNING_CONFIGURATION_VERSION = GUITAR_CONFIGURATION_VERSION;
 export const GUITAR_STRING_COUNT = 6;
+export const GUITAR_MAX_ABSOLUTE_FRET = 24;
+export const RESEARCH_MAX_CAPO_FRET = GUITAR_MAX_ABSOLUTE_FRET;
+export const GUITAR_FRET_SEMANTICS = 'RELATIVE_FROM_CAPO';
 export const RESEARCH_MIN_OPEN_MIDI = 28;
 export const RESEARCH_MAX_OPEN_MIDI = 76;
 export const RESEARCH_MAX_ADJACENT_INTERVAL = 12;
@@ -53,8 +57,15 @@ export class TuningConfigurationError extends Error {
   }
 }
 
+export class GuitarConfigurationError extends TuningConfigurationError {
+  constructor(code, message, details = {}) {
+    super(code, message, details);
+    this.name = 'GuitarConfigurationError';
+  }
+}
+
 function fail(code, message, details = {}) {
-  throw new TuningConfigurationError(code, message, details);
+  throw new GuitarConfigurationError(code, message, details);
 }
 
 function isPlainObject(value) {
@@ -65,20 +76,20 @@ function isPlainObject(value) {
 
 function exactDataDescriptors(value, allowed, path) {
   if (!isPlainObject(value)) {
-    fail('HOSTILE_TUNING_INPUT', `${path} must be a non-proxy plain object.`, { path });
+    fail('HOSTILE_GUITAR_CONFIGURATION_INPUT', `${path} must be a non-proxy plain object.`, { path });
   }
   const descriptors = Object.getOwnPropertyDescriptors(value);
   const keys = Reflect.ownKeys(value);
   for (const key of keys) {
     if (typeof key !== 'string' || !allowed.includes(key)) {
-      fail('INVALID_TUNING_ENTRY', `${path} contains an unknown field.`, {
+      fail('INVALID_GUITAR_CONFIGURATION_FIELD', `${path} contains an unknown field.`, {
         path,
         field: typeof key === 'symbol' ? key.toString() : key,
       });
     }
     const descriptor = descriptors[key];
     if (!descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor, 'value')) {
-      fail('HOSTILE_TUNING_INPUT', `${path} fields must be enumerable data properties.`, {
+      fail('HOSTILE_GUITAR_CONFIGURATION_INPUT', `${path} fields must be enumerable data properties.`, {
         path,
         field: key,
       });
@@ -162,7 +173,23 @@ function derivePreset(strings) {
   return 'CUSTOM';
 }
 
-function validatePhysicalBounds(strings) {
+function validateCapoFret(value) {
+  if (!Number.isSafeInteger(value)) {
+    fail('INVALID_CAPO_FRET', 'capoFret must be an integer.', { capoFret: value });
+  }
+  if (value < 0) {
+    fail('INVALID_CAPO_FRET', 'capoFret cannot be negative.', { capoFret: value });
+  }
+  if (value > RESEARCH_MAX_CAPO_FRET) {
+    fail('CAPO_OUT_OF_BOUNDS', 'capoFret exceeds the bounded research fretboard.', {
+      capoFret: value,
+      maximumCapoFret: RESEARCH_MAX_CAPO_FRET,
+    });
+  }
+  return value;
+}
+
+function validatePhysicalBounds(strings, capoFret) {
   for (const entry of strings) {
     if (entry.midi < RESEARCH_MIN_OPEN_MIDI || entry.midi > RESEARCH_MAX_OPEN_MIDI) {
       fail(
@@ -175,6 +202,13 @@ function validatePhysicalBounds(strings) {
           maximumMidi: RESEARCH_MAX_OPEN_MIDI,
         },
       );
+    }
+    if (entry.midi + capoFret > 127) {
+      fail('PHYSICALLY_UNBOUNDED_CONFIGURATION', 'Capo pushes an open string outside MIDI range.', {
+        string: entry.string,
+        openMidi: entry.midi,
+        capoFret,
+      });
     }
   }
   for (let index = 0; index < strings.length - 1; index += 1) {
@@ -202,7 +236,7 @@ function freezeStrings(strings) {
   return Object.freeze(strings.map((entry) => Object.freeze({ ...entry })));
 }
 
-export function createGuitarTuningConfiguration(tuning) {
+function normalizeTuning(tuning) {
   assertNativeDenseArray(tuning, 'tuning');
   if (tuning.length !== GUITAR_STRING_COUNT) {
     fail('INVALID_STRING_COUNT', `Tuning must define exactly ${GUITAR_STRING_COUNT} strings.`, {
@@ -254,7 +288,7 @@ export function createGuitarTuningConfiguration(tuning) {
         });
       }
       if (midi !== derivedMidi) {
-        fail('PITCH_MIDI_MISMATCH', 'Pitch and MIDI must describe the same open-string pitch.', {
+        fail('PITCH_MIDI_MISMATCH', 'Pitch and MIDI must describe the same non-capo open-string pitch.', {
           path,
           pitch,
           midi,
@@ -277,42 +311,62 @@ export function createGuitarTuningConfiguration(tuning) {
 
     normalized.push({ string, pitch, midi, writtenPitch });
   }
+  return normalized;
+}
 
-  validatePhysicalBounds(normalized);
-  const strings = freezeStrings(normalized);
+export function createGuitarConfiguration(request = {}) {
+  const descriptors = exactDataDescriptors(request, ['tuning', 'capoFret'], 'configurationRequest');
+  const tuning = Object.hasOwn(descriptors, 'tuning') ? descriptors.tuning.value : STANDARD_REQUEST;
+  const capoFret = validateCapoFret(
+    Object.hasOwn(descriptors, 'capoFret') ? descriptors.capoFret.value : 0,
+  );
+  const normalized = normalizeTuning(tuning);
+  validatePhysicalBounds(normalized, capoFret);
+  const frozenTuning = freezeStrings(normalized);
+
   return Object.freeze({
-    documentType: 'GuitarTuningConfiguration',
-    contractVersion: GUITAR_TUNING_CONFIGURATION_VERSION,
+    documentType: 'GuitarConfiguration',
+    contractVersion: GUITAR_CONFIGURATION_VERSION,
     stringCount: GUITAR_STRING_COUNT,
-    preset: derivePreset(strings),
-    strings,
+    preset: derivePreset(frozenTuning),
+    capoFret,
+    fretSemantics: GUITAR_FRET_SEMANTICS,
+    tuning: frozenTuning,
+    // Compatibility alias for TUNING-LAB-01 consumers. It is the same frozen array,
+    // not a second physical model.
+    strings: frozenTuning,
   });
 }
 
-export function resolveGuitarTuningConfiguration(value = STANDARD_TUNING_CONFIGURATION) {
-  if (Array.isArray(value)) return createGuitarTuningConfiguration(value);
-  if (!isPlainObject(value)) {
-    fail('INVALID_TUNING_CONFIGURATION', 'Expected a GuitarTuningConfiguration or tuning array.');
-  }
-  const descriptors = exactDataDescriptors(
-    value,
-    ['documentType', 'contractVersion', 'stringCount', 'preset', 'strings'],
-    'configuration',
-  );
-  const required = ['documentType', 'contractVersion', 'stringCount', 'preset', 'strings'];
+export function createGuitarTuningConfiguration(tuning) {
+  return createGuitarConfiguration({ tuning, capoFret: 0 });
+}
+
+function reconstructNewConfiguration(descriptors) {
+  const required = [
+    'documentType', 'contractVersion', 'stringCount', 'preset', 'capoFret',
+    'fretSemantics', 'tuning', 'strings',
+  ];
   if (required.some((field) => !Object.hasOwn(descriptors, field))) {
-    fail('INVALID_TUNING_CONFIGURATION', 'GuitarTuningConfiguration is missing a required field.');
+    fail('INVALID_GUITAR_CONFIGURATION', 'GuitarConfiguration is missing a required field.');
   }
   if (
-    descriptors.documentType.value !== 'GuitarTuningConfiguration'
-    || descriptors.contractVersion.value !== GUITAR_TUNING_CONFIGURATION_VERSION
+    descriptors.documentType.value !== 'GuitarConfiguration'
+    || descriptors.contractVersion.value !== GUITAR_CONFIGURATION_VERSION
     || descriptors.stringCount.value !== GUITAR_STRING_COUNT
+    || descriptors.fretSemantics.value !== GUITAR_FRET_SEMANTICS
   ) {
-    fail('INVALID_TUNING_CONFIGURATION', 'Unsupported GuitarTuningConfiguration header.');
+    fail('INVALID_GUITAR_CONFIGURATION', 'Unsupported GuitarConfiguration header.');
   }
-  const normalized = createGuitarTuningConfiguration(descriptors.strings.value);
+  if (descriptors.tuning.value !== descriptors.strings.value) {
+    fail('AMBIGUOUS_FRET_OR_TUNING_SEMANTICS', 'tuning and compatibility strings must reference the same immutable tuning array.');
+  }
+  const normalized = createGuitarConfiguration({
+    tuning: descriptors.tuning.value,
+    capoFret: descriptors.capoFret.value,
+  });
   if (normalized.preset !== descriptors.preset.value) {
-    fail('INVALID_TUNING_CONFIGURATION', 'Tuning preset provenance does not match the contained strings.', {
+    fail('INVALID_GUITAR_CONFIGURATION', 'Tuning preset provenance does not match the contained tuning.', {
       expectedPreset: normalized.preset,
       observedPreset: descriptors.preset.value,
     });
@@ -320,24 +374,62 @@ export function resolveGuitarTuningConfiguration(value = STANDARD_TUNING_CONFIGU
   return normalized;
 }
 
-export function tuningConfigurationToGuitarFacts(value = STANDARD_TUNING_CONFIGURATION) {
-  const configuration = resolveGuitarTuningConfiguration(value);
+export function resolveGuitarConfiguration(value = STANDARD_GUITAR_CONFIGURATION) {
+  if (Array.isArray(value)) return createGuitarConfiguration({ tuning: value, capoFret: 0 });
+  if (!isPlainObject(value)) {
+    fail('INVALID_GUITAR_CONFIGURATION', 'Expected a GuitarConfiguration, request object, or tuning array.');
+  }
+
+  const keys = Reflect.ownKeys(value);
+  if (keys.includes('documentType')) {
+    const descriptors = exactDataDescriptors(
+      value,
+      [
+        'documentType', 'contractVersion', 'stringCount', 'preset', 'capoFret',
+        'fretSemantics', 'tuning', 'strings',
+      ],
+      'configuration',
+    );
+    return reconstructNewConfiguration(descriptors);
+  }
+
+  const descriptors = exactDataDescriptors(value, ['tuning', 'capoFret'], 'configurationRequest');
+  return createGuitarConfiguration({
+    ...(Object.hasOwn(descriptors, 'tuning') ? { tuning: descriptors.tuning.value } : {}),
+    ...(Object.hasOwn(descriptors, 'capoFret') ? { capoFret: descriptors.capoFret.value } : {}),
+  });
+}
+
+export function resolveGuitarTuningConfiguration(value = STANDARD_TUNING_CONFIGURATION) {
+  return resolveGuitarConfiguration(value);
+}
+
+export function guitarConfigurationToGuitarFacts(value = STANDARD_GUITAR_CONFIGURATION) {
+  const configuration = resolveGuitarConfiguration(value);
   return Object.freeze({
     stringCount: GUITAR_STRING_COUNT,
-    tuning: Object.freeze(configuration.strings.map((entry) => Object.freeze({
+    tuning: Object.freeze(configuration.tuning.map((entry) => Object.freeze({
       string: entry.string,
       pitch: entry.pitch,
       midi: entry.midi,
       writtenPitch: entry.writtenPitch,
+      soundingOpenMidi: entry.midi + configuration.capoFret,
     }))),
+    capoFret: configuration.capoFret,
+    fretSemantics: GUITAR_FRET_SEMANTICS,
   });
 }
 
-export function tuningConfigurationToWorkbenchRequest(value = STANDARD_TUNING_CONFIGURATION) {
-  const configuration = resolveGuitarTuningConfiguration(value);
+export function tuningConfigurationToGuitarFacts(value = STANDARD_TUNING_CONFIGURATION) {
+  return guitarConfigurationToGuitarFacts(value);
+}
+
+export function guitarConfigurationToWorkbenchRequest(value = STANDARD_GUITAR_CONFIGURATION) {
+  const configuration = resolveGuitarConfiguration(value);
   return Object.freeze({
     guitar: Object.freeze({
-      tuning: Object.freeze(configuration.strings.map((entry) => Object.freeze({
+      capoFret: configuration.capoFret,
+      tuning: Object.freeze(configuration.tuning.map((entry) => Object.freeze({
         string: entry.string,
         pitch: entry.pitch,
       }))),
@@ -345,5 +437,33 @@ export function tuningConfigurationToWorkbenchRequest(value = STANDARD_TUNING_CO
   });
 }
 
-export const STANDARD_TUNING_CONFIGURATION = createGuitarTuningConfiguration(STANDARD_REQUEST);
-export const DROP_D_TUNING_CONFIGURATION = createGuitarTuningConfiguration(DROP_D_REQUEST);
+// Compatibility helper for TUNING-LAB-01. New callers should use
+// guitarConfigurationToWorkbenchRequest so capo provenance cannot be dropped.
+export function tuningConfigurationToWorkbenchRequest(value = STANDARD_TUNING_CONFIGURATION) {
+  const configuration = resolveGuitarConfiguration(value);
+  return Object.freeze({
+    guitar: Object.freeze({
+      tuning: Object.freeze(configuration.tuning.map((entry) => Object.freeze({
+        string: entry.string,
+        pitch: entry.pitch,
+      }))),
+    }),
+  });
+}
+
+export function withCapo(value, capoFret) {
+  const configuration = resolveGuitarConfiguration(value);
+  return createGuitarConfiguration({ tuning: configuration.tuning, capoFret });
+}
+
+export const STANDARD_GUITAR_CONFIGURATION = createGuitarConfiguration({
+  tuning: STANDARD_REQUEST,
+  capoFret: 0,
+});
+export const DROP_D_GUITAR_CONFIGURATION = createGuitarConfiguration({
+  tuning: DROP_D_REQUEST,
+  capoFret: 0,
+});
+
+export const STANDARD_TUNING_CONFIGURATION = STANDARD_GUITAR_CONFIGURATION;
+export const DROP_D_TUNING_CONFIGURATION = DROP_D_GUITAR_CONFIGURATION;
