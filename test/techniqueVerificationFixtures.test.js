@@ -90,8 +90,8 @@ test('reused hammer-on number in a Guitar Pro chain is explicitly not a unique p
   const fixture = byId(document, 'hammer-on-chain-reused-number-gp760');
   assert.equal(fixture.verification.numberAloneIsUniquePairingId, false);
   assert.equal(fixture.verification.automaticPairing, 'BLOCKED_UNKNOWN_OR_AMBIGUOUS');
-  assert.match(fixture.sourceShape.sequence[1], /type=\\"start\\"/);
-  assert.match(fixture.sourceShape.sequence[1], /type=\\"stop\\"/);
+  assert.match(fixture.sourceShape.sequence[1], /type="start"/);
+  assert.match(fixture.sourceShape.sequence[1], /type="stop"/);
 
   const middleStart = createGuitarTechniqueProvenance({
     kind: 'HAMMER_ON',
