@@ -1,0 +1,270 @@
+{
+  "documentType": "GuitarTechniqueVerificationFixtureMatrix",
+  "contractVersion": "1.0.0",
+  "stage": "LAB-TECH-03",
+  "evidenceDate": "2026-08-30",
+  "policy": {
+    "realCorpusCommitted": false,
+    "syntheticFragmentsMayMirrorObservedShape": true,
+    "unknownProducerShapeRemainsBlocked": true,
+    "pairingIsNeverInferredFromTechniqueNumberAlone": true,
+    "physicalSemanticsEnabled": false
+  },
+  "cases": [
+    {
+      "id": "hammer-on-simple-pair-gp760",
+      "technique": "hammer-on",
+      "sourceEvidence": {
+        "fileName": "[Air]鸟之诗.xml",
+        "sha256": "9c40607822baf52de03db555664446ecc33f5adda80fdb1aa6175b0e8a3602c6",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "start": "<hammer-on number=\"1\" type=\"start\">H</hammer-on>",
+        "stop": "<hammer-on number=\"1\" type=\"stop\"/>",
+        "path": "note/notations/technical/hammer-on",
+        "observedVoice": "1",
+        "observedStaff": "1"
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "pairing": "DETERMINISTIC_ONLY_WITH_EVENT_IDENTITY",
+        "destinationPitchInference": "FORBIDDEN",
+        "physicalLegatoSemantics": "NOT_PROVEN"
+      }
+    },
+    {
+      "id": "hammer-on-chain-reused-number-gp760",
+      "technique": "hammer-on",
+      "sourceEvidence": {
+        "fileName": "[Air]てんとう虫(瓢虫).xml",
+        "sha256": "6fdbccad2038ad549376778832a5ac5183fa8235907d7a69982e28d6658cae06",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "sequence": [
+          "<hammer-on number=\"1\" type=\"start\">H</hammer-on>",
+          "<hammer-on number=\"1\" type=\"start\">H</hammer-on> + <hammer-on number=\"1\" type=\"stop\"/>",
+          "<hammer-on number=\"1\" type=\"stop\"/>"
+        ],
+        "observedVoices": ["1", "5"],
+        "observedStaffs": ["1", "2"]
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "numberAloneIsUniquePairingId": false,
+        "automaticPairing": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+        "reason": "The same number is reused across a chained start/start+stop/stop sequence; pairing must use event identity and score context, never number alone."
+      }
+    },
+    {
+      "id": "slide-same-string-evidence-gp760",
+      "technique": "slide",
+      "sourceEvidence": {
+        "fileName": "[Air]鸟之诗.xml",
+        "sha256": "9c40607822baf52de03db555664446ecc33f5adda80fdb1aa6175b0e8a3602c6",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "start": "<slide number=\"5\" type=\"start\"/>",
+        "stop": "<slide number=\"5\" type=\"stop\"/>",
+        "path": "note/notations/slide",
+        "startPosition": { "string": "2", "fret": "1", "grace": true },
+        "stopPosition": { "string": "2", "fret": "3", "grace": false },
+        "voice": "5",
+        "staff": "2"
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "sameStringEvidence": "PRESENT_IN_SOURCE",
+        "sameStringRequirementInference": "FORBIDDEN",
+        "positionMutation": "FORBIDDEN"
+      }
+    },
+    {
+      "id": "slide-without-string-evidence-gp760",
+      "technique": "slide",
+      "sourceEvidence": {
+        "fileName": "[CLANNAD]メグメル(幻想).xml",
+        "sha256": "d87f6da5c47c2bf60f203512e7a4921bfe1985ec60898da270d57d30fa71b8c5",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "start": "<slide number=\"6\" type=\"start\"/>",
+        "stop": "<slide number=\"6\" type=\"stop\"/>",
+        "path": "note/notations/slide",
+        "technicalStringFretAtEndpoints": false,
+        "voice": "1",
+        "staff": "1"
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "sameStringEvidence": "ABSENT",
+        "sameStringRequirementInference": "FORBIDDEN",
+        "automaticPhysicalPath": "FORBIDDEN"
+      }
+    },
+    {
+      "id": "natural-harmonic-base-pitch-gp760",
+      "technique": "natural-harmonic",
+      "sourceEvidence": {
+        "fileName": "[Angel Beats!]Brave Song.xml",
+        "sha256": "666f78180e07b14aae83ac1d2733ee2a0236645cb04e965d91e5a4d168a1cfaa",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "fragment": "<harmonic><natural/><base-pitch/></harmonic>",
+        "path": "note/notations/technical/harmonic",
+        "observedWithStringFret": true,
+        "observedWithoutStringFret": true
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "normalizedSemantics": "HARMONIC_NATURAL_BASE_PITCH",
+        "soundingPitchInference": "FORBIDDEN",
+        "positionAuthority": "FORBIDDEN"
+      }
+    },
+    {
+      "id": "artificial-harmonic-pitch-role-chord-gp760",
+      "technique": "artificial-harmonic",
+      "sourceEvidence": {
+        "fileName": "[Angel Beats!]Brave Song.xml",
+        "sha256": "666f78180e07b14aae83ac1d2733ee2a0236645cb04e965d91e5a4d168a1cfaa",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "fragments": [
+          "<harmonic><artificial/><base-pitch/></harmonic>",
+          "<harmonic><artificial/><touching-pitch/></harmonic>",
+          "<harmonic><artificial/><sounding-pitch/></harmonic>"
+        ],
+        "path": "note/notations/technical/harmonic",
+        "chordContext": true
+      },
+      "verification": {
+        "sourceRolesAreExplicit": true,
+        "projectionCapability": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+        "reason": "The three pitch-role notes can affect solver-visible note identity if passed through naively; LAB-TECH-04 must prove a metadata-only projection invariant before clearance.",
+        "soundingPitchRewrite": "FORBIDDEN"
+      }
+    },
+    {
+      "id": "straight-mute-note-play-gp760",
+      "technique": "straight-mute",
+      "sourceEvidence": {
+        "fileName": "[Air]てんとう虫(瓢虫).xml",
+        "sha256": "6fdbccad2038ad549376778832a5ac5183fa8235907d7a69982e28d6658cae06",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "fragment": "<play><mute>straight</mute></play>",
+        "path": "note/play/mute",
+        "perNote": true
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "scopeInference": "FORBIDDEN",
+        "durationMutation": "FORBIDDEN"
+      }
+    },
+    {
+      "id": "gp7-let-ring-processing-instruction",
+      "technique": "let-ring",
+      "sourceEvidence": {
+        "fileName": "[AKB48]桜の木になろう(成为樱树吧).xml",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "fragment": "<?GP7 <root><letring/></root>?>",
+        "location": "note child processing instruction",
+        "observedOnChordAndNonChordNotes": true
+      },
+      "verification": {
+        "sourceMarkerPreservation": "RESEARCH_SUPPORTED",
+        "normalizedScopeSemantics": "UNKNOWN",
+        "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+        "reason": "The marker is producer-specific and per-note placement does not prove sounding duration or termination scope."
+      }
+    },
+    {
+      "id": "position-fingering-pluck-gp760",
+      "technique": "position",
+      "sourceEvidence": {
+        "fileName": "[CLANNAD]メグメル(幻想).xml",
+        "sha256": "d87f6da5c47c2bf60f203512e7a4921bfe1985ec60898da270d57d30fa71b8c5",
+        "producer": "Guitar Pro 7.6.0",
+        "evidenceStatus": "EXACT_SOURCE_REAUDIT"
+      },
+      "sourceShape": {
+        "observedChildren": ["string", "fret", "fingering", "pluck"],
+        "examples": ["<fingering>1</fingering>", "<pluck>2</pluck>"]
+      },
+      "verification": {
+        "individualProvenance": "SAFE_METADATA_ONLY",
+        "solverTargetAuthority": "FORBIDDEN",
+        "conflictWithPitchOrConfiguration": "FAIL_CLOSED_REQUIRED"
+      }
+    },
+    {
+      "id": "pull-off-no-producer-evidence",
+      "technique": "pull-off",
+      "sourceEvidence": { "evidenceStatus": "STANDARD_SPEC_ONLY_NO_RETRIEVED_GP760_CORPUS" },
+      "verification": { "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    },
+    {
+      "id": "bend-no-producer-evidence",
+      "technique": "bend",
+      "sourceEvidence": { "evidenceStatus": "STANDARD_SPEC_ONLY_NO_RETRIEVED_GP760_CORPUS" },
+      "verification": { "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    },
+    {
+      "id": "palm-mute-tap-no-producer-evidence",
+      "technique": "palm-mute/tap",
+      "sourceEvidence": { "evidenceStatus": "NO_RETRIEVED_GP760_CORPUS" },
+      "verification": { "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    },
+    {
+      "id": "negative-hammer-missing-stop",
+      "technique": "hammer-on",
+      "sourceEvidence": { "evidenceStatus": "SYNTHETIC_NEGATIVE" },
+      "sourceShape": { "sequence": ["<hammer-on number=\"1\" type=\"start\">H</hammer-on>"] },
+      "verification": { "pairing": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    },
+    {
+      "id": "negative-hammer-conflicting-number",
+      "technique": "hammer-on",
+      "sourceEvidence": { "evidenceStatus": "SYNTHETIC_NEGATIVE" },
+      "sourceShape": {
+        "start": "<hammer-on number=\"1\" type=\"start\">H</hammer-on>",
+        "stop": "<hammer-on number=\"2\" type=\"stop\"/>"
+      },
+      "verification": { "pairing": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    },
+    {
+      "id": "negative-slide-missing-endpoint",
+      "technique": "slide",
+      "sourceEvidence": { "evidenceStatus": "SYNTHETIC_NEGATIVE" },
+      "sourceShape": { "start": "<slide number=\"5\" type=\"start\"/>" },
+      "verification": { "pairing": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    },
+    {
+      "id": "negative-bend-malformed-or-duplicate",
+      "technique": "bend",
+      "sourceEvidence": { "evidenceStatus": "SYNTHETIC_NEGATIVE_STANDARD_SHAPE" },
+      "sourceShape": {
+        "malformed": "<bend><bend-alter>not-a-number</bend-alter></bend>",
+        "duplicate": "<bend><bend-alter>1</bend-alter><bend-alter>2</bend-alter></bend>"
+      },
+      "verification": { "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS" }
+    }
+  ]
+}
