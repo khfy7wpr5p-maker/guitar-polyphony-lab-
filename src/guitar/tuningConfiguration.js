@@ -75,21 +75,29 @@ function isPlainObject(value) {
 }
 
 function exactDataDescriptors(value, allowed, path) {
+  const tuningEntry = path.startsWith('tuning[');
+  const hostileCode = tuningEntry
+    ? 'HOSTILE_TUNING_INPUT'
+    : 'HOSTILE_GUITAR_CONFIGURATION_INPUT';
+  const unknownFieldCode = tuningEntry
+    ? 'INVALID_TUNING_ENTRY'
+    : 'INVALID_GUITAR_CONFIGURATION_FIELD';
+
   if (!isPlainObject(value)) {
-    fail('HOSTILE_GUITAR_CONFIGURATION_INPUT', `${path} must be a non-proxy plain object.`, { path });
+    fail(hostileCode, `${path} must be a non-proxy plain object.`, { path });
   }
   const descriptors = Object.getOwnPropertyDescriptors(value);
   const keys = Reflect.ownKeys(value);
   for (const key of keys) {
     if (typeof key !== 'string' || !allowed.includes(key)) {
-      fail('INVALID_GUITAR_CONFIGURATION_FIELD', `${path} contains an unknown field.`, {
+      fail(unknownFieldCode, `${path} contains an unknown field.`, {
         path,
         field: typeof key === 'symbol' ? key.toString() : key,
       });
     }
     const descriptor = descriptors[key];
     if (!descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor, 'value')) {
-      fail('HOSTILE_GUITAR_CONFIGURATION_INPUT', `${path} fields must be enumerable data properties.`, {
+      fail(hostileCode, `${path} fields must be enumerable data properties.`, {
         path,
         field: key,
       });
