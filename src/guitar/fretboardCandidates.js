@@ -1,32 +1,21 @@
-const NATURAL_PITCH_CLASSES = Object.freeze({
-  C: 0,
-  D: 2,
-  E: 4,
-  F: 5,
-  G: 7,
-  A: 9,
-  B: 11,
-});
+import {
+  STANDARD_TUNING_CONFIGURATION,
+  resolveGuitarTuningConfiguration,
+  spelledPitchToMidi,
+} from './tuningConfiguration.js';
 
-const ACCIDENTAL_OFFSETS = Object.freeze({
-  bb: -2,
-  b: -1,
-  '': 0,
-  '#': 1,
-  '##': 2,
-});
+const MAX_FRET = 24;
 
 export const STANDARD_GUITAR_PROFILE = Object.freeze({
   id: 'STANDARD_E2_E4_24_FRET_1.0',
-  maxFret: 24,
-  strings: Object.freeze([
-    Object.freeze({ string: 1, openPitch: 'E4', openMidi: 64 }),
-    Object.freeze({ string: 2, openPitch: 'B3', openMidi: 59 }),
-    Object.freeze({ string: 3, openPitch: 'G3', openMidi: 55 }),
-    Object.freeze({ string: 4, openPitch: 'D3', openMidi: 50 }),
-    Object.freeze({ string: 5, openPitch: 'A2', openMidi: 45 }),
-    Object.freeze({ string: 6, openPitch: 'E2', openMidi: 40 }),
-  ]),
+  maxFret: MAX_FRET,
+  strings: Object.freeze(
+    STANDARD_TUNING_CONFIGURATION.strings.map((entry) => Object.freeze({
+      string: entry.string,
+      openPitch: entry.pitch,
+      openMidi: entry.midi,
+    })),
+  ),
 });
 
 export class FretboardCandidateError extends Error {
@@ -42,59 +31,97 @@ function fail(code, message, details) {
   throw new FretboardCandidateError(code, message, details);
 }
 
-export function spelledPitchToMidi(pitch) {
-  if (typeof pitch !== 'string') {
-    fail('INVALID_PITCH', 'Pitch must be a spelling-preserving string.', { pitch });
+export { spelledPitchToMidi };
+
+function validatePitchMidi(midi) {
+  if (!Number.isSafeInteger(midi) || midi < 0 || midi > 127) {
+    fail('INVALID_PITCH_MIDI', 'Pitch MIDI must be an integer in the range 0..127.', { midi });
   }
-
-  const match = /^([A-G])(bb|##|b|#)?([0-9])$/.exec(pitch.trim());
-  if (!match) {
-    fail('INVALID_PITCH', 'Pitch must match A..G with optional bb/b/#/## and octave 0..9.', {
-      pitch,
-    });
-  }
-
-  const [, step, accidental = '', octaveText] = match;
-  const octave = Number(octaveText);
-  const midi =
-    (octave + 1) * 12 + NATURAL_PITCH_CLASSES[step] + ACCIDENTAL_OFFSETS[accidental];
-
-  if (!Number.isInteger(midi) || midi < 0 || midi > 127) {
-    fail('PITCH_OUTSIDE_MIDI_RANGE', 'Spelled pitch resolves outside MIDI note range 0..127.', {
-      pitch,
-      midi,
-    });
-  }
-
   return midi;
 }
 
-export function generateFretboardCandidates(pitch) {
-  const pitchMidi = spelledPitchToMidi(pitch);
+function profileId(configuration) {
+  if (configuration.preset === 'STANDARD') return STANDARD_GUITAR_PROFILE.id;
+  const pitches = configuration.strings.map((entry) => entry.pitch).join('_');
+  return `CUSTOM_TUNING_${configuration.preset}_${pitches}_${MAX_FRET}_FRET_1.0`;
+}
+
+export function getPositionCandidates(
+  pitchMidi,
+  tuningConfiguration = STANDARD_TUNING_CONFIGURATION,
+) {
+  validatePitchMidi(pitchMidi);
+  const configuration = resolveGuitarTuningConfiguration(tuningConfiguration);
   const candidates = [];
 
-  for (const stringProfile of STANDARD_GUITAR_PROFILE.strings) {
-    const fret = pitchMidi - stringProfile.openMidi;
-    if (fret < 0 || fret > STANDARD_GUITAR_PROFILE.maxFret) continue;
-
-    candidates.push(
-      Object.freeze({
-        string: stringProfile.string,
-        fret,
-        pitch,
-        pitchMidi,
-        openPitch: stringProfile.openPitch,
-      }),
-    );
+  for (const stringProfile of configuration.strings) {
+    const fret = pitchMidi - stringProfile.midi;
+    if (fret < 0 || fret > MAX_FRET) continue;
+    candidates.push(Object.freeze({
+      string: stringProfile.string,
+      fret,
+      pitchMidi,
+      openPitch: stringProfile.pitch,
+      openMidi: stringProfile.midi,
+    }));
   }
 
   return Object.freeze(candidates);
 }
 
-export function attachFretboardCandidates(noteIntervals) {
+export function positionToMidi(
+  position,
+  tuningConfiguration = STANDARD_TUNING_CONFIGURATION,
+) {
+  if (
+    !position
+    || typeof position !== 'object'
+    || Array.isArray(position)
+    || !Number.isSafeInteger(position.string)
+    || !Number.isSafeInteger(position.fret)
+    || position.string < 1
+    || position.string > 6
+    || position.fret < 0
+    || position.fret > MAX_FRET
+  ) {
+    fail('INVALID_POSITION', 'Position must contain a string 1..6 and fret 0..24.', { position });
+  }
+  const configuration = resolveGuitarTuningConfiguration(tuningConfiguration);
+  const stringDefinition = configuration.strings[position.string - 1];
+  const midi = stringDefinition.midi + position.fret;
+  return validatePitchMidi(midi);
+}
+
+export function generateFretboardCandidates(
+  pitch,
+  tuningConfiguration = STANDARD_TUNING_CONFIGURATION,
+) {
+  let pitchMidi;
+  try {
+    pitchMidi = spelledPitchToMidi(pitch);
+  } catch (error) {
+    if (error && error.code === 'INVALID_PITCH') {
+      fail('INVALID_PITCH', error.message, error.details);
+    }
+    throw error;
+  }
+
+  return Object.freeze(
+    getPositionCandidates(pitchMidi, tuningConfiguration).map((candidate) => Object.freeze({
+      ...candidate,
+      pitch,
+    })),
+  );
+}
+
+export function attachFretboardCandidates(
+  noteIntervals,
+  tuningConfiguration = STANDARD_TUNING_CONFIGURATION,
+) {
   if (!Array.isArray(noteIntervals)) {
     fail('INVALID_NOTE_INTERVALS', 'noteIntervals must be an array.');
   }
+  const configuration = resolveGuitarTuningConfiguration(tuningConfiguration);
 
   const seenIds = new Set();
   const result = noteIntervals.map((note, index) => {
@@ -112,12 +139,13 @@ export function attachFretboardCandidates(noteIntervals) {
     }
     seenIds.add(note.id);
 
-    const fretboardCandidates = generateFretboardCandidates(note.pitch);
+    const fretboardCandidates = generateFretboardCandidates(note.pitch, configuration);
     return Object.freeze({
       ...note,
       fretboardCandidates,
       playableOnProfile: fretboardCandidates.length > 0,
-      fretboardProfileId: STANDARD_GUITAR_PROFILE.id,
+      fretboardProfileId: profileId(configuration),
+      tuningPreset: configuration.preset,
     });
   });
 
