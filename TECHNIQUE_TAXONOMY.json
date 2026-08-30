@@ -1,0 +1,156 @@
+{
+  "documentType": "GuitarTechniqueTaxonomy",
+  "contractVersion": "1.0.0",
+  "stage": "LAB-TECH-01",
+  "evidencePolicy": {
+    "rule": "Record only shapes supported by retained repository evidence; incomplete external-corpus shapes remain blocked until the original source is re-audited.",
+    "productionSnapshot": "bb8c5f0be3c0f352d64026c988e61ba6af9dc3f3",
+    "retainedEvidence": [
+      "docs/GUITAR_PRO_HARMONIC_PLAY_POST_225_AUDIT.md",
+      "guitar-pro-harmonic-play-audit-results.json"
+    ],
+    "sourceCorpusCommitted": false
+  },
+  "capabilityClasses": [
+    "SAFE_METADATA_ONLY",
+    "PHYSICAL_SEMANTICS_SUPPORTED",
+    "BLOCKED_UNKNOWN_OR_AMBIGUOUS"
+  ],
+  "techniques": [
+    {
+      "id": "gp760-empty-technical-harmonic",
+      "kind": "HARMONIC",
+      "subtype": "guitar-pro-unspecified-harmonic-marker",
+      "producer": "Guitar Pro 7.6.0",
+      "xmlPath": "note/notations/technical/harmonic",
+      "sourceShape": {
+        "attributes": {},
+        "children": [],
+        "text": "",
+        "optionalSiblingEvidence": ["string", "fret"]
+      },
+      "state": "SINGLE",
+      "pairingBehavior": "NONE_OBSERVED",
+      "noteLinkage": "DIRECT_NOTE_NOTATIONS_TECHNICAL",
+      "voiceStaffContext": "INHERITED_FROM_SOURCE_NOTE",
+      "observedCorpus": [
+        {
+          "fileName": "[Air]鸟之诗.xml",
+          "sha256": "9c40607822baf52de03db555664446ecc33f5adda80fdb1aa6175b0e8a3602c6",
+          "committed": false
+        }
+      ],
+      "evidenceStatus": "EXACT_RETAINED_AUDIT",
+      "normalizedSemantics": "HARMONIC_UNSPECIFIED",
+      "capabilityClass": "SAFE_METADATA_ONLY",
+      "physicalSemantics": "NOT_PROVEN",
+      "notes": "The retained audit proves only an empty harmonic marker. Natural/artificial type, sounding pitch, node, string/fret authority, and pitch transformation are absent."
+    },
+    {
+      "id": "gp760-play-straight-mute",
+      "kind": "MUTE",
+      "subtype": "straight-mute",
+      "producer": "Guitar Pro 7.6.0",
+      "xmlPath": "note/play/mute",
+      "sourceShape": {
+        "attributes": {},
+        "children": [],
+        "text": "straight",
+        "parentConstraints": {
+          "playAttributes": {},
+          "sameNamespaceChildren": ["mute"]
+        }
+      },
+      "state": "SINGLE",
+      "pairingBehavior": "NONE_OBSERVED",
+      "noteLinkage": "DIRECT_NOTE_PLAY",
+      "voiceStaffContext": "INHERITED_FROM_SOURCE_NOTE",
+      "observedCorpus": [
+        {
+          "fileName": "[Beck]Face.xml",
+          "sha256": "8d22370d81ac4cab63f27e440c006e85b35f50303ba4041e026ae39094ba0104",
+          "committed": false
+        },
+        {
+          "fileName": "[CLANNAD]メグメル(幻想).xml",
+          "sha256": "d87f6da5c47c2bf60f203512e7a4921bfe1985ec60898da270d57d30fa71b8c5",
+          "committed": false
+        }
+      ],
+      "evidenceStatus": "EXACT_RETAINED_AUDIT",
+      "normalizedSemantics": "MUTE_STRAIGHT",
+      "capabilityClass": "SAFE_METADATA_ONLY",
+      "physicalSemantics": "NOT_PROVEN",
+      "notes": "The retained audit proves note-level performance/timbre provenance only. Duration and scope must not be inferred."
+    },
+    {
+      "id": "gp760-technical-hammer-on",
+      "kind": "HAMMER_ON",
+      "subtype": "producer-observed-unresolved-shape",
+      "producer": "Guitar Pro 7.6.0",
+      "xmlPath": "note/notations/technical/hammer-on",
+      "sourceShape": {
+        "attributes": "UNKNOWN_NOT_RETAINED",
+        "children": "UNKNOWN_NOT_RETAINED",
+        "text": "UNKNOWN_NOT_RETAINED"
+      },
+      "state": "UNKNOWN",
+      "pairingBehavior": "UNKNOWN_REQUIRES_SOURCE_REAUDIT",
+      "noteLinkage": "DIRECT_NOTE_NOTATIONS_TECHNICAL",
+      "voiceStaffContext": "SOURCE_NOTE_CONTEXT_NOT_RETAINED_IN_AUDIT",
+      "observedCorpus": [
+        {
+          "fileName": "[Air]鸟之诗.xml",
+          "sha256": "9c40607822baf52de03db555664446ecc33f5adda80fdb1aa6175b0e8a3602c6",
+          "committed": false
+        }
+      ],
+      "evidenceStatus": "PARTIAL_REQUIRES_SOURCE_REAUDIT",
+      "normalizedSemantics": "UNKNOWN",
+      "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "physicalSemantics": "NOT_PROVEN",
+      "notes": "The retained post-#225 audit proves the blocker kind and path but not exact attributes, numbering, text, or start/stop pairing."
+    },
+    {
+      "id": "gp760-artificial-harmonic-structure",
+      "kind": "HARMONIC",
+      "subtype": "artificial-harmonic-with-pitch-components",
+      "producer": "Guitar Pro 7.6.0",
+      "xmlPath": "note/notations/technical",
+      "sourceShape": {
+        "attributes": "UNKNOWN_NOT_RETAINED",
+        "children": ["artificial-harmonic semantics with base/touching/sounding pitch components"],
+        "text": "UNKNOWN_NOT_RETAINED"
+      },
+      "state": "UNKNOWN",
+      "pairingBehavior": "UNKNOWN_REQUIRES_SOURCE_REAUDIT",
+      "noteLinkage": "DIRECT_NOTE_NOTATIONS_TECHNICAL",
+      "voiceStaffContext": "SOURCE_NOTE_CONTEXT_NOT_RETAINED_IN_AUDIT",
+      "observedCorpus": [
+        {
+          "fileName": "[CLANNAD]メグメル(幻想).xml",
+          "sha256": "d87f6da5c47c2bf60f203512e7a4921bfe1985ec60898da270d57d30fa71b8c5",
+          "committed": false
+        }
+      ],
+      "evidenceStatus": "PARTIAL_REQUIRES_SOURCE_REAUDIT",
+      "normalizedSemantics": "UNKNOWN",
+      "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "physicalSemantics": "NOT_PROVEN",
+      "notes": "The retained audit explicitly classifies this as a legitimate blocker because pitch-component semantics are present but the exact source structure is not retained."
+    }
+  ],
+  "notObservedOrNotYetRetained": [
+    "pull-off",
+    "slide",
+    "bend",
+    "natural-harmonic explicit form",
+    "palm-mute",
+    "let-ring",
+    "tap",
+    "fingering",
+    "pluck",
+    "up-bow/down-bow in guitar producer output",
+    "producer-specific technical children beyond the retained audit"
+  ]
+}
