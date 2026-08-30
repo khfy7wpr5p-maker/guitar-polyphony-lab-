@@ -1,0 +1,58 @@
+{
+  "documentType": "GuitarTechniqueFixtureIndex",
+  "contractVersion": "1.0.0",
+  "stage": "LAB-TECH-01",
+  "entries": [
+    {
+      "id": "synthetic-empty-technical-harmonic",
+      "path": "fixtures/techniques/guitar-pro-7.6.0-empty-technical-harmonic.musicxml",
+      "sourceType": "SYNTHETIC_MINIMAL",
+      "producerProfile": "Guitar Pro 7.6.0 retained shape",
+      "taxonomyId": "gp760-empty-technical-harmonic",
+      "lawfulFixture": true,
+      "expectedCapabilityClass": "SAFE_METADATA_ONLY"
+    },
+    {
+      "id": "synthetic-play-straight-mute",
+      "path": "fixtures/techniques/guitar-pro-7.6.0-play-straight-mute.musicxml",
+      "sourceType": "SYNTHETIC_MINIMAL",
+      "producerProfile": "Guitar Pro 7.6.0 retained shape",
+      "taxonomyId": "gp760-play-straight-mute",
+      "lawfulFixture": true,
+      "expectedCapabilityClass": "SAFE_METADATA_ONLY"
+    },
+    {
+      "id": "external-air-tori-no-uta",
+      "path": null,
+      "sourceType": "EXTERNAL_REAL_CORPUS",
+      "fileName": "[Air]鸟之诗.xml",
+      "sha256": "9c40607822baf52de03db555664446ecc33f5adda80fdb1aa6175b0e8a3602c6",
+      "committed": false,
+      "taxonomyIds": [
+        "gp760-empty-technical-harmonic",
+        "gp760-technical-hammer-on"
+      ]
+    },
+    {
+      "id": "external-beck-face",
+      "path": null,
+      "sourceType": "EXTERNAL_REAL_CORPUS",
+      "fileName": "[Beck]Face.xml",
+      "sha256": "8d22370d81ac4cab63f27e440c006e85b35f50303ba4041e026ae39094ba0104",
+      "committed": false,
+      "taxonomyIds": ["gp760-play-straight-mute"]
+    },
+    {
+      "id": "external-clannad-megumeru",
+      "path": null,
+      "sourceType": "EXTERNAL_REAL_CORPUS",
+      "fileName": "[CLANNAD]メグメル(幻想).xml",
+      "sha256": "d87f6da5c47c2bf60f203512e7a4921bfe1985ec60898da270d57d30fa71b8c5",
+      "committed": false,
+      "taxonomyIds": [
+        "gp760-play-straight-mute",
+        "gp760-artificial-harmonic-structure"
+      ]
+    }
+  ]
+}
