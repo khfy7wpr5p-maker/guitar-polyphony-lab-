@@ -1,0 +1,57 @@
+{
+  "documentType": "GuitarTechniqueProvenanceContract",
+  "contractVersion": "1.0.0",
+  "stage": "LAB-TECH-02",
+  "authority": "PROVENANCE_ONLY",
+  "fields": {
+    "kind": "HAMMER_ON | PULL_OFF | SLIDE | BEND | HARMONIC | MUTE | LET_RING | TAP | POSITION | OTHER",
+    "subtype": "bounded producer or standard subtype",
+    "state": "START | STOP | SINGLE | UNKNOWN",
+    "sourcePath": "bounded exact MusicXML note-relative path",
+    "sourceAttributes": "bounded immutable copy with at most 16 string attributes",
+    "sourceText": "bounded optional source text",
+    "pairingId": "nullable; START/STOP only",
+    "pairingBasis": "nullable or DETERMINISTIC_SOURCE_IDENTITY",
+    "sourcePairingToken": "nullable; required with deterministic pairing",
+    "normalizedSemantics": "known bounded semantic token or UNKNOWN",
+    "capabilityClass": "SAFE_METADATA_ONLY | PHYSICAL_SEMANTICS_SUPPORTED | BLOCKED_UNKNOWN_OR_AMBIGUOUS"
+  },
+  "rules": [
+    "LAB-TECH-02 rejects PHYSICAL_SEMANTICS_SUPPORTED at runtime.",
+    "BLOCKED_UNKNOWN_OR_AMBIGUOUS must use normalizedSemantics UNKNOWN.",
+    "SINGLE and UNKNOWN records cannot carry pairing identity.",
+    "START/STOP pairing identity requires an explicit deterministic source token.",
+    "Pair validation never guesses or repairs missing, duplicate, or conflicting pair identity.",
+    "The contract carries no pitch, octave, onset, duration, voice, staff, tie, grace, chord membership, candidate, ranking, or solver fields."
+  ],
+  "knownMetadataOnlyMappingsFromLabTech01": [
+    {
+      "taxonomyId": "gp760-empty-technical-harmonic",
+      "kind": "HARMONIC",
+      "state": "SINGLE",
+      "normalizedSemantics": "HARMONIC_UNSPECIFIED",
+      "capabilityClass": "SAFE_METADATA_ONLY"
+    },
+    {
+      "taxonomyId": "gp760-play-straight-mute",
+      "kind": "MUTE",
+      "state": "SINGLE",
+      "normalizedSemantics": "MUTE_STRAIGHT",
+      "capabilityClass": "SAFE_METADATA_ONLY"
+    }
+  ],
+  "blockedMappingsFromLabTech01": [
+    {
+      "taxonomyId": "gp760-technical-hammer-on",
+      "normalizedSemantics": "UNKNOWN",
+      "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "reason": "exact attributes/text/start-stop pairing are not retained"
+    },
+    {
+      "taxonomyId": "gp760-artificial-harmonic-structure",
+      "normalizedSemantics": "UNKNOWN",
+      "capabilityClass": "BLOCKED_UNKNOWN_OR_AMBIGUOUS",
+      "reason": "exact pitch-component hierarchy is not retained"
+    }
+  ]
+}
