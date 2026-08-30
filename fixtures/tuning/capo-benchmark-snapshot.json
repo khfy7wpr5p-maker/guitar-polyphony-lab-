@@ -1,0 +1,108 @@
+{
+  "benchmarkVersion": "TUNING-LAB-02.1",
+  "fretSemantics": "RELATIVE_FROM_CAPO",
+  "cases": {
+    "standard-capo-0": {
+      "ps6-counterpoint-2v.musicxml": {
+        "candidateCount": 3,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:0", "A2@5:0"]
+      },
+      "ps6-counterpoint-4v-tie.musicxml": {
+        "candidateCount": 10,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:0", "A2@5:0", "D3@4:0", "G3@3:0"]
+      },
+      "deterministicRerun": true,
+      "tieConsistency": "PASS",
+      "graceConsistency": "PASS"
+    },
+    "standard-capo-2": {
+      "ps6-counterpoint-2v.musicxml": {
+        "candidateCount": 1,
+        "playable": false,
+        "solverStatus": "BLOCKED",
+        "selectedPositions": []
+      },
+      "ps6-counterpoint-4v-tie.musicxml": {
+        "candidateCount": 6,
+        "playable": false,
+        "solverStatus": "BLOCKED",
+        "selectedPositions": []
+      },
+      "deterministicRerun": true,
+      "tieConsistency": "PASS",
+      "graceConsistency": "PASS"
+    },
+    "drop-d-capo-0": {
+      "ps6-counterpoint-2v.musicxml": {
+        "candidateCount": 3,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:2", "A2@5:0"]
+      },
+      "ps6-counterpoint-4v-tie.musicxml": {
+        "candidateCount": 10,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:2", "A2@5:0", "D3@4:0", "G3@3:0"]
+      },
+      "deterministicRerun": true,
+      "tieConsistency": "PASS",
+      "graceConsistency": "PASS"
+    },
+    "drop-d-capo-2": {
+      "ps6-counterpoint-2v.musicxml": {
+        "candidateCount": 2,
+        "playable": false,
+        "solverStatus": "BLOCKED",
+        "selectedPositions": []
+      },
+      "ps6-counterpoint-4v-tie.musicxml": {
+        "candidateCount": 7,
+        "playable": false,
+        "solverStatus": "BLOCKED",
+        "selectedPositions": []
+      },
+      "deterministicRerun": true,
+      "tieConsistency": "PASS",
+      "graceConsistency": "PASS"
+    },
+    "custom-capo-0": {
+      "ps6-counterpoint-2v.musicxml": {
+        "candidateCount": 3,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:4", "A2@5:2"]
+      },
+      "ps6-counterpoint-4v-tie.musicxml": {
+        "candidateCount": 10,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:4", "A2@5:2", "D3@4:2", "G3@3:2"]
+      },
+      "deterministicRerun": true,
+      "tieConsistency": "PASS",
+      "graceConsistency": "PASS"
+    },
+    "custom-capo-2": {
+      "ps6-counterpoint-2v.musicxml": {
+        "candidateCount": 3,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:2", "A2@5:0"]
+      },
+      "ps6-counterpoint-4v-tie.musicxml": {
+        "candidateCount": 10,
+        "playable": true,
+        "solverStatus": "PASS",
+        "selectedPositions": ["E2@6:2", "A2@5:0", "D3@4:0", "G3@3:0"]
+      },
+      "deterministicRerun": true,
+      "tieConsistency": "PASS",
+      "graceConsistency": "PASS"
+    }
+  }
+}
