@@ -17,6 +17,21 @@ const CAPABILITY_CLASSES = new Set([
   'PHYSICAL_SEMANTICS_SUPPORTED',
   'BLOCKED_UNKNOWN_OR_AMBIGUOUS',
 ]);
+const FORBIDDEN_MUSICAL_FACT_FIELDS = new Set([
+  'pitch',
+  'octave',
+  'onset',
+  'duration',
+  'voice',
+  'staff',
+  'tie',
+  'grace',
+  'chordMembership',
+  'candidate',
+  'candidates',
+  'ranking',
+  'solverState',
+]);
 
 export class GuitarTechniqueProvenanceError extends Error {
   constructor(code, message, details = {}) {
@@ -69,6 +84,18 @@ function normalizeOptionalSourceText(value) {
   return boundedString(value, 'sourceText', { min: 0, max: 256 });
 }
 
+function rejectMusicalFactAuthority(input) {
+  for (const field of FORBIDDEN_MUSICAL_FACT_FIELDS) {
+    if (Object.hasOwn(input, field)) {
+      fail(
+        'MUSICAL_FACT_AUTHORITY_FORBIDDEN',
+        'Guitar technique provenance must not carry or override source musical facts or solver state.',
+        { field },
+      );
+    }
+  }
+}
+
 function validatePairing({ state, pairingId, pairingBasis, sourcePairingToken }) {
   const hasAnyPairing = pairingId !== undefined || pairingBasis !== undefined || sourcePairingToken !== undefined;
   if (!hasAnyPairing) {
@@ -93,6 +120,7 @@ export function createGuitarTechniqueProvenance(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
     fail('INVALID_TECHNIQUE_PROVENANCE_INPUT', 'Technique provenance input must be an object.');
   }
+  rejectMusicalFactAuthority(input);
 
   const kind = input.kind;
   if (!KINDS.has(kind)) fail('UNKNOWN_TECHNIQUE_KIND', 'Unknown guitar technique kind.', { kind });
