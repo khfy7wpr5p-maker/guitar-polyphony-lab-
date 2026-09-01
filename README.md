@@ -16,6 +16,7 @@ The existing Lab work is retained but its authority is bounded:
 - **P1C:** compatibility corpus → corpus / regression foundation
 - **P2A:** deterministic, configuration-aware fretboard candidate enumeration
 - **P2B:** bounded, distinct-string sonority assignment enumeration
+- **V1B:** deterministic Lab/Engine semantic snapshot comparison without runtime coupling
 - **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
 - **Technique research:** bounded source-provenance sidecars that are deliberately excluded from physical solving
 
@@ -37,12 +38,12 @@ It does not perform OMR, PDF rendering, audio/MIDI transcription, playback, UI r
 | Technique provenance sidecars | 🟡 PARTIAL | Metadata only; no physical-technique authority |
 | Technique-driven physical solver behavior | ⚠️ FAIL-CLOSED | No technique is authorized to affect candidates, path, or ranking |
 | MIDI input or evidence | ❌ UNSUPPORTED | No MIDI parser, contract, or fixture exists |
-| Engine/Lab semantic comparator | 📋 PLANNED | V1B has no implementation in this repository |
+| Engine/Lab semantic comparator | 🟡 PARTIAL | V1B comparator core implemented; pinned real Engine-generated artifacts still pending |
 
 ### V1 status
 
 - **V1A Corpus Registry:** complete initial slice. Existing internal fixtures now carry pinned source provenance, license notice, SHA-256, MusicXML version, semantic expectations, and fail-closed registry validation.
-- **V1B Engine/Lab Semantic Comparator:** next verification slice.
+- **V1B Engine/Lab Semantic Comparator:** comparator core and deterministic mismatch report implemented. Remaining integration work is to pin real Engine-generated `PolyphonicSourceModel 1.0.0` artifacts for approved fixtures and compare them in Lab CI.
 - **V1C External MusicXML Polyphony Compatibility Corpus:** future; only after source and fixture licensing are verified.
 
 The intended verification flow is:
@@ -71,7 +72,7 @@ semantic oracle                  parser/projector
           musicxml-to-guitar-tab-engine
 ```
 
-Comparison is semantic rather than visual. Relevant facts include source-note identity, pitch, onset, duration, voice, staff, tie evidence, sustain-chain membership, active-sonority membership, and peak polyphony.
+Current V1B comparison is semantic rather than visual. It compares source-note identity, written pitch, onset, duration, voice, staff, tie evidence, active-sonority membership, and peak polyphony. Cross-measure sustain-chain comparison remains outside the implemented V1B slice until both sides expose a compatible reviewed contract.
 
 ## Safety boundaries
 
@@ -90,6 +91,7 @@ See:
 - `docs/ARCHITECTURE.md`
 - `docs/REPOSITORY_REALITY.md` — fresh-read module, contract, corpus, and test inventory
 - `docs/DOCUMENTATION_AUDIT.md` — status of every maintained document
+- `docs/V1B-SEMANTIC-COMPARATOR.md`
 - `docs/P1A-INPUT-GATE.md`
 - `docs/P1B-PARSER-ADAPTER.md`
 - `docs/P1C-COMPATIBILITY-MATRIX.md`
