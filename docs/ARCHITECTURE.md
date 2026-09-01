@@ -18,6 +18,7 @@ Existing work is retained rather than deleted, but its role is explicitly non-pr
 - **P1C compatibility corpus:** corpus / regression foundation
 - **P2A fretboard candidate generation:** fretboard reference/oracle
 - **P2B distinct-string sonority assignment:** sonority-assignment reference/oracle
+- **V1B semantic comparator:** Lab snapshot ↔ Engine `PolyphonicSourceModel 1.0.0` evidence comparison
 - **configuration-aware research verification:** immutable tuning/capo facts plus sustained and grace verifiers
 - **technique provenance:** metadata-only source evidence with an explicit physical-semantics gate
 
@@ -41,25 +42,30 @@ Lab reference semantic events
     v
 reference note intervals / sonority spans
     |
-    +-------------------------------+
-    |                               |
-    |                               | same fixture
-    |                               v
-    |                    musicxml-to-guitar-tab-engine
-    |                    parser / projector authority
-    |                               |
-    +---------------+---------------+
+    | buildLabSemanticSnapshot()
+    v
+Lab semantic snapshot ------------------------------+
+                                                    |
+                                                    | same source part
+musicxml-to-guitar-tab-engine                       |
+parser / projector authority                        |
+    |                                               |
+    v                                               |
+Engine-produced PolyphonicSourceModel 1.0.0         |
+    |                                               |
+    | adaptEnginePolyphonicSourceModel()            |
+    v                                               |
+Engine semantic snapshot ---------------------------+
                     |
-                    | V1B
+                    | V1B compareSemanticSnapshots()
                     v
-          semantic comparator
-                    |
-                    v
-       deterministic mismatch report
+          deterministic mismatch report
                     |
                     v
         reviewed production PR
 ```
+
+The Lab does not import Engine runtime code. V1B consumes Engine-produced data only.
 
 P2A/P2B may provide independent reference facts for fretboard feasibility and bounded sonority assignment. They accept the Lab's immutable Standard, Drop D, custom-tuning, and capo configurations. They do not extend into a Lab-owned production path solver.
 
@@ -135,20 +141,25 @@ P0 is not responsible for production XML syntax authority, cross-measure product
 
 V1A records corpus provenance and expectations. External fixtures require source and license metadata before they are eligible for registry promotion.
 
-V1B compares semantic facts, not visual output. The comparison surface should remain deterministic and versioned, including where available:
+V1B now implements a deterministic, versioned comparison surface in `src/verification/semanticComparator.js`. Current compared facts are:
 
-- source-note identity;
-- pitch;
-- onset;
-- duration;
+- source-note identity as `partId + measureIndex + sourceNoteIndex`;
+- written pitch;
+- onset in divisions;
+- duration in divisions;
 - voice;
 - staff;
-- tie start/stop;
-- sustain-chain membership;
+- tie start/stop evidence;
 - active-sonority membership;
 - peak polyphony.
 
-A mismatch report is evidence. It does not itself authorize a production behavior change.
+Source rests count in `sourceNoteIndex` ordering even though P0 does not create note intervals for rests. This keeps Lab and Engine source identity aligned.
+
+Cross-measure sustain-chain membership is **not** part of the implemented V1B contract because the Lab does not currently own a cross-measure tie-joining contract. That comparison remains fail-closed until both sides expose a compatible reviewed representation.
+
+The comparator accepts Engine `PolyphonicSourceModel 1.0.0` evidence as data. It does not import the Engine or call Engine runtime code. A mismatch report is evidence. It does not itself authorize a production behavior change.
+
+The remaining V1B integration work is to pin real Engine-generated source-model artifacts for approved compatibility fixtures and run those artifacts through the comparator in Lab CI.
 
 ## Evidence-to-production boundary
 
