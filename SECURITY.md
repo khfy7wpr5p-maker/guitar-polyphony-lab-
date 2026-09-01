@@ -2,11 +2,11 @@
 
 ## Current status
 
-P0 contains no raw XML parser and no external runtime dependency. It operates only on already-decoded semantic events.
+P0 contains no raw XML parser and no external runtime dependency. It operates only on already-decoded semantic events. Raw MusicXML first passes the implemented P1A gate and P1B parser adapter.
 
 ## Trust boundaries
 
-Future MusicXML input is untrusted. Parser and corpus ingestion code must assume malformed, adversarial, or unexpectedly large input.
+MusicXML input is untrusted. Parser and corpus ingestion code must assume malformed, adversarial, or unexpectedly large input.
 
 The XML boundary must not:
 

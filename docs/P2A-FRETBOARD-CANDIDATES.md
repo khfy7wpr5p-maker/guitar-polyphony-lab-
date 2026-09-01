@@ -2,11 +2,11 @@
 
 ## Scope
 
-P2A converts each spelling-preserving pitch into every physically available position on one bounded standard-guitar profile.
+P2A converts each spelling-preserving pitch into every physically available position on a bounded six-string `GuitarConfiguration`. Standard tuning is the default; Drop D, fully custom six-string tunings, and capo configurations are accepted by the same implementation.
 
 This stage is **candidate generation only**. It does not select, rank, optimize, or prefer any position.
 
-## Fretboard profile
+## Default fretboard profile
 
 Authority id:
 
@@ -25,7 +25,7 @@ Profile:
 | 5 | A2 | 45 |
 | 6 | E2 | 40 |
 
-Valid fret range is `0..24` inclusive.
+The default valid relative-fret range is `0..24` inclusive. With capo, relative fret `0` is the capoed open string and sounding MIDI is `openMidi + capoFret + relativeFret`.
 
 ## Pitch identity
 
@@ -71,7 +71,7 @@ A2 -> [5/0, 6/5]
 E4 -> [1/0, 2/5, 3/9, 4/14, 5/19, 6/24]
 ```
 
-An empty candidate array means the pitch is valid but has no playable position inside this bounded profile. It is evidence, not an exception and not permission to transpose the source pitch.
+An empty candidate array means the pitch is valid but has no playable position inside the active bounded configuration. It is evidence, not an exception and not permission to transpose the source pitch.
 
 ## Note-interval attachment
 

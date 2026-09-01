@@ -18,6 +18,8 @@ Existing work is retained rather than deleted, but its role is explicitly non-pr
 - **P1C compatibility corpus:** corpus / regression foundation
 - **P2A fretboard candidate generation:** fretboard reference/oracle
 - **P2B distinct-string sonority assignment:** sonority-assignment reference/oracle
+- **configuration-aware research verification:** immutable tuning/capo facts plus sustained and grace verifiers
+- **technique provenance:** metadata-only source evidence with an explicit physical-semantics gate
 
 These modules may be compared with production behavior. They must not be promoted to production authority merely because equivalent behavior exists in the Lab.
 
@@ -59,11 +61,11 @@ reference note intervals / sonority spans
         reviewed production PR
 ```
 
-P2A/P2B may provide independent reference facts for fretboard feasibility and bounded sonority assignment. They do not extend into a Lab-owned production path solver.
+P2A/P2B may provide independent reference facts for fretboard feasibility and bounded sonority assignment. They accept the Lab's immutable Standard, Drop D, custom-tuning, and capo configurations. They do not extend into a Lab-owned production path solver.
 
 ## Production sustained-path authority
 
-The Lab does not implement a second production P3 sustained path solver.
+The Lab does not implement a second production P3 sustained path solver. It does include an explicit deterministic sustained research verifier and a grace-transition verifier. Their lexicographic policies are research baselines only and do not become production ranking authority.
 
 Production sustained polyphony remains in `musicxml-to-guitar-tab-engine`, including its PS-1 through PS-6 pipeline and PS-5 sustained path selection. Lab research may challenge or verify production results, but it may not silently replace or override that authority.
 
@@ -122,6 +124,12 @@ A `note` can carry `chord=true`, `voice`, `staff`, and tie evidence. Rest proven
 P0 is responsible for deterministic measure cursor movement, chord onset reuse, voice-overlap reconstruction through `backup`, gap/rest cursor movement, note interval production, sonority-span production, and fail-closed validation.
 
 P0 is not responsible for production XML syntax authority, cross-measure production tie joining, grace timing, tuplets, ornaments, final fret/string assignment, production fingering optimization, TAB serialization, rendering, or playback.
+
+## Configuration and technique boundaries
+
+`src/guitar/tuningConfiguration.js` is the single Lab configuration contract for six strings and optional capo. Candidate generation, research verifiers, MusicXML staff-tuning serialization, and configuration authority resolution all consume the same normalized facts. A conflict between explicit user and MusicXML configurations is returned as a conflict, not silently resolved.
+
+`src/musicxml/guitarTechniqueProvenance.js` deliberately keeps guitar technique data in a sidecar. The LAB-TECH-04 benchmark verifies that approved `SAFE_METADATA_ONLY` records do not change source musical facts, candidate sets, assignment ordering, or sustained results. The LAB-TECH-05 gate authorizes zero techniques to affect physical behavior.
 
 ## V1 corpus and comparator boundary
 

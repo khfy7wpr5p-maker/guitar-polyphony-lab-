@@ -85,8 +85,8 @@ It produces deterministic note intervals and active-note sonority spans within a
 - multiple-part synchronization
 - repeat/navigation expansion
 - exporter-specific compatibility normalizers
-- guitar string/fret candidates
-- sustained path solving
+- full MusicXML technical-technique parsing into physical behavior
+- production sustained path solving
 - TAB writing
 
 ## Compatibility policy
