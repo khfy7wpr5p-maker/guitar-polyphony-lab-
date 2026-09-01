@@ -1,12 +1,12 @@
 # Guitar Polyphony Lab
 
-Experimental, evidence-first research and verification laboratory for sustained guitar polyphony from MusicXML semantics.
+Evidence-first research and verification laboratory for bounded guitar-polyphony semantics from MusicXML.
 
 This repository is intentionally **not** the production TAB or sustained-path authority. Production behavior belongs to `musicxml-to-guitar-tab-engine`. The Lab exists to build fixtures, semantic reference/oracle behavior, differential verification, failure reproduction, and research evidence that may later support a separately reviewed production PR.
 
 There must be no production runtime dependency from `musicxml-to-guitar-tab-engine` to this repository.
 
-## Current direction: V1 — Polyphony Verification Foundation
+## What it does
 
 The existing Lab work is retained but its authority is bounded:
 
@@ -14,10 +14,30 @@ The existing Lab work is retained but its authority is bounded:
 - **P1A:** bounded MusicXML input gate → security / hostile-input validation
 - **P1B:** parser adapter → differential parser oracle
 - **P1C:** compatibility corpus → corpus / regression foundation
-- **P2A:** fretboard candidate generation → fretboard reference/oracle
-- **P2B:** bounded distinct-string sonority assignment → sonority-assignment reference/oracle
+- **P2A:** deterministic, configuration-aware fretboard candidate enumeration
+- **P2B:** bounded, distinct-string sonority assignment enumeration
+- **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
+- **Technique research:** bounded source-provenance sidecars that are deliberately excluded from physical solving
 
-The Lab does **not** develop a second production path solver. PS-5 sustained polyphonic path selection remains owned by `musicxml-to-guitar-tab-engine`.
+The Lab contains deterministic research verifiers for sustained and grace transitions, but it does **not** own production path selection. Production authority remains `musicxml-to-guitar-tab-engine`.
+
+## What it does not do
+
+It does not perform OMR, PDF rendering, audio/MIDI transcription, playback, UI rendering, harmony analysis, Canonical TAB writing, or production MusicXML-to-TAB projection. It has no production runtime dependency contract with another repository.
+
+## Current implementation status
+
+| Area | Status | Verified boundary |
+|---|---|---|
+| MusicXML input gate and bounded partwise parser | ✅ PRODUCTION | Lab-only input/reference contract; not production Engine authority |
+| Measure timelines, voice overlap and sonority spans | ✅ PRODUCTION | Per-measure reference semantics |
+| 2-voice and 4-voice fixture coverage | 🟡 PARTIAL | Two pinned compatibility fixtures; no 3-voice fixture |
+| Fretboard candidates and distinct-string assignments | ✅ PRODUCTION | Bounded six-string research configuration |
+| Sustained/grace physical verifiers | 🧪 EXPERIMENTAL | Deterministic research baselines, not production solvers |
+| Technique provenance sidecars | 🟡 PARTIAL | Metadata only; no physical-technique authority |
+| Technique-driven physical solver behavior | ⚠️ FAIL-CLOSED | No technique is authorized to affect candidates, path, or ranking |
+| MIDI input or evidence | ❌ UNSUPPORTED | No MIDI parser, contract, or fixture exists |
+| Engine/Lab semantic comparator | 📋 PLANNED | V1B has no implementation in this repository |
 
 ### V1 status
 
@@ -68,11 +88,14 @@ Comparison is semantic rather than visual. Relevant facts include source-note id
 See:
 
 - `docs/ARCHITECTURE.md`
+- `docs/REPOSITORY_REALITY.md` — fresh-read module, contract, corpus, and test inventory
+- `docs/DOCUMENTATION_AUDIT.md` — status of every maintained document
 - `docs/P1A-INPUT-GATE.md`
 - `docs/P1B-PARSER-ADAPTER.md`
 - `docs/P1C-COMPATIBILITY-MATRIX.md`
 - `docs/POLYPHONY-MODEL.md`
 - `docs/SUPPORTED-MUSICXML.md`
+- `docs/TUNING-LAB-02.md`
 - `SECURITY.md`
 
 ## Commands

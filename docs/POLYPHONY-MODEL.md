@@ -2,7 +2,7 @@
 
 ## Ordered measure events
 
-The semantic core consumes events in MusicXML document order after a future parser adapter has decoded XML syntax.
+The semantic core consumes events in MusicXML document order after `src/musicxml/partwiseParser.js` has decoded a bounded `score-partwise` input. It also accepts the same ordered-event contract from callers that do not use the parser.
 
 ### Note
 
@@ -24,7 +24,7 @@ Rules:
 
 - `duration` is a positive safe integer in the caller's measure division units.
 - `id` is unique within the measure.
-- `pitch` is an opaque normalized pitch token at P0; pitch spelling semantics are a later contract.
+- `pitch` is a bounded spelling-preserving token at P0. The bundled parser produces tokens such as `Cb4`, `C4`, `C#4`, and `C##4`; P0 itself does not interpret them.
 - `voice` defaults to `"1"` when omitted.
 - `staff` defaults to `1` when omitted.
 - `chord=true` reuses the onset of the immediately preceding attack note and does not advance the measure cursor.
@@ -74,7 +74,7 @@ becomes:
 [4,8) -> C4 + F4
 ```
 
-This representation is the intended bridge to future sustained guitar-state search. A sustained note remains active even when another voice attacks a new note.
+This representation is an input to the Lab's existing sustained research verifier and a bridge to possible future research. A sustained note remains active even when another voice attacks a new note.
 
 ## Determinism and limits
 
