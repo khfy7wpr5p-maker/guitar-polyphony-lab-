@@ -2,29 +2,19 @@
 
 ## Status
 
-This stage establishes a Lab-only, provenance-tracked contract for explicit guitar-arrangement alternatives.
+A1 establishes a Lab-only, provenance-tracked representation for explicit guitar-arrangement alternatives. Current contract version:
 
-It does **not** automatically choose or apply musical transformations in production. It does not change `musicxml-to-guitar-tab-engine` runtime behavior, final TAB selection, export readiness, or learned-model authority.
+```text
+GuitarArrangementAlternativeSet 1.1.0
+```
+
+A1 does **not** automatically apply musical transformations in production. It does not own final TAB, export readiness, learned ranking, or production selection.
 
 ## Purpose
 
-Strict transcription and playable arrangement are different questions.
+Strict transcription and playable arrangement are separate layers. When exact source material cannot be realized directly on guitar, the architecture must be able to represent explicit alternatives without changing the original source facts.
 
-When exact source material cannot be realized directly on guitar, the architecture must be able to represent alternatives such as:
-
-- preserve the source event;
-- omit an explicitly identified event;
-- move an event by one or more octaves;
-- redistribute a source event to another target voice;
-- reduce a simultaneous group while recording exactly which source events survive;
-- revoice a group by octave-register changes;
-- arpeggiate a simultaneous group with explicit member order and spread.
-
-Every transformed alternative must remain traceable to immutable source truth.
-
-## Alignment with production vocabulary
-
-The Lab contract intentionally uses the existing production arrangement-decision vocabulary:
+Decision vocabulary is aligned with the production arrangement language:
 
 ```text
 PRESERVED
@@ -36,123 +26,52 @@ REVOICED
 ARPEGGIATED
 ```
 
-This avoids creating a second incompatible arrangement language.
+## Core invariants
 
-The Lab adds independent validation around N-best alternative sets and executable target provenance. Production remains the authority for application/runtime behavior.
+### Exact source coverage
 
-## Contract
+Every source event must be covered **exactly once in every alternative**.
 
-Implementation:
-
-```text
-src/arrangement/arrangementAlternativeSet.js
-```
-
-Main document:
+Therefore:
 
 ```text
-GuitarArrangementAlternativeSet 1.0.0
+silent note dropping -> invalid
+duplicate transformation -> invalid
+unknown source event -> invalid
 ```
 
-Each alternative contains:
+An event may disappear from the realized surface only through explicit provenance such as `OMITTED` or as a non-survivor of `CHORD_REDUCED`.
+
+### Source groups are not guitar-string bounded
+
+A1 `1.0.0` incorrectly capped source group cardinality at six. A2 research exposed that this would make piano/non-guitar source truth artificially narrow.
+
+A1 `1.1.0` corrects the boundary:
 
 ```text
-alternativeId
-candidateOrder
-candidateOrderIsPreferenceRank = false
-strategyTags[]
-reviewRequired
-musicalContentChanged
-sourceCoverageComplete
-decisions[]
+maxSourceGroupEvents = 128
+source group size != target guitar string count
 ```
 
-The set declares:
+An 8-note piano sonority is therefore preserved as an 8-note source group even if a guitar realization later keeps only six notes.
 
-```text
-productionAuthority = false
-automaticTransformationAuthority = false
-learnedRankingAuthority = false
-```
+### Exact group provenance
 
-## Source coverage invariant
+`CHORD_REDUCED`, `REVOICED`, and `ARPEGGIATED` require a known `sourceGroupId` and exact canonical source membership. Implementations may not fabricate a smaller source group simply because it is easier to play.
 
-Every source note event must be covered **exactly once in every alternative**.
+## Type-specific target facts
 
-This prevents:
-
-- silent note dropping;
-- duplicate source-event transformation;
-- an arrangement candidate that cannot explain what happened to a source event.
-
-A note may disappear from the realized musical surface only through an explicit provenance-bearing decision such as `OMITTED` or `CHORD_REDUCED`.
-
-## Group-transform invariant
-
-`CHORD_REDUCED`, `REVOICED`, and `ARPEGGIATED` are group decisions.
-
-They require:
-
-- a known `sourceGroupId`;
-- the exact canonical source membership of that group;
-- explicit target facts appropriate to the transformation.
-
-Partial or invented group membership is rejected.
-
-## Type-specific target provenance
-
-### `PRESERVED`
-
-No target mutation fields are allowed.
-
-### `OMITTED`
-
-No target mutation fields are allowed. The omission remains explicit through the decision type and source event ID.
-
-### `OCTAVE_DISPLACED`
-
-Requires a non-zero bounded whole-octave displacement:
-
-```text
-semitoneDelta = ... -24, -12, +12, +24 ...
-```
-
-The Lab derives and records target MIDI. Arbitrary pitch-class rewriting is not admitted by this V1 contract.
-
-### `VOICE_REDISTRIBUTED`
-
-Requires explicit `targetVoice`.
-
-### `CHORD_REDUCED`
-
-Requires a non-empty proper subset:
-
-```text
-survivingSourceEventIds[]
-```
-
-The source group itself remains fully represented in provenance.
-
-### `REVOICED`
-
-Requires explicit target MIDI for every group member.
-
-V1 permits only octave-register changes for each source event, preserving pitch class. This is intentionally narrower than future general harmonic transformation.
-
-### `ARPEGGIATED`
-
-Requires:
-
-```text
-orderedSourceEventIds[]
-spreadDivisions
-```
-
-The order must be an exact permutation of the original simultaneous group.
+- `PRESERVED` — no target mutation facts.
+- `OMITTED` — no target mutation facts; omission remains explicit by type and source ID.
+- `OCTAVE_DISPLACED` — bounded non-zero whole-octave `semitoneDelta`; target MIDI is derived.
+- `VOICE_REDISTRIBUTED` — explicit `targetVoice`.
+- `CHORD_REDUCED` — explicit non-empty proper subset `survivingSourceEventIds`.
+- `REVOICED` — target MIDI for every source-group member; current contract preserves pitch class by whole-octave register changes.
+- `ARPEGGIATED` — exact source-event permutation plus `spreadDivisions`.
 
 ## Strategy tags
 
-Strategy tags explain arrangement intent but do not themselves mutate notes:
+Current descriptive tags:
 
 ```text
 MELODY_PRESERVATION
@@ -163,93 +82,80 @@ REGISTER_COMPRESSION
 ARPEGGIATION
 ```
 
-They are descriptive candidate metadata, not automatic authority.
+Tags describe candidate intent; they do not mutate source truth or imply quality.
 
 ## N-best semantics
 
-`candidateOrder` is deterministic candidate order only.
-
-It does **not** mean:
-
-- best musical choice;
-- preferred fingering;
-- highest learned-model score;
-- teacher-approved choice.
-
-Therefore:
+Candidate order is deterministic enumeration only:
 
 ```text
 candidateOrderIsPreferenceRank = false
 qualityRankingNotImplied = true
 ```
 
-Future deterministic or learned ranking may operate only after candidates satisfy source/provenance and physical-validity contracts.
+The first candidate is not automatically the best musical, ergonomic, learned-model, or teacher-approved choice.
 
-## Review and export boundary
+## Review and authority boundary
 
-Any alternative containing a non-`PRESERVED` decision is marked:
+Any alternative containing a non-`PRESERVED` decision is:
 
 ```text
 reviewRequired = true
 musicalContentChanged = true
 ```
 
-All alternatives remain:
+A1 explicitly declares:
 
 ```text
 productionAuthority = false
+automaticTransformationAuthority = false
+learnedRankingAuthority = false
 exportAuthority = false
 ```
 
-This stage therefore creates the language needed for playable arrangements without silently authorizing automatic content-changing production behavior.
-
-## Relationship to V3
-
-V3 answers whether exact source material is physically feasible under declared guitar constraints.
-
-Arrangement follows only as a separate layer:
+## Relationship to V3 and A2
 
 ```text
 source truth
    |
-   v
-V3 exact + left-hand physical evidence
+V3 physical evidence
    |
-   +--> exact feasible -> strict transcription candidate
+A1 explicit source-complete alternatives
    |
-   +--> exact infeasible / explicit arrangement request
-           |
-           v
-ArrangementAlternativeSet
-   multiple explicit transformed candidates
-           |
-           v
-future physical validation of each transformed candidate
-           |
-           v
-future deterministic / learned / teacher ranking
+A2 bounded explicit-policy generation
+   |
+physical revalidation of transformed candidates
+   |
+future ranking / teacher selection
 ```
 
-Physical impossibility does not authorize silent mutation. Every transformed candidate remains explicit and reviewable.
+V3 strict infeasibility does not authorize silent mutation. A1 supplies the explicit provenance language; A2 may generate candidates only within separately declared policy.
 
 ## Current acceptance evidence
 
 Regression tests verify:
 
 - immutable alternative-set construction;
-- source input is not mutated;
+- caller-owned inputs are not mutated;
 - exact source coverage;
 - overlap rejection;
 - exact group membership;
+- piano-scale source groups larger than six are preserved;
 - bounded whole-octave displacement;
-- pitch-class-preserving V1 revoicing;
+- pitch-class-preserving register revoicing;
 - exact arpeggiation permutation;
 - explicit chord-reduction survivors;
-- unknown decision/strategy rejection;
+- unknown strategy/decision rejection;
 - candidate order is not preference rank.
 
-## Next stage
+## Current continuation
 
-The next arrangement slice should generate a **bounded candidate set from explicit policy inputs** and pass every transformed candidate back through independent physical validation.
+A2 initial static bounded generation is now implemented and benchmarked. See:
 
-Automatic note-changing production behavior remains a separate consequential gate. The Lab may research and benchmark generation policy without silently enabling it in the production Engine.
+```text
+docs/ARRANGEMENT-A2-BOUNDED-GENERATION.md
+```
+
+The next arrangement slice is A2B temporal and combined-transform research, especially arpeggiation timing semantics and broader piano/polyphonic benchmarks.
+
+Automatic note-changing production behavior remains a separate consequential gate.
