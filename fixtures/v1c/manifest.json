@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "stage": "V1C",
+  "purpose": "External licensed MusicXML capability observation and regression corpus",
+  "source": {
+    "repository": "w3c-cg/musicxmlTestSuite",
+    "commitSha": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/w3c-cg/musicxmlTestSuite/blob/77c19f7e819154c70ca1a1992e80dcda8ff82fea/LICENSE",
+    "licenseNotice": "Copyright (c) 2016-2026 Michael Scott Asato Cuthbert; MusicXML files are distributed under the repository MIT License."
+  },
+  "engine": {
+    "repository": "khfy7wpr5p-maker/musicxml-to-guitar-tab-engine",
+    "commitSha": "1d8ced644f544f7e991f7275eda77a2ce557774e"
+  },
+  "policy": {
+    "unsupportedIsLocal": true,
+    "corpusContinuesAfterCaseFailure": true,
+    "globalFailureOnlyFor": [
+      "SOURCE_PROVENANCE_MISMATCH",
+      "CORPUS_CONTRACT_INVALID",
+      "EXPECTED_OUTCOME_DRIFT",
+      "RUNNER_FAILURE"
+    ]
+  },
+  "cases": [
+    {
+      "caseId": "w3c-03b-rhythm-backup",
+      "sourcePath": "xmlFiles/03b-Rhythm-Backup.musicxml",
+      "sourceBlobSha": "dc634c939c195a6b217ecc176c7e158f4035561c",
+      "sourceSha256": null,
+      "category": "RHYTHM_BACKUP_POLYPHONY",
+      "featureTags": ["rhythm", "backup", "polyphony"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-21a-chord-basic",
+      "sourcePath": "xmlFiles/21a-Chord-Basic.musicxml",
+      "sourceBlobSha": "03fcf58e1b8d3fdf36834614b886d7f712dd9c30",
+      "sourceSha256": null,
+      "category": "CHORD_BASIC",
+      "featureTags": ["chord", "simultaneous-notes"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-23a-tuplets",
+      "sourcePath": "xmlFiles/23a-Tuplets.musicxml",
+      "sourceBlobSha": "b3ff70060e7106192156a33c0e0c83aa0a488742",
+      "sourceSha256": null,
+      "category": "TUPLETS",
+      "featureTags": ["tuplet", "time-modification"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-24a-grace-notes",
+      "sourcePath": "xmlFiles/24a-GraceNotes.musicxml",
+      "sourceBlobSha": "36437732f41aeaf88b7854cf3fad61ad9c0efeec",
+      "sourceSha256": null,
+      "category": "GRACE_NOTES",
+      "featureTags": ["grace", "ornament"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-42a-multivoice",
+      "sourcePath": "xmlFiles/42a-MultiVoice-TwoVoicesOnStaff-Lyrics.musicxml",
+      "sourceBlobSha": "2fe52bcb7e048728d17b4ecd93ca5b492ebe8857",
+      "sourceSha256": null,
+      "category": "MULTIVOICE_SINGLE_STAFF",
+      "featureTags": ["polyphony", "voices", "lyrics"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-43a-piano-staff",
+      "sourcePath": "xmlFiles/43a-PianoStaff.musicxml",
+      "sourceBlobSha": "e9455ac7fb096c5fb13ddd03aeff3166ff61e327",
+      "sourceSha256": null,
+      "category": "PIANO_MULTISTAFF",
+      "featureTags": ["piano", "multistaff", "cross-staff-source"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-45b-repeat-alternatives",
+      "sourcePath": "xmlFiles/45b-RepeatWithAlternatives.musicxml",
+      "sourceBlobSha": "fcae0ff50d9a2feebb2a5c8437c12fddd8e63af9",
+      "sourceSha256": null,
+      "category": "REPEAT_ALTERNATIVE_ENDINGS",
+      "featureTags": ["repeat", "ending", "barline"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-71e-tab-staves",
+      "sourcePath": "xmlFiles/71e-TabStaves.musicxml",
+      "sourceBlobSha": "8a87f515f1fe59aded871c9b79e4b9660ca568b6",
+      "sourceSha256": null,
+      "category": "TAB_STAFF_GUITAR",
+      "featureTags": ["tablature", "staff-tuning", "technical-string-fret"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    }
+  ]
+}
