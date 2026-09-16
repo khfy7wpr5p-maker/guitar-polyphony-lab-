@@ -80,12 +80,25 @@
       "expectedSemanticComparison": "OBSERVE"
     },
     {
-      "caseId": "w3c-42a-multivoice",
+      "caseId": "w3c-42a-multivoice-lyrics",
       "sourcePath": "xmlFiles/42a-MultiVoice-TwoVoicesOnStaff-Lyrics.musicxml",
       "sourceBlobSha": "2fe52bcb7e048728d17b4ecd93ca5b492ebe8857",
       "sourceSha256": null,
-      "category": "MULTIVOICE_SINGLE_STAFF",
+      "category": "MULTIVOICE_SINGLE_STAFF_WITH_LYRICS",
       "featureTags": ["polyphony", "voices", "lyrics"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
+      "caseId": "w3c-42b-multivoice-clef-change",
+      "sourcePath": "xmlFiles/42b-MultiVoice-MidMeasureClefChange.musicxml",
+      "sourceBlobSha": "f24eb2c144f86147553c2ff64447a7579f62c607",
+      "sourceSha256": null,
+      "category": "MULTIVOICE_MULTISTAFF_CLEF_CHANGE",
+      "featureTags": ["polyphony", "three-voices", "multistaff", "mid-measure-clef", "staccato", "slur"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
@@ -106,6 +119,19 @@
       "expectedSemanticComparison": "OBSERVE"
     },
     {
+      "caseId": "w3c-45a-simple-repeat",
+      "sourcePath": "xmlFiles/45a-SimpleRepeat.musicxml",
+      "sourceBlobSha": "464477f007376585eb3d112f2c088c5950ddc850",
+      "sourceSha256": null,
+      "category": "SIMPLE_REPEAT",
+      "featureTags": ["repeat", "barline", "repeat-times"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
       "caseId": "w3c-45b-repeat-alternatives",
       "sourcePath": "xmlFiles/45b-RepeatWithAlternatives.musicxml",
       "sourceBlobSha": "fcae0ff50d9a2feebb2a5c8437c12fddd8e63af9",
@@ -119,12 +145,25 @@
       "expectedSemanticComparison": "OBSERVE"
     },
     {
+      "caseId": "w3c-71c-fretboard-frames",
+      "sourcePath": "xmlFiles/71c-ChordsFrets.musicxml",
+      "sourceBlobSha": "dde80bded470d7f92d99318d6e7b54d460951725",
+      "sourceSha256": null,
+      "category": "GUITAR_FRETBOARD_FRAME_METADATA",
+      "featureTags": ["harmony", "fretboard-frame", "string", "fret", "fingering"],
+      "expectedLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedSemanticComparison": "OBSERVE"
+    },
+    {
       "caseId": "w3c-71e-tab-staves",
       "sourcePath": "xmlFiles/71e-TabStaves.musicxml",
       "sourceBlobSha": "8a87f515f1fe59aded871c9b79e4b9660ca568b6",
       "sourceSha256": null,
-      "category": "TAB_STAFF_GUITAR",
-      "featureTags": ["tablature", "staff-tuning", "technical-string-fret"],
+      "category": "TAB_STAFF_GUITAR_STRESS",
+      "featureTags": ["tablature", "staff-tuning", "technical-string-fret", "multipart", "grace"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
