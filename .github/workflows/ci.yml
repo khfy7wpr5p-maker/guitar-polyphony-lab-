@@ -139,6 +139,25 @@ jobs:
           node scripts/verify-a2-arrangement-benchmark.mjs
           --generated a2-generated/arrangement-generation-report.json
 
+      - name: Generate A2B temporal composition benchmark
+        run: >-
+          node scripts/run-a2b-temporal-composition-benchmark.mjs
+          --output a2b-generated/temporal-composition-report.json
+          --assert-expectations
+
+      - name: Verify committed A2B temporal composition baseline
+        run: >-
+          node scripts/verify-a2b-temporal-composition-benchmark.mjs
+          --generated a2b-generated/temporal-composition-report.json
+
+      - name: Upload A2B temporal composition benchmark
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: a2b-temporal-composition-report
+          path: a2b-generated/temporal-composition-report.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload A2 bounded arrangement benchmark
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
