@@ -15,7 +15,13 @@ import {
 const require = createRequire(import.meta.url);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PINNED_DOCTYPE = /<!DOCTYPE\s+score-partwise\s+PUBLIC\s+"-\/\/Recordare\/\/DTD MusicXML 4\.0 Partwise\/\/EN"\s+"http:\/\/www\.musicxml\.org\/dtds\/partwise\.dtd"\s*>\s*/g;
+const ANY_DOCTYPE = /<!DOCTYPE\b/i;
+const ANY_ENTITY = /<!ENTITY\b/i;
 const SHA1 = /^[a-f0-9]{40}$/;
+const ALLOWED_TRANSFORMS = new Set([
+  'IDENTITY_NO_DOCTYPE',
+  'REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE',
+]);
 
 function fail(message) {
   throw new Error(message);
@@ -46,11 +52,22 @@ function parseArgs(argv) {
 
 function readDiscovery() {
   const value = JSON.parse(fs.readFileSync(path.join(repoRoot, 'fixtures/v1c/discovery.json'), 'utf8'));
-  if (value.documentType !== 'GuitarPolyphonyV1CDiscoverySet' || value.contractVersion !== '1.0.0') {
+  if (value.documentType !== 'GuitarPolyphonyV1CDiscoverySet' || value.contractVersion !== '1.1.0') {
     fail('INVALID_V1C_DISCOVERY_CONTRACT');
   }
-  if (value.policy?.discoveryOnly !== true || value.policy?.mustBePromotedBeforeRegressionUse !== true) {
+  if (
+    value.policy?.discoveryOnly !== true
+    || value.policy?.mustBePromotedBeforeRegressionUse !== true
+    || value.policy?.rejectOtherDeclarations !== true
+  ) {
     fail('INVALID_V1C_DISCOVERY_POLICY');
+  }
+  if (
+    !Array.isArray(value.policy?.allowedSemanticProbeTransforms)
+    || value.policy.allowedSemanticProbeTransforms.length !== ALLOWED_TRANSFORMS.size
+    || value.policy.allowedSemanticProbeTransforms.some((item) => !ALLOWED_TRANSFORMS.has(item))
+  ) {
+    fail('INVALID_V1C_DISCOVERY_TRANSFORM_POLICY');
   }
   if (!SHA1.test(value.source?.commitSha || '') || !SHA1.test(value.engine?.commitSha || '')) {
     fail('INVALID_V1C_DISCOVERY_PROVENANCE');
@@ -93,15 +110,32 @@ function sha256(buffer) {
 }
 
 function createProbe(xml, caseId) {
-  const matches = [...xml.matchAll(PINNED_DOCTYPE)];
-  if (matches.length !== 1) {
-    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: observed ${matches.length} pinned declarations`);
+  if (ANY_ENTITY.test(xml)) {
+    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: entity declaration present`);
   }
+
+  const pinnedMatches = [...xml.matchAll(PINNED_DOCTYPE)];
+  const hasAnyDoctype = ANY_DOCTYPE.test(xml);
+
+  if (!hasAnyDoctype) {
+    return Object.freeze({
+      transform: 'IDENTITY_NO_DOCTYPE',
+      xml,
+    });
+  }
+
+  if (pinnedMatches.length !== 1) {
+    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: DOCTYPE is not the single pinned MusicXML 4.0 declaration`);
+  }
+
   const transformed = xml.replace(PINNED_DOCTYPE, '');
-  if (/<!DOCTYPE/i.test(transformed) || /<!ENTITY/i.test(transformed)) {
-    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: declaration remains`);
+  if (ANY_DOCTYPE.test(transformed) || ANY_ENTITY.test(transformed)) {
+    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: declaration remains after pinned transform`);
   }
-  return transformed;
+  return Object.freeze({
+    transform: 'REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE',
+    xml: transformed,
+  });
 }
 
 function labObservation(xml) {
@@ -184,19 +218,19 @@ function main() {
       projectParsedMusicXmlThroughPolyProductionCompatibilityChain,
     );
     const probe = createProbe(xml, item.caseId);
-    const probeLab = labObservation(probe);
+    const probeLab = labObservation(probe.xml);
     const probeEngine = engineObservation(
-      probe,
+      probe.xml,
       parseParsedMusicXmlDocument,
       projectParsedMusicXmlThroughPolyProductionCompatibilityChain,
     );
     return {
       ...item,
       sourceSha256: sha256(bytes),
-      semanticProbeSha256: sha256(Buffer.from(probe, 'utf8')),
+      semanticProbeSha256: sha256(Buffer.from(probe.xml, 'utf8')),
       rawInput: { lab: rawLab.summary, engine: rawEngine.summary },
       semanticProbe: {
-        transform: discovery.policy.semanticProbeTransform,
+        transform: probe.transform,
         lab: probeLab.summary,
         engine: probeEngine.summary,
         semanticComparison: semanticObservation(probeLab, probeEngine),
@@ -206,7 +240,7 @@ function main() {
 
   const report = {
     documentType: 'GuitarPolyphonyV1CDiscoveryReport',
-    contractVersion: '1.0.0',
+    contractVersion: '1.1.0',
     discoveryOnly: true,
     sourceRepository: discovery.source.repository,
     sourceCommitSha: discovery.source.commitSha,
