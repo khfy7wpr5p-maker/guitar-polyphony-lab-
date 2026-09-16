@@ -1,8 +1,8 @@
 export const V1C_CAPABILITY_CORPUS_SCHEMA_VERSION = 1;
 export const V1C_CAPABILITY_CORPUS_ERROR_CODE = 'INVALID_V1C_CAPABILITY_CORPUS';
 
-const EXPECTED_STATUSES = new Set(['OBSERVE', 'SUPPORTED', 'UNSUPPORTED_LOCAL']);
-const SEMANTIC_EXPECTATIONS = new Set(['OBSERVE', 'EQUAL', 'MISMATCH', 'NOT_COMPARABLE']);
+const EXPECTED_STATUSES = new Set(['SUPPORTED', 'UNSUPPORTED_LOCAL']);
+const SEMANTIC_EXPECTATIONS = new Set(['EQUAL', 'MISMATCH', 'NOT_COMPARABLE']);
 const SEMANTIC_PROBE_TRANSFORM = 'REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE';
 const SHA1 = /^[a-f0-9]{40}$/;
 const SHA256 = /^[a-f0-9]{64}$/;
@@ -48,7 +48,10 @@ function assertHttps(value, path) {
 function assertExpectedOutcomeShape(value, path) {
   assertRecord(value, path);
   if (!EXPECTED_STATUSES.has(value.status)) {
-    invalid('V1C expected status is not supported.', { path: `${path}.status`, status: value.status });
+    invalid('V1C expected status must be pinned to SUPPORTED or UNSUPPORTED_LOCAL.', {
+      path: `${path}.status`,
+      status: value.status,
+    });
   }
   if (
     value.errorCode !== null
@@ -58,8 +61,11 @@ function assertExpectedOutcomeShape(value, path) {
       path: `${path}.errorCode`,
     });
   }
-  if (value.status !== 'UNSUPPORTED_LOCAL' && value.errorCode !== null) {
-    invalid('Only UNSUPPORTED_LOCAL expectations may pin an errorCode.', { path });
+  if (value.status === 'SUPPORTED' && value.errorCode !== null) {
+    invalid('SUPPORTED expectations must have a null errorCode.', { path });
+  }
+  if (value.status === 'UNSUPPORTED_LOCAL' && value.errorCode === null) {
+    invalid('UNSUPPORTED_LOCAL expectations must pin an errorCode.', { path });
   }
 }
 
@@ -150,9 +156,14 @@ export function validateV1CCapabilityManifest(rawManifest) {
         path: `${path}.sourceBlobSha`,
       });
     }
-    if (item.sourceSha256 !== null && !SHA256.test(item.sourceSha256)) {
-      invalid('sourceSha256 must be null or a lowercase SHA-256 digest.', {
+    if (!SHA256.test(item.sourceSha256)) {
+      invalid('sourceSha256 must be a pinned lowercase SHA-256 digest.', {
         path: `${path}.sourceSha256`,
+      });
+    }
+    if (!SHA256.test(item.semanticProbeSha256)) {
+      invalid('semanticProbeSha256 must be a pinned lowercase SHA-256 digest.', {
+        path: `${path}.semanticProbeSha256`,
       });
     }
     assertText(item.category, `${path}.category`, 256);
@@ -165,7 +176,7 @@ export function validateV1CCapabilityManifest(rawManifest) {
     assertExpectedOutcomeShape(item.expectedProbeLab, `${path}.expectedProbeLab`);
     assertExpectedOutcomeShape(item.expectedProbeEngine, `${path}.expectedProbeEngine`);
     if (!SEMANTIC_EXPECTATIONS.has(item.expectedSemanticComparison)) {
-      invalid('V1C semantic comparison expectation is not supported.', {
+      invalid('V1C semantic comparison expectation must be pinned.', {
         path: `${path}.expectedSemanticComparison`,
         value: item.expectedSemanticComparison,
       });
