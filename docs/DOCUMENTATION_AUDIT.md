@@ -1,16 +1,17 @@
 # Documentation audit
 
-Fresh-read classification against the current V3B branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A/V2B failure evidence, committed V3A strict-feasibility evidence, committed V3B left-hand comparison evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
+Fresh-read classification against the current Arrangement A1 branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A/V2B failure evidence, committed V3A/V3B physical evidence, the new arrangement alternative-set contract, package metadata, CI, and the 2026-09-16 progressive-capability directive.
 
 | Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md` | CURRENT | project purpose, V1/V2/V3 closure and arrangement-contract continuation |
-| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V1–V3 evidence layers and arrangement/V4 direction |
-| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned evidence, current CI and exact remaining work |
+| `README.md` | CURRENT | project purpose, V1/V2/V3 closure and Arrangement A1/A2 direction |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V1–V3 evidence, A1 contract and A2/V4 direction |
+| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned evidence, A1 contract reality, current CI and exact remaining work |
 | `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible V1B loop |
 | `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license and 22-case raw/probe evidence |
 | `docs/V2-FAILURE-INTELLIGENCE.md` | CURRENT | V2A taxonomy plus completed V2B cause/location refinement |
 | `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md` | CURRENT | V3A exact-position plus V3B left-hand independent physical evidence |
+| `docs/ARRANGEMENT-NBEST-CONTRACT.md` | CURRENT | A1 source-complete explicit transformation/N-best representation boundary |
 | active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents evidence-stage restrictions from becoming permanent product ceilings |
 | `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence, not runtime authority |
 | P1/P2 stage documents | CURRENT_WITH_BOUNDARY_NOTE | bounded source/physical research contracts |
@@ -68,81 +69,67 @@ FEATURE_REGION_SET 2
 
 All six are architecture-level `REVIEW_REQUIRED` candidates. The two harmony cases deliberately retain bounded multi-occurrence scope because the Engine does not identify one exact causal occurrence.
 
-## V3A closure
+## V3 closure
 
-V3A is implemented and reproducible.
+V3A and V3B are implemented and reproducible.
 
-Core implementation/evidence:
+V3A provides exhaustive exact pitch/string/sustain reachability and preserves one proven legacy greedy false negative. V3B adds independent static left-hand finger/barre/span/reach evidence and records 6/6 normalized status parity against the pinned Engine on six comparable benchmark cases.
 
-```text
-src/guitar/strictFeasibilityOracle.js
-fixtures/v3a/benchmark.json
-artifacts/v3a/strict-feasibility-baseline.json
-scripts/run-v3a-strict-feasibility-benchmark.mjs
-scripts/verify-v3a-strict-feasibility-report.mjs
-test/strictFeasibilityOracle.test.js
-```
+Evidence exhaustion remains `INDETERMINATE_LIMIT`; it is never converted into physical impossibility.
 
-Pinned benchmark:
+## Arrangement A1 closure
+
+Arrangement A1 is implemented as a Lab-only representation contract:
 
 ```text
-cases:                               5
-FEASIBLE:                            2
-INFEASIBLE:                          2
-INDETERMINATE_LIMIT:                 1
-proven legacy greedy false-negative: 1
+src/arrangement/arrangementAlternativeSet.js
+test/arrangementAlternativeSet.test.js
+docs/ARRANGEMENT-NBEST-CONTRACT.md
 ```
 
-The false-negative case proves that a greedy verifier can report `BLOCKED` even though an exact sustained path exists. A single-path solver failure therefore cannot be treated as physical impossibility without independent reachability evidence.
-
-## V3B closure
-
-V3B is implemented and reproducible.
-
-Core implementation/evidence:
+A1 deliberately aligns its decision vocabulary with the existing production arrangement contract:
 
 ```text
-src/guitar/leftHandFeasibilityOracle.js
-fixtures/v3b/left-hand-benchmark.json
-artifacts/v3b/left-hand-benchmark-baseline.json
-scripts/run-v3b-left-hand-benchmark.mjs
-scripts/verify-v3b-left-hand-benchmark-report.mjs
-test/leftHandFeasibilityOracle.test.js
+PRESERVED
+OMITTED
+OCTAVE_DISPLACED
+VOICE_REDISTRIBUTED
+CHORD_REDUCED
+REVOICED
+ARPEGGIATED
 ```
 
-Declared static physical policy covers ordered fingers, barre legality, fret span, conservative extra reach, and bounded assignment enumeration.
+A1 adds these explicit invariants:
 
-Pinned benchmark:
+- every source event is covered exactly once in every alternative;
+- source events cannot silently disappear;
+- group transformations require exact canonical group membership;
+- V1 octave displacement is whole-octave only;
+- V1 revoicing preserves pitch class;
+- chord reduction records surviving source IDs;
+- arpeggiation records exact member order and spread;
+- candidate order is not a musical/learned preference rank;
+- content-changing alternatives are review-required;
+- output is immutable and caller-owned inputs are not mutated.
 
-```text
-cases:                       7
-Lab FEASIBLE:                3
-Lab INFEASIBLE:              3
-Lab INDETERMINATE_LIMIT:     1
-cross-repo comparable:       6
-pinned Engine status parity: 6 / 6
-```
-
-The Engine is comparison evidence only. The Lab implementation remains independent and does not inherit production authority.
-
-The assignment-limit case remains `INDETERMINATE_LIMIT`; computational/evidence exhaustion is not converted into physical impossibility.
+A1 explicitly has no production, automatic-transformation, learned-ranking, or export authority.
 
 ## Broad-capability interpretation rule
 
 Strict evidence validation applies at the specific evidence/trust boundary. It is not a mandate for global product blocking. Known musical facts should be preserved, uncertainty localized, and provisional/editable output retained where production safety permits.
 
-V3B `FEASIBLE` means an admissible static left-hand shape exists within the declared policy. It does not mean the fingering is optimal, comfortable for every player, or musically preferred.
+V3 strict infeasibility does not authorize silent source alteration. A1 supplies an explicit provenance language for transformed alternatives instead.
 
-V3B `INFEASIBLE` applies to the tested strict fixed-position realization under the declared policy. It does not authorize silent source alteration; recovery belongs to an explicit arrangement layer.
+Likewise, A1 does not authorize an automatic arrangement generator merely because the representation is valid. Generation and application are separate gates.
 
 ## Current continuation
 
-The principal next stage is **provenance-tracked Arrangement / N-best contracts**.
+The principal next stage is **Arrangement A2: bounded explicit-policy candidate generation + transformed-candidate physical revalidation**.
 
-This layer should define explicit, reversible transformations such as omission, octave displacement, register compression, arpeggiation, and voice prioritization. Every alternative must preserve original source facts separately and record before/after facts, reason/policy, and transformation provenance.
+A2 may research generation of omission/reduction, octave/register, arpeggiation, and voice-priority alternatives, but each candidate must be represented through A1 and independently revalidated for physical feasibility.
 
-No learned ranking should become authoritative at this stage. V4 TabCNN/FretNet-style evidence remains shadow-only until benchmark/calibration/candidate-invariance gates are satisfied.
+Automatic note-changing production behavior remains a separate consequential gate. No learned ranking should become authoritative at A2. V4 TabCNN/FretNet-style evidence remains shadow-only until benchmark/calibration/candidate-invariance gates are satisfied.
 
-The two unresolved V2B harmony occurrence sets may be refined additively and do not block arrangement-contract work.
+The two unresolved V2B harmony occurrence sets may be refined additively and do not block arrangement research.
 
 `CURRENT_RESEARCH_RECORD` means a document is accurate as a research/evidence record but is not a statement of production-engine authority.
