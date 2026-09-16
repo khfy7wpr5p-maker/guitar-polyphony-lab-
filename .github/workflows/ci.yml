@@ -49,12 +49,12 @@ jobs:
         run: npm ci --ignore-scripts --prefix .v1b-engine
 
       - name: Generate pinned real Engine V1B artifacts
-        run: node scripts/generate-v1b-engine-artifacts.cjs --engine-root .v1b-engine --output-dir .v1b-generated
+        run: node scripts/generate-v1b-engine-artifacts.cjs --engine-root .v1b-engine --output-dir v1b-generated
 
       - name: Upload V1B Engine evidence artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: v1b-engine-artifacts
-          path: .v1b-generated
+          path: v1b-generated
           if-no-files-found: error
           retention-days: 7
