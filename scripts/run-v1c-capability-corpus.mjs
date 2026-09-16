@@ -26,12 +26,7 @@ function fail(message) {
 }
 
 function parseArgs(argv) {
-  const options = {
-    externalRoot: null,
-    engineRoot: null,
-    output: null,
-    assertExpectations: false,
-  };
+  const options = { externalRoot: null, engineRoot: null, output: null, assertExpectations: false };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
     if (token === '--external-root') {
@@ -93,12 +88,7 @@ function labObservation(xml) {
     const snapshot = buildLabSemanticSnapshot(xml);
     const noteCount = snapshot.measures.reduce((sum, measure) => sum + measure.notes.length, 0);
     return {
-      summary: Object.freeze({
-        status: 'SUPPORTED',
-        errorCode: null,
-        measureCount: snapshot.measures.length,
-        noteCount,
-      }),
+      summary: Object.freeze({ status: 'SUPPORTED', errorCode: null, measureCount: snapshot.measures.length, noteCount }),
       snapshot,
     };
   } catch (error) {
@@ -106,16 +96,24 @@ function labObservation(xml) {
   }
 }
 
-function engineObservation(xml, parseParsedMusicXmlDocument, projectParsedMusicXmlToPolyphonicSourceModel) {
+function engineObservation(
+  xml,
+  parseParsedMusicXmlDocument,
+  projectParsedMusicXmlThroughPolyProductionCompatibilityChain,
+) {
   try {
     const parsed = parseParsedMusicXmlDocument(xml);
-    const model = projectParsedMusicXmlToPolyphonicSourceModel(parsed);
+    const projection = projectParsedMusicXmlThroughPolyProductionCompatibilityChain(parsed);
+    const model = projection.sourceModel;
     return {
       summary: Object.freeze({
         status: 'SUPPORTED',
         errorCode: null,
         measureCount: model.measureCount,
         noteCount: model.eventCount,
+        extractedGraceEventCount: projection.musicalMaterialAccounting.extractedGraceEventCount,
+        ignoredFeatureCount: projection.ignoredFeatures.length,
+        reviewIssueCount: projection.reviewIssues.length,
       }),
       model,
     };
@@ -125,15 +123,10 @@ function engineObservation(xml, parseParsedMusicXmlDocument, projectParsedMusicX
 }
 
 function semanticObservation(lab, engine) {
-  if (!lab.snapshot || !engine.model) {
-    return { status: 'NOT_COMPARABLE', mismatchCount: null };
-  }
+  if (!lab.snapshot || !engine.model) return { status: 'NOT_COMPARABLE', mismatchCount: null };
   const engineSnapshot = adaptEnginePolyphonicSourceModel(engine.model);
   const report = compareSemanticSnapshots(lab.snapshot, engineSnapshot);
-  return {
-    status: report.equal ? 'EQUAL' : 'MISMATCH',
-    mismatchCount: report.mismatchCount,
-  };
+  return { status: report.equal ? 'EQUAL' : 'MISMATCH', mismatchCount: report.mismatchCount };
 }
 
 function main() {
@@ -157,9 +150,9 @@ function main() {
     engineRoot,
     'src/parser/parsedMusicXmlDocument.js',
   );
-  const { projectParsedMusicXmlToPolyphonicSourceModel } = requireEngineModule(
+  const { projectParsedMusicXmlThroughPolyProductionCompatibilityChain } = requireEngineModule(
     engineRoot,
-    'src/parser/polyphonicMusicXmlProjector.js',
+    'src/app/polyProductionCompatibilityNormalizationChain.js',
   );
 
   const cases = [];
@@ -183,7 +176,7 @@ function main() {
     const rawEngine = engineObservation(
       xml,
       parseParsedMusicXmlDocument,
-      projectParsedMusicXmlToPolyphonicSourceModel,
+      projectParsedMusicXmlThroughPolyProductionCompatibilityChain,
     );
 
     const probeXml = createSemanticProbeXml(xml, item.caseId);
@@ -191,7 +184,7 @@ function main() {
     const probeEngine = engineObservation(
       probeXml,
       parseParsedMusicXmlDocument,
-      projectParsedMusicXmlToPolyphonicSourceModel,
+      projectParsedMusicXmlThroughPolyProductionCompatibilityChain,
     );
     const semantic = semanticObservation(probeLab, probeEngine);
 
@@ -200,11 +193,7 @@ function main() {
       assertExpectedOutcome(item.expectedEngine, rawEngine.summary, `${item.caseId}.rawEngine`);
       assertExpectedOutcome(item.expectedProbeLab, probeLab.summary, `${item.caseId}.probeLab`);
       assertExpectedOutcome(item.expectedProbeEngine, probeEngine.summary, `${item.caseId}.probeEngine`);
-      assertExpectedSemanticComparison(
-        item.expectedSemanticComparison,
-        semantic.status,
-        `${item.caseId}.semantic`,
-      );
+      assertExpectedSemanticComparison(item.expectedSemanticComparison, semantic.status, `${item.caseId}.semantic`);
     }
 
     cases.push({
@@ -215,10 +204,7 @@ function main() {
       declaredMusicXmlVersion: declaredMusicXmlVersion(xml),
       category: item.category,
       featureTags: item.featureTags,
-      rawInput: {
-        lab: rawLab.summary,
-        engine: rawEngine.summary,
-      },
+      rawInput: { lab: rawLab.summary, engine: rawEngine.summary },
       semanticProbe: {
         transform: manifest.policy.semanticProbeTransform,
         transformedSha256: sha256(Buffer.from(probeXml, 'utf8')),
@@ -229,20 +215,16 @@ function main() {
     });
   }
 
-  const rawCount = (side, status) => cases.filter(
-    (item) => item.rawInput[side].status === status,
-  ).length;
-  const probeCount = (side, status) => cases.filter(
-    (item) => item.semanticProbe[side].status === status,
-  ).length;
-
+  const rawCount = (side, status) => cases.filter((item) => item.rawInput[side].status === status).length;
+  const probeCount = (side, status) => cases.filter((item) => item.semanticProbe[side].status === status).length;
   const report = {
     documentType: 'GuitarPolyphonyV1CCapabilityReport',
-    contractVersion: '1.1.0',
+    contractVersion: '1.2.0',
     sourceRepository: manifest.source.repository,
     sourceCommitSha: manifest.source.commitSha,
     engineRepository: manifest.engine.repository,
     engineCommitSha: manifest.engine.commitSha,
+    engineObservationPath: 'polyProductionCompatibilityNormalizationChain',
     policy: manifest.policy,
     summary: {
       caseCount: cases.length,
