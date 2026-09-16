@@ -29,6 +29,7 @@ See `handoffs/guitar_polyphony_lab_progressive_capability_developer_prompt_2026-
 - **V1A:** corpus provenance/licensing/expectation registry
 - **V1B:** deterministic Lab ↔ production Engine semantic comparison with pinned real Engine evidence
 - **V1C:** 22-case pinned external MusicXML capability regression with local unsupported outcomes and separate raw/probe evidence
+- **V2A:** deterministic failure-family / layer / scope / handling taxonomy over all current V1C failure observations
 - **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
 - **Technique research:** bounded source-provenance sidecars kept separate from physical authority
 
@@ -40,68 +41,69 @@ The Lab contains deterministic sustained/grace research verifiers, but productio
 |---|---|---|
 | MusicXML input gate and bounded partwise parser | ✅ VERIFIED | Lab reference/security contract |
 | Measure timelines, voice overlap and sonority spans | ✅ VERIFIED | Per-measure deterministic semantics |
-| 2-voice and 4-voice compatibility fixtures | ✅ VERIFIED | Two pinned internal fixtures; broader shapes now additionally tracked by V1C |
+| 2-voice and 4-voice compatibility fixtures | ✅ VERIFIED | Two pinned internal fixtures; broader shapes tracked by V1C |
 | Fretboard candidates and distinct-string assignments | ✅ VERIFIED | Bounded six-string research configuration |
 | Sustained/grace physical verifiers | 🧪 EXPERIMENTAL | Deterministic research baselines, not production solvers |
 | Technique provenance sidecars | 🟡 PARTIAL | Metadata/source evidence only |
 | Engine/Lab semantic comparator | ✅ V1B SLICE COMPLETE | Real Engine artifacts pinned, hashed, compared, and reproducible in CI |
 | External real-world MusicXML corpus | ✅ V1C BASELINE COMPLETE | 22 pinned MIT-licensed cases; local outcomes, hashed probe evidence and sharded committed report reproducible in CI |
-| Failure intelligence | 📋 V2 NEXT | Localized capability/recovery taxonomy and mismatch/failure classification |
+| Failure intelligence | ✅ V2A FOUNDATION | 66 observed failures mapped to 8 families; semantic global-block invariant enforced; 6 generic projection cases remain for V2B refinement |
 | Independent feasibility oracle | 📋 V3 PLANNED | Separate strict-physical oracle, not production runtime authority |
 | Arrangement/N-best alternatives | 📋 FUTURE CAPABILITY | Explicit transformed alternatives with provenance; not source truth |
 | Learned guitar evidence / FretNet / TabCNN | 📋 V4 RESEARCH | Future shadow evidence/ranking provider; no production runtime integration |
 
 ## V1B reproducible evidence loop
 
-V1B closes the first real cross-repository evidence loop without creating a production runtime dependency:
-
-```text
-approved MusicXML fixture
-        |
-        +------------------------------+
-        |                              |
-        v                              v
-Lab P1A/P1B/P0                  pinned production Engine
-semantic snapshot               parser/projector
-        |                              |
-        |                              v
-        |                    PolyphonicSourceModel 1.0.0
-        |                              |
-        +---------------+--------------+
-                        |
-                        v
-                V1B comparator
-                        |
-                        v
-           deterministic equality /
-              mismatch evidence
-```
-
-Pinned Engine commit:
+V1B closes the first real cross-repository evidence loop without creating a production runtime dependency. The production Engine commit is pinned to:
 
 ```text
 1d8ced644f544f7e991f7275eda77a2ce557774e
 ```
 
-Committed production evidence is under `artifacts/v1b-engine/`. CI checks out that exact Engine commit, regenerates the two approved artifacts, requires a byte-for-byte match with the committed evidence, and runs Lab semantic-comparison tests.
+Committed production evidence is under `artifacts/v1b-engine/`. CI checks out that exact Engine commit, regenerates the approved artifacts, requires a byte-for-byte match with committed evidence, and runs Lab semantic-comparison tests.
 
 V1B compares source-note identity, written pitch, onset, duration, voice, staff, tie evidence, active-sonority membership, and peak polyphony. It intentionally does not claim string/fret, arrangement, reduction, rendering, playback, OMR, or cross-measure sustain-chain equivalence.
 
 ## V1C external capability baseline
 
-V1C adds a pinned external evidence loop using 22 files from `w3c-cg/musicxmlTestSuite` at commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea`.
+V1C uses 22 pinned files from `w3c-cg/musicxmlTestSuite` at commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea`.
 
-The selected upstream files carry external MusicXML `DOCTYPE` declarations. Raw trust-boundary behavior is therefore recorded separately from musical capability. V1C does not weaken that security gate: raw files remain rejected, while an offline CI-only semantic probe accepts only an explicitly allowed transform, structurally verifies the expected Recordare MusicXML partwise declaration, removes it for semantic observation, and hashes the transformed bytes per case.
+Raw trust-boundary behavior is recorded separately from musical capability. V1C does not weaken XML security: raw files remain rejected when they contain external DOCTYPE declarations, while the offline CI-only semantic probe applies only an explicitly allowed and structurally verified transform.
 
-The pinned probe baseline records:
+Pinned probe summary:
 
-- 17/22 cases parsed by the Lab semantic path;
-- 5/22 cases supported by the pinned Engine production compatibility chain;
-- 5 semantic `EQUAL` cases: rhythm/backup polyphony, basic chord, simple tie, piano/multistaff, and single-voice multistaff staff-change;
-- 0 semantic mismatches;
-- 17 locally unsupported/not-comparable cases with pinned error codes.
+- Lab semantic path: 17/22 supported;
+- Engine production compatibility chain: 5/22 supported;
+- semantic `EQUAL`: 5;
+- semantic `MISMATCH`: 0;
+- locally unsupported / `NOT_COMPARABLE`: 17.
 
-These counts describe only the exact pinned cases and revisions. They are not a general MusicXML conformance score. See `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
+These are exact pinned-case observations, not a general MusicXML conformance score. See `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
+
+## V2A failure intelligence
+
+V2A interprets the current V1C failure evidence without changing production behavior.
+
+Current deterministic baseline:
+
+```text
+66 failure observations
+  44 raw-input trust failures
+  22 semantic capability failures
+
+semantic failures:
+  16 -> REVIEW_REQUIRED candidates
+   6 -> UNSUPPORTED_LOCAL / NEEDS_REFINEMENT
+   0 -> BLOCKED_GLOBAL
+```
+
+The eight current families are input security, source selection, source semantic capability, rhythm compatibility, ornament compatibility, playback structure, presentation compatibility, and generic projection capability.
+
+Only raw input trust failures may map to a global reject in this V2 taxonomy. Semantic capability evidence is prevented from becoming a global block.
+
+`UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` remains intentionally generic: six cases are marked `UNKNOWN_LOCAL / NEEDS_FEATURE_REFINEMENT`. Fixture names and feature tags are treated as context, not causal proof.
+
+See `docs/V2-FAILURE-INTELLIGENCE.md`.
 
 ## Architecture direction
 
@@ -121,6 +123,10 @@ strict guitar feasibility
       +---- locally infeasible or unsupported
                   |
                   v
+          V2 failure intelligence
+      family / layer / scope / handling
+                  |
+                  v
         localized capability state
         review / approximation / recovery
                   |
@@ -138,8 +144,9 @@ Hard physical validity and source truth remain separate from preferences and lea
 
 - Development occurs on branches and through pull requests; `main` is protected-by-process even if repository rulesets do not enforce it.
 - P1A remains authoritative for bounded UTF-8 and hostile-XML rejection before Lab parsing.
-- V1C's semantic probe is offline test evidence only and does not alter raw input security behavior.
-- No Lab module is production authority for parsing, reduction, arrangement, fingering, sustained-path selection, Canonical TAB, writing, rendering, playback, or OMR.
+- V1C semantic probing is offline test evidence only and does not alter raw input security behavior.
+- V2 classifications are evidence-only; `progressiveStateCandidate` is not production runtime authority.
+- No Lab module is production authority for parsing, reduction, arrangement, fingering, sustained-path selection, Canonical TAB, writing, rendering, playback, OMR, or application UI.
 - Unsupported evidence contracts fail closed at the evidence/trust boundary.
 - Higher-level musical capability gaps should be localized rather than automatically interpreted as whole-score product failure.
 - External fixtures, models, code, or datasets require source/license provenance before promotion into repository evidence.
@@ -148,14 +155,13 @@ Hard physical validity and source truth remain separate from preferences and lea
 ## Roadmap
 
 - **V1 — Polyphony Verification Foundation**
-  - V1A Corpus Registry ✅ initial slice
-  - V1B Engine/Lab Semantic Comparator ✅ approved two-fixture reproducible slice
-  - V1C external MusicXML capability corpus ✅ 22-case pinned baseline; further corpus growth is additive
-- **V2 — Failure Intelligence** **NEXT**
-  - localized capability/recovery reasons
-  - semantic mismatch and failure-layer classification
-  - reproducible failure fixtures
-  - narrowest truthful scope for review/recovery metadata
+  - V1A Corpus Registry ✅
+  - V1B Engine/Lab Semantic Comparator ✅
+  - V1C external MusicXML capability corpus ✅ 22-case pinned baseline
+- **V2 — Failure Intelligence**
+  - V2A deterministic failure taxonomy + committed regression baseline ✅
+  - V2B bounded live error-details/location refinement for generic projection cases **NEXT**
+  - V2C semantic mismatch classification when mismatch evidence exists
 - **V3 — Independent Feasibility Oracle**
   - distinguish true strict guitar infeasibility from production search failure
   - offline/CI evidence only
@@ -185,6 +191,7 @@ Node.js 22 or newer is required.
 - `docs/DOCUMENTATION_AUDIT.md`
 - `docs/V1B-SEMANTIC-COMPARATOR.md`
 - `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`
+- `docs/V2-FAILURE-INTELLIGENCE.md`
 - `docs/FRETNET_RESEARCH.md`
 - `docs/P1A-INPUT-GATE.md`
 - `docs/P1B-PARSER-ADAPTER.md`
