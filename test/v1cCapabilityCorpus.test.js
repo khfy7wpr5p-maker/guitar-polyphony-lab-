@@ -24,7 +24,33 @@ test('V1C manifest validates the pinned external source and eleven capability ca
   assert.ok(Object.isFrozen(validated));
 });
 
-test('V1C observation mode does not turn unsupported local capability into a global contract failure', () => {
+test('V1C committed cases pin raw and probe hashes plus non-observational outcomes', () => {
+  const validated = validateV1CCapabilityManifest(manifest);
+  for (const item of validated.cases) {
+    assert.match(item.sourceSha256, /^[a-f0-9]{64}$/);
+    assert.match(item.semanticProbeSha256, /^[a-f0-9]{64}$/);
+    assert.notEqual(item.expectedLab.status, 'OBSERVE');
+    assert.notEqual(item.expectedEngine.status, 'OBSERVE');
+    assert.notEqual(item.expectedProbeLab.status, 'OBSERVE');
+    assert.notEqual(item.expectedProbeEngine.status, 'OBSERVE');
+    assert.notEqual(item.expectedSemanticComparison, 'OBSERVE');
+  }
+});
+
+test('V1C baseline pins three equal semantic comparisons without claiming broader conformance', () => {
+  const validated = validateV1CCapabilityManifest(manifest);
+  const equalCases = validated.cases
+    .filter((item) => item.expectedSemanticComparison === 'EQUAL')
+    .map((item) => item.caseId)
+    .sort();
+  assert.deepEqual(equalCases, [
+    'w3c-03b-rhythm-backup',
+    'w3c-21a-chord-basic',
+    'w3c-43a-piano-staff',
+  ]);
+});
+
+test('V1C observation helper keeps unsupported local capability distinct from runner failure', () => {
   assert.doesNotThrow(() => assertExpectedOutcome(
     { status: 'OBSERVE', errorCode: null },
     { status: 'UNSUPPORTED_LOCAL', errorCode: 'ANY_LOCAL_CODE' },
@@ -48,14 +74,22 @@ test('V1C pinned expectations detect outcome drift', () => {
   );
 });
 
-test('V1C manifest rejects duplicate identity, malformed provenance and global unsupported policy', () => {
+test('V1C manifest rejects duplicate identity, unpinned provenance and global unsupported policy', () => {
   const duplicate = structuredClone(manifest);
   duplicate.cases[1].caseId = duplicate.cases[0].caseId;
   assert.throws(() => validateV1CCapabilityManifest(duplicate), V1CCapabilityCorpusError);
 
   const badSha = structuredClone(manifest);
-  badSha.source.commitSha = 'main';
+  badSha.cases[0].sourceSha256 = null;
   assert.throws(() => validateV1CCapabilityManifest(badSha), V1CCapabilityCorpusError);
+
+  const badProbeSha = structuredClone(manifest);
+  badProbeSha.cases[0].semanticProbeSha256 = null;
+  assert.throws(() => validateV1CCapabilityManifest(badProbeSha), V1CCapabilityCorpusError);
+
+  const observe = structuredClone(manifest);
+  observe.cases[0].expectedProbeEngine = { status: 'OBSERVE', errorCode: null };
+  assert.throws(() => validateV1CCapabilityManifest(observe), V1CCapabilityCorpusError);
 
   const globalBlock = structuredClone(manifest);
   globalBlock.policy.unsupportedIsLocal = false;
