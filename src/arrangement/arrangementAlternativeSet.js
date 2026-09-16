@@ -2,7 +2,7 @@ import { types as utilTypes } from 'node:util';
 
 const { isProxy } = utilTypes;
 
-export const ARRANGEMENT_ALTERNATIVE_SET_VERSION = '1.0.0';
+export const ARRANGEMENT_ALTERNATIVE_SET_VERSION = '1.1.0';
 export const ARRANGEMENT_ALTERNATIVE_SET_DOCUMENT_TYPE = 'GuitarArrangementAlternativeSet';
 export const ARRANGEMENT_ALTERNATIVE_DOCUMENT_TYPE = 'GuitarArrangementAlternative';
 export const ARRANGEMENT_DECISION_TYPES = Object.freeze([
@@ -22,13 +22,23 @@ export const ARRANGEMENT_STRATEGY_TAGS = Object.freeze([
   'REGISTER_COMPRESSION',
   'ARPEGGIATION',
 ]);
+export const ARRANGEMENT_CONTRACT_LIMITS = Object.freeze({
+  maxAlternatives: 32,
+  maxSourceEvents: 4096,
+  maxSourceGroupEvents: 128,
+  maxIdLength: 256,
+  maxOctaveShiftSemitones: 36,
+});
 
 const DECISION_TYPE_SET = new Set(ARRANGEMENT_DECISION_TYPES);
 const STRATEGY_TAG_SET = new Set(ARRANGEMENT_STRATEGY_TAGS);
-const MAX_ALTERNATIVES = 32;
-const MAX_SOURCE_EVENTS = 4096;
-const MAX_ID_LENGTH = 256;
-const MAX_OCTAVE_SHIFT = 36;
+const GROUP_DECISION_TYPES = new Set(['CHORD_REDUCED', 'REVOICED', 'ARPEGGIATED']);
+const SINGLE_EVENT_DECISION_TYPES = new Set([
+  'PRESERVED',
+  'OMITTED',
+  'OCTAVE_DISPLACED',
+  'VOICE_REDISTRIBUTED',
+]);
 
 export class ArrangementAlternativeContractError extends Error {
   constructor(code, message, details = {}) {
@@ -56,10 +66,11 @@ function assertPlainObject(value, path) {
   return value;
 }
 
-function assertExactKeys(value, allowed, path) {
+function assertExactKeys(value, allowedKeys, path) {
   assertPlainObject(value, path);
+  const allowed = new Set(allowedKeys);
   for (const key of Reflect.ownKeys(value)) {
-    if (typeof key !== 'string' || !allowed.includes(key)) {
+    if (typeof key !== 'string' || !allowed.has(key)) {
       fail('INVALID_ARRANGEMENT_CONTRACT_FIELD', `${path} contains an unknown field.`, {
         path,
         field: typeof key === 'symbol' ? key.toString() : key,
@@ -75,7 +86,7 @@ function assertExactKeys(value, allowed, path) {
   }
 }
 
-function assertDenseArray(value, path, maximumLength = Infinity) {
+function assertDenseArray(value, path, maximumLength) {
   if (
     !Array.isArray(value)
     || isProxy(value)
@@ -95,7 +106,11 @@ function assertDenseArray(value, path, maximumLength = Infinity) {
 }
 
 function boundedId(value, path) {
-  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_ID_LENGTH) {
+  if (
+    typeof value !== 'string'
+    || value.length === 0
+    || value.length > ARRANGEMENT_CONTRACT_LIMITS.maxIdLength
+  ) {
     fail('INVALID_ARRANGEMENT_ID', `${path} must be a bounded non-empty string.`, { path });
   }
   return value;
@@ -108,38 +123,38 @@ function boundedVoice(value, path) {
   return value;
 }
 
-function clonePrimitiveRecord(record, path) {
-  assertPlainObject(record, path);
-  const output = Object.create(null);
-  for (const key of Object.keys(record).sort()) {
-    const value = record[key];
-    if (!['string', 'number', 'boolean'].includes(typeof value) && value !== null) {
-      fail('INVALID_ARRANGEMENT_TARGET', `${path}.${key} must be scalar.`, { path, key });
-    }
-    output[key] = value;
-  }
-  return Object.freeze(output);
-}
-
-function normalizeSource(source) {
-  assertExactKeys(source, ['partId', 'events', 'groups'], 'source');
-  const partId = boundedId(source.partId, 'source.partId');
-  assertDenseArray(source.events, 'source.events', MAX_SOURCE_EVENTS);
-  assertDenseArray(source.groups, 'source.groups', MAX_SOURCE_EVENTS);
+function normalizeSource(sourceInput) {
+  assertExactKeys(sourceInput, ['partId', 'events', 'groups'], 'source');
+  const partId = boundedId(sourceInput.partId, 'source.partId');
+  assertDenseArray(
+    sourceInput.events,
+    'source.events',
+    ARRANGEMENT_CONTRACT_LIMITS.maxSourceEvents,
+  );
+  assertDenseArray(
+    sourceInput.groups,
+    'source.groups',
+    ARRANGEMENT_CONTRACT_LIMITS.maxSourceEvents,
+  );
 
   const eventIds = new Set();
-  const events = source.events.map((event, index) => {
-    assertExactKeys(event, ['sourceEventId', 'midi', 'voice', 'staff'], `source.events[${index}]`);
-    const sourceEventId = boundedId(event.sourceEventId, `source.events[${index}].sourceEventId`);
+  const events = sourceInput.events.map((event, index) => {
+    const path = `source.events[${index}]`;
+    assertExactKeys(event, ['sourceEventId', 'midi', 'voice', 'staff'], path);
+    const sourceEventId = boundedId(event.sourceEventId, `${path}.sourceEventId`);
     if (eventIds.has(sourceEventId)) {
       fail('DUPLICATE_SOURCE_EVENT_ID', 'source event IDs must be unique.', { sourceEventId });
     }
     if (!Number.isSafeInteger(event.midi) || event.midi < 0 || event.midi > 127) {
-      fail('INVALID_SOURCE_EVENT_FACT', 'source event MIDI must be an integer in 0..127.', { sourceEventId });
+      fail('INVALID_SOURCE_EVENT_FACT', 'source event MIDI must be an integer in 0..127.', {
+        sourceEventId,
+      });
     }
-    const voice = boundedVoice(event.voice, `source.events[${index}].voice`);
+    const voice = boundedVoice(event.voice, `${path}.voice`);
     if (!Number.isSafeInteger(event.staff) || event.staff < 1 || event.staff > 32) {
-      fail('INVALID_SOURCE_EVENT_FACT', 'source event staff must be a positive bounded integer.', { sourceEventId });
+      fail('INVALID_SOURCE_EVENT_FACT', 'source event staff must be a positive bounded integer.', {
+        sourceEventId,
+      });
     }
     eventIds.add(sourceEventId);
     return Object.freeze({ sourceEventId, midi: event.midi, voice, staff: event.staff });
@@ -147,30 +162,43 @@ function normalizeSource(source) {
 
   const eventIndex = new Map(events.map((event) => [event.sourceEventId, event]));
   const groupIds = new Set();
-  const groups = source.groups.map((group, index) => {
-    assertExactKeys(group, ['sourceGroupId', 'sourceEventIds'], `source.groups[${index}]`);
-    const sourceGroupId = boundedId(group.sourceGroupId, `source.groups[${index}].sourceGroupId`);
+  const groups = sourceInput.groups.map((group, index) => {
+    const path = `source.groups[${index}]`;
+    assertExactKeys(group, ['sourceGroupId', 'sourceEventIds'], path);
+    const sourceGroupId = boundedId(group.sourceGroupId, `${path}.sourceGroupId`);
     if (groupIds.has(sourceGroupId)) {
       fail('DUPLICATE_SOURCE_GROUP_ID', 'source group IDs must be unique.', { sourceGroupId });
     }
-    assertDenseArray(group.sourceEventIds, `source.groups[${index}].sourceEventIds`, 6);
+    assertDenseArray(
+      group.sourceEventIds,
+      `${path}.sourceEventIds`,
+      ARRANGEMENT_CONTRACT_LIMITS.maxSourceGroupEvents,
+    );
     if (group.sourceEventIds.length < 2) {
-      fail('INVALID_SOURCE_GROUP', 'source groups must contain at least two events.', { sourceGroupId });
+      fail('INVALID_SOURCE_GROUP', 'source groups must contain at least two events.', {
+        sourceGroupId,
+      });
     }
-    const members = group.sourceEventIds.map((id, memberIndex) => boundedId(
+    const sourceEventIds = group.sourceEventIds.map((id, memberIndex) => boundedId(
       id,
-      `source.groups[${index}].sourceEventIds[${memberIndex}]`,
+      `${path}.sourceEventIds[${memberIndex}]`,
     ));
-    if (new Set(members).size !== members.length) {
+    if (new Set(sourceEventIds).size !== sourceEventIds.length) {
       fail('INVALID_SOURCE_GROUP', 'source group members must be unique.', { sourceGroupId });
     }
-    for (const sourceEventId of members) {
+    for (const sourceEventId of sourceEventIds) {
       if (!eventIndex.has(sourceEventId)) {
-        fail('UNKNOWN_SOURCE_EVENT', 'source group references an unknown event.', { sourceGroupId, sourceEventId });
+        fail('UNKNOWN_SOURCE_EVENT', 'source group references an unknown event.', {
+          sourceGroupId,
+          sourceEventId,
+        });
       }
     }
     groupIds.add(sourceGroupId);
-    return Object.freeze({ sourceGroupId, sourceEventIds: Object.freeze([...members]) });
+    return Object.freeze({
+      sourceGroupId,
+      sourceEventIds: Object.freeze([...sourceEventIds]),
+    });
   });
 
   return Object.freeze({
@@ -186,7 +214,11 @@ function normalizeStrategyTags(tags, path) {
   assertDenseArray(tags, path, ARRANGEMENT_STRATEGY_TAGS.length);
   const normalized = tags.map((tag, index) => {
     if (typeof tag !== 'string' || !STRATEGY_TAG_SET.has(tag)) {
-      fail('UNKNOWN_ARRANGEMENT_STRATEGY_TAG', 'Unknown arrangement strategy tag.', { path, index, tag });
+      fail('UNKNOWN_ARRANGEMENT_STRATEGY_TAG', 'Unknown arrangement strategy tag.', {
+        path,
+        index,
+        tag,
+      });
     }
     return tag;
   });
@@ -196,179 +228,252 @@ function normalizeStrategyTags(tags, path) {
   return Object.freeze([...normalized].sort());
 }
 
-function requireExactGroup(decision, source, path) {
-  if (decision.sourceGroupId === null || decision.sourceGroupId === undefined) {
+function normalizeSourceEventIds(value, path) {
+  assertDenseArray(
+    value,
+    path,
+    ARRANGEMENT_CONTRACT_LIMITS.maxSourceGroupEvents,
+  );
+  if (value.length === 0) {
+    fail('INVALID_ARRANGEMENT_DECISION', 'Arrangement decisions must cover at least one source event.', {
+      path,
+    });
+  }
+  const ids = value.map((id, index) => boundedId(id, `${path}[${index}]`));
+  if (new Set(ids).size !== ids.length) {
+    fail('DUPLICATE_ARRANGEMENT_SOURCE_REFERENCE', 'A decision cannot repeat a source event.', {
+      path,
+    });
+  }
+  return ids;
+}
+
+function requireKnownSourceEvents(sourceEventIds, source, path) {
+  for (const sourceEventId of sourceEventIds) {
+    if (!source.eventIndex.has(sourceEventId)) {
+      fail('UNKNOWN_SOURCE_EVENT', 'Arrangement decision references an unknown source event.', {
+        path,
+        sourceEventId,
+      });
+    }
+  }
+}
+
+function requireExactGroup(sourceEventIds, sourceGroupId, source, path) {
+  if (sourceGroupId === null) {
     fail('ARRANGEMENT_GROUP_REQUIRED', 'Group decision requires sourceGroupId.', { path });
   }
-  const group = source.groupIndex.get(decision.sourceGroupId);
+  const group = source.groupIndex.get(sourceGroupId);
   if (!group) {
     fail('UNKNOWN_SOURCE_GROUP', 'Arrangement decision references an unknown source group.', {
       path,
-      sourceGroupId: decision.sourceGroupId,
+      sourceGroupId,
     });
   }
   if (
-    group.sourceEventIds.length !== decision.sourceEventIds.length
-    || group.sourceEventIds.some((id, index) => id !== decision.sourceEventIds[index])
+    group.sourceEventIds.length !== sourceEventIds.length
+    || group.sourceEventIds.some((id, index) => id !== sourceEventIds[index])
   ) {
     fail('ARRANGEMENT_GROUP_MEMBERSHIP_MISMATCH', 'Group decision must reference exact canonical group membership.', {
       path,
-      sourceGroupId: decision.sourceGroupId,
+      sourceGroupId,
     });
   }
-  return group;
 }
 
-function normalizeTarget(decisionType, target, decision, source, path) {
+function normalizeOctaveTarget(target, sourceEventId, source, path) {
+  assertExactKeys(target, ['semitoneDelta'], path);
+  const delta = target.semitoneDelta;
+  if (
+    !Number.isSafeInteger(delta)
+    || delta === 0
+    || delta % 12 !== 0
+    || Math.abs(delta) > ARRANGEMENT_CONTRACT_LIMITS.maxOctaveShiftSemitones
+  ) {
+    fail('INVALID_OCTAVE_DISPLACEMENT', 'Octave displacement must be a non-zero bounded multiple of 12 semitones.', {
+      path,
+      semitoneDelta: delta,
+    });
+  }
+  const targetMidi = source.eventIndex.get(sourceEventId).midi + delta;
+  if (targetMidi < 0 || targetMidi > 127) {
+    fail('INVALID_OCTAVE_DISPLACEMENT', 'Octave displacement leaves MIDI range.', {
+      path,
+      targetMidi,
+    });
+  }
+  return Object.freeze({ semitoneDelta: delta, targetMidi });
+}
+
+function normalizeChordReductionTarget(target, sourceEventIds, path) {
+  assertExactKeys(target, ['survivingSourceEventIds'], path);
+  assertDenseArray(
+    target.survivingSourceEventIds,
+    `${path}.survivingSourceEventIds`,
+    ARRANGEMENT_CONTRACT_LIMITS.maxSourceGroupEvents,
+  );
+  const survivors = target.survivingSourceEventIds.map((id, index) => boundedId(
+    id,
+    `${path}.survivingSourceEventIds[${index}]`,
+  ));
+  if (survivors.length === 0 || survivors.length >= sourceEventIds.length) {
+    fail('INVALID_CHORD_REDUCTION', 'Chord reduction must keep a non-empty proper subset of the group.', {
+      path,
+    });
+  }
+  if (new Set(survivors).size !== survivors.length) {
+    fail('INVALID_CHORD_REDUCTION', 'Chord reduction survivors must be unique.', { path });
+  }
+  for (const sourceEventId of survivors) {
+    if (!sourceEventIds.includes(sourceEventId)) {
+      fail('INVALID_CHORD_REDUCTION', 'Chord reduction survivor must belong to the source group.', {
+        path,
+        sourceEventId,
+      });
+    }
+  }
+  return Object.freeze({ survivingSourceEventIds: Object.freeze([...survivors]) });
+}
+
+function normalizeRevoicingTarget(target, sourceEventIds, source, path) {
+  assertExactKeys(target, ['targetMidiBySourceEventId'], path);
+  assertPlainObject(target.targetMidiBySourceEventId, `${path}.targetMidiBySourceEventId`);
+  const keys = Object.keys(target.targetMidiBySourceEventId);
+  if (
+    keys.length !== sourceEventIds.length
+    || sourceEventIds.some((id) => !Object.hasOwn(target.targetMidiBySourceEventId, id))
+  ) {
+    fail('INVALID_REVOICING', 'Revoicing target map must cover every source group member exactly once.', {
+      path,
+    });
+  }
+  const mapping = Object.create(null);
+  for (const sourceEventId of sourceEventIds) {
+    const targetMidi = target.targetMidiBySourceEventId[sourceEventId];
+    if (!Number.isSafeInteger(targetMidi) || targetMidi < 0 || targetMidi > 127) {
+      fail('INVALID_REVOICING', 'Revoiced MIDI must be an integer in 0..127.', {
+        path,
+        sourceEventId,
+      });
+    }
+    const sourceMidi = source.eventIndex.get(sourceEventId).midi;
+    if ((targetMidi - sourceMidi) % 12 !== 0) {
+      fail('INVALID_REVOICING', 'V1 revoicing may only change register by whole octaves.', {
+        path,
+        sourceEventId,
+      });
+    }
+    mapping[sourceEventId] = targetMidi;
+  }
+  return Object.freeze({ targetMidiBySourceEventId: Object.freeze(mapping) });
+}
+
+function normalizeArpeggiationTarget(target, sourceEventIds, path) {
+  assertExactKeys(target, ['orderedSourceEventIds', 'spreadDivisions'], path);
+  assertDenseArray(
+    target.orderedSourceEventIds,
+    `${path}.orderedSourceEventIds`,
+    ARRANGEMENT_CONTRACT_LIMITS.maxSourceGroupEvents,
+  );
+  const order = target.orderedSourceEventIds.map((id, index) => boundedId(
+    id,
+    `${path}.orderedSourceEventIds[${index}]`,
+  ));
+  if (
+    order.length !== sourceEventIds.length
+    || new Set(order).size !== order.length
+    || sourceEventIds.some((id) => !order.includes(id))
+  ) {
+    fail('INVALID_ARPEGGIATION', 'Arpeggiation order must be an exact permutation of the source group.', {
+      path,
+    });
+  }
+  if (
+    !Number.isSafeInteger(target.spreadDivisions)
+    || target.spreadDivisions <= 0
+    || target.spreadDivisions > 4096
+  ) {
+    fail('INVALID_ARPEGGIATION', 'spreadDivisions must be a positive bounded integer.', { path });
+  }
+  return Object.freeze({
+    orderedSourceEventIds: Object.freeze([...order]),
+    spreadDivisions: target.spreadDivisions,
+  });
+}
+
+function normalizeTarget(decisionType, target, sourceEventIds, source, path) {
   if (decisionType === 'PRESERVED' || decisionType === 'OMITTED') {
     if (target !== null && target !== undefined) {
-      fail('UNEXPECTED_ARRANGEMENT_TARGET', `${decisionType} decisions cannot carry target facts.`, { path });
+      fail('UNEXPECTED_ARRANGEMENT_TARGET', `${decisionType} decisions cannot carry target facts.`, {
+        path,
+      });
     }
     return null;
   }
 
   assertPlainObject(target, `${path}.target`);
-
   if (decisionType === 'OCTAVE_DISPLACED') {
-    assertExactKeys(target, ['semitoneDelta'], `${path}.target`);
-    if (
-      !Number.isSafeInteger(target.semitoneDelta)
-      || target.semitoneDelta === 0
-      || target.semitoneDelta % 12 !== 0
-      || Math.abs(target.semitoneDelta) > MAX_OCTAVE_SHIFT
-    ) {
-      fail('INVALID_OCTAVE_DISPLACEMENT', 'Octave displacement must be a non-zero bounded multiple of 12 semitones.', {
-        path,
-        semitoneDelta: target.semitoneDelta,
-      });
-    }
-    const sourceEvent = source.eventIndex.get(decision.sourceEventIds[0]);
-    const targetMidi = sourceEvent.midi + target.semitoneDelta;
-    if (targetMidi < 0 || targetMidi > 127) {
-      fail('INVALID_OCTAVE_DISPLACEMENT', 'Octave displacement leaves MIDI range.', { path, targetMidi });
-    }
-    return Object.freeze({ semitoneDelta: target.semitoneDelta, targetMidi });
+    return normalizeOctaveTarget(target, sourceEventIds[0], source, `${path}.target`);
   }
-
   if (decisionType === 'VOICE_REDISTRIBUTED') {
     assertExactKeys(target, ['targetVoice'], `${path}.target`);
-    return Object.freeze({ targetVoice: boundedVoice(target.targetVoice, `${path}.target.targetVoice`) });
-  }
-
-  if (decisionType === 'CHORD_REDUCED') {
-    assertExactKeys(target, ['survivingSourceEventIds'], `${path}.target`);
-    assertDenseArray(target.survivingSourceEventIds, `${path}.target.survivingSourceEventIds`, 6);
-    const survivors = target.survivingSourceEventIds.map((id, index) => boundedId(
-      id,
-      `${path}.target.survivingSourceEventIds[${index}]`,
-    ));
-    if (survivors.length === 0 || survivors.length >= decision.sourceEventIds.length) {
-      fail('INVALID_CHORD_REDUCTION', 'Chord reduction must keep a non-empty proper subset of the group.', { path });
-    }
-    if (new Set(survivors).size !== survivors.length) {
-      fail('INVALID_CHORD_REDUCTION', 'Chord reduction survivors must be unique.', { path });
-    }
-    for (const id of survivors) {
-      if (!decision.sourceEventIds.includes(id)) {
-        fail('INVALID_CHORD_REDUCTION', 'Chord reduction survivor must belong to the source group.', { path, sourceEventId: id });
-      }
-    }
-    return Object.freeze({ survivingSourceEventIds: Object.freeze([...survivors]) });
-  }
-
-  if (decisionType === 'REVOICED') {
-    assertExactKeys(target, ['targetMidiBySourceEventId'], `${path}.target`);
-    const mapping = clonePrimitiveRecord(target.targetMidiBySourceEventId, `${path}.target.targetMidiBySourceEventId`);
-    const keys = Object.keys(mapping);
-    if (keys.length !== decision.sourceEventIds.length || decision.sourceEventIds.some((id) => !Object.hasOwn(mapping, id))) {
-      fail('INVALID_REVOICING', 'Revoicing target map must cover every source group member exactly once.', { path });
-    }
-    const normalized = Object.create(null);
-    for (const id of decision.sourceEventIds) {
-      const targetMidi = mapping[id];
-      if (!Number.isSafeInteger(targetMidi) || targetMidi < 0 || targetMidi > 127) {
-        fail('INVALID_REVOICING', 'Revoiced MIDI must be an integer in 0..127.', { path, sourceEventId: id });
-      }
-      const sourceMidi = source.eventIndex.get(id).midi;
-      if ((targetMidi - sourceMidi) % 12 !== 0) {
-        fail('INVALID_REVOICING', 'V1 revoicing may only change register by whole octaves.', { path, sourceEventId: id });
-      }
-      normalized[id] = targetMidi;
-    }
-    return Object.freeze({ targetMidiBySourceEventId: Object.freeze(normalized) });
-  }
-
-  if (decisionType === 'ARPEGGIATED') {
-    assertExactKeys(target, ['orderedSourceEventIds', 'spreadDivisions'], `${path}.target`);
-    assertDenseArray(target.orderedSourceEventIds, `${path}.target.orderedSourceEventIds`, 6);
-    const order = target.orderedSourceEventIds.map((id, index) => boundedId(
-      id,
-      `${path}.target.orderedSourceEventIds[${index}]`,
-    ));
-    if (
-      order.length !== decision.sourceEventIds.length
-      || new Set(order).size !== order.length
-      || decision.sourceEventIds.some((id) => !order.includes(id))
-    ) {
-      fail('INVALID_ARPEGGIATION', 'Arpeggiation order must be an exact permutation of the source group.', { path });
-    }
-    if (!Number.isSafeInteger(target.spreadDivisions) || target.spreadDivisions <= 0 || target.spreadDivisions > 4096) {
-      fail('INVALID_ARPEGGIATION', 'spreadDivisions must be a positive bounded integer.', { path });
-    }
     return Object.freeze({
-      orderedSourceEventIds: Object.freeze([...order]),
-      spreadDivisions: target.spreadDivisions,
+      targetVoice: boundedVoice(target.targetVoice, `${path}.target.targetVoice`),
     });
   }
-
+  if (decisionType === 'CHORD_REDUCED') {
+    return normalizeChordReductionTarget(target, sourceEventIds, `${path}.target`);
+  }
+  if (decisionType === 'REVOICED') {
+    return normalizeRevoicingTarget(target, sourceEventIds, source, `${path}.target`);
+  }
+  if (decisionType === 'ARPEGGIATED') {
+    return normalizeArpeggiationTarget(target, sourceEventIds, `${path}.target`);
+  }
   fail('UNKNOWN_ARRANGEMENT_DECISION_TYPE', 'Unsupported arrangement decision type.', { decisionType });
 }
 
 function normalizeDecision(input, source, alternativeIndex, decisionIndex) {
   const path = `alternatives[${alternativeIndex}].decisions[${decisionIndex}]`;
-  assertExactKeys(input, ['decisionId', 'decisionType', 'sourceEventIds', 'sourceGroupId', 'target', 'reasonCode'], path);
+  assertExactKeys(
+    input,
+    ['decisionId', 'decisionType', 'sourceEventIds', 'sourceGroupId', 'target', 'reasonCode'],
+    path,
+  );
   const decisionId = boundedId(input.decisionId, `${path}.decisionId`);
   if (typeof input.decisionType !== 'string' || !DECISION_TYPE_SET.has(input.decisionType)) {
-    fail('UNKNOWN_ARRANGEMENT_DECISION_TYPE', 'Unknown arrangement decision type.', { path, decisionType: input.decisionType });
-  }
-  assertDenseArray(input.sourceEventIds, `${path}.sourceEventIds`, 6);
-  if (input.sourceEventIds.length === 0) {
-    fail('INVALID_ARRANGEMENT_DECISION', 'Arrangement decisions must cover at least one source event.', { path });
-  }
-  const sourceEventIds = input.sourceEventIds.map((id, index) => boundedId(id, `${path}.sourceEventIds[${index}]`));
-  if (new Set(sourceEventIds).size !== sourceEventIds.length) {
-    fail('DUPLICATE_ARRANGEMENT_SOURCE_REFERENCE', 'A decision cannot repeat a source event.', { path });
-  }
-  for (const sourceEventId of sourceEventIds) {
-    if (!source.eventIndex.has(sourceEventId)) {
-      fail('UNKNOWN_SOURCE_EVENT', 'Arrangement decision references an unknown source event.', { path, sourceEventId });
-    }
+    fail('UNKNOWN_ARRANGEMENT_DECISION_TYPE', 'Unknown arrangement decision type.', {
+      path,
+      decisionType: input.decisionType,
+    });
   }
 
-  const groupDecision = ['CHORD_REDUCED', 'REVOICED', 'ARPEGGIATED'].includes(input.decisionType);
-  const singleDecision = ['PRESERVED', 'OMITTED', 'OCTAVE_DISPLACED', 'VOICE_REDISTRIBUTED'].includes(input.decisionType);
-  if (singleDecision && sourceEventIds.length !== 1) {
-    fail('INVALID_ARRANGEMENT_DECISION_CARDINALITY', `${input.decisionType} must reference exactly one source event.`, { path });
+  const sourceEventIds = normalizeSourceEventIds(input.sourceEventIds, `${path}.sourceEventIds`);
+  requireKnownSourceEvents(sourceEventIds, source, path);
+
+  if (SINGLE_EVENT_DECISION_TYPES.has(input.decisionType) && sourceEventIds.length !== 1) {
+    fail('INVALID_ARRANGEMENT_DECISION_CARDINALITY', `${input.decisionType} must reference exactly one source event.`, {
+      path,
+    });
   }
-  const normalizedSourceGroupId = input.sourceGroupId === null || input.sourceGroupId === undefined
+
+  const sourceGroupId = input.sourceGroupId === null || input.sourceGroupId === undefined
     ? null
     : boundedId(input.sourceGroupId, `${path}.sourceGroupId`);
-  const normalizedDecision = { sourceEventIds, sourceGroupId: normalizedSourceGroupId };
-  if (groupDecision) {
-    requireExactGroup(normalizedDecision, source, path);
-  } else if (normalizedSourceGroupId !== null) {
+  if (GROUP_DECISION_TYPES.has(input.decisionType)) {
+    requireExactGroup(sourceEventIds, sourceGroupId, source, path);
+  } else if (sourceGroupId !== null) {
     fail('UNEXPECTED_SOURCE_GROUP', `${input.decisionType} cannot carry sourceGroupId.`, { path });
   }
 
-  const reasonCode = boundedId(input.reasonCode, `${path}.reasonCode`);
-  const target = normalizeTarget(input.decisionType, input.target, normalizedDecision, source, path);
+  const target = normalizeTarget(input.decisionType, input.target, sourceEventIds, source, path);
   return Object.freeze({
     decisionId,
     decisionType: input.decisionType,
     sourceEventIds: Object.freeze([...sourceEventIds]),
-    sourceGroupId: normalizedSourceGroupId,
+    sourceGroupId,
     target,
-    reasonCode,
+    reasonCode: boundedId(input.reasonCode, `${path}.reasonCode`),
   });
 }
 
@@ -377,13 +482,19 @@ function normalizeAlternative(input, source, alternativeIndex) {
   assertExactKeys(input, ['alternativeId', 'strategyTags', 'decisions'], path);
   const alternativeId = boundedId(input.alternativeId, `${path}.alternativeId`);
   const strategyTags = normalizeStrategyTags(input.strategyTags, `${path}.strategyTags`);
-  assertDenseArray(input.decisions, `${path}.decisions`, MAX_SOURCE_EVENTS);
+  assertDenseArray(
+    input.decisions,
+    `${path}.decisions`,
+    ARRANGEMENT_CONTRACT_LIMITS.maxSourceEvents,
+  );
   if (input.decisions.length === 0) {
-    fail('EMPTY_ARRANGEMENT_ALTERNATIVE', 'Each arrangement alternative requires decisions.', { alternativeId });
+    fail('EMPTY_ARRANGEMENT_ALTERNATIVE', 'Each arrangement alternative requires decisions.', {
+      alternativeId,
+    });
   }
 
   const decisionIds = new Set();
-  const covered = new Set();
+  const coveredSourceEvents = new Set();
   const decisions = input.decisions.map((decision, decisionIndex) => {
     const normalized = normalizeDecision(decision, source, alternativeIndex, decisionIndex);
     if (decisionIds.has(normalized.decisionId)) {
@@ -394,20 +505,23 @@ function normalizeAlternative(input, source, alternativeIndex) {
     }
     decisionIds.add(normalized.decisionId);
     for (const sourceEventId of normalized.sourceEventIds) {
-      if (covered.has(sourceEventId)) {
+      if (coveredSourceEvents.has(sourceEventId)) {
         fail('OVERLAPPING_ARRANGEMENT_DECISIONS', 'Source events must be covered exactly once per alternative.', {
           alternativeId,
           sourceEventId,
         });
       }
-      covered.add(sourceEventId);
+      coveredSourceEvents.add(sourceEventId);
     }
     return normalized;
   });
 
-  if (covered.size !== source.events.length || source.events.some((event) => !covered.has(event.sourceEventId))) {
+  if (
+    coveredSourceEvents.size !== source.events.length
+    || source.events.some((event) => !coveredSourceEvents.has(event.sourceEventId))
+  ) {
     const missingSourceEventIds = source.events
-      .filter((event) => !covered.has(event.sourceEventId))
+      .filter((event) => !coveredSourceEvents.has(event.sourceEventId))
       .map((event) => event.sourceEventId);
     fail('INCOMPLETE_ARRANGEMENT_SOURCE_COVERAGE', 'Every source event must be covered exactly once.', {
       alternativeId,
@@ -435,7 +549,11 @@ function normalizeAlternative(input, source, alternativeIndex) {
 
 export function createArrangementAlternativeSet(sourceInput, alternativesInput) {
   const source = normalizeSource(sourceInput);
-  assertDenseArray(alternativesInput, 'alternatives', MAX_ALTERNATIVES);
+  assertDenseArray(
+    alternativesInput,
+    'alternatives',
+    ARRANGEMENT_CONTRACT_LIMITS.maxAlternatives,
+  );
   if (alternativesInput.length === 0) {
     fail('EMPTY_ARRANGEMENT_ALTERNATIVE_SET', 'At least one arrangement alternative is required.');
   }
