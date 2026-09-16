@@ -128,6 +128,20 @@ jobs:
           node scripts/verify-v3b-left-hand-benchmark-report.mjs
           --generated v3b-generated/left-hand-benchmark-report.json
 
+      - name: Generate A2 bounded arrangement benchmark
+        run: >-
+          node scripts/run-a2-arrangement-benchmark.mjs
+          --output a2-generated/arrangement-generation-report.json
+          --assert-expectations
+
+      - name: Upload A2 bounded arrangement benchmark
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: a2-arrangement-generation-report
+          path: a2-generated/arrangement-generation-report.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload V3B left-hand comparison benchmark
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
