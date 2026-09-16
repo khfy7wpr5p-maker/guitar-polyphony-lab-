@@ -117,15 +117,18 @@ jobs:
           --generated v3a-generated/strict-feasibility-report.json
 
       - name: Generate V3B left-hand comparison benchmark
-        if: github.event_name == 'push' && github.ref == 'refs/heads/stage/v3b-independent-left-hand-oracle'
         run: >-
           node scripts/run-v3b-left-hand-benchmark.mjs
           --engine-root .v1b-engine
           --output v3b-generated/left-hand-benchmark-report.json
           --assert-expectations
 
+      - name: Verify committed V3B left-hand benchmark baseline
+        run: >-
+          node scripts/verify-v3b-left-hand-benchmark-report.mjs
+          --generated v3b-generated/left-hand-benchmark-report.json
+
       - name: Upload V3B left-hand comparison benchmark
-        if: github.event_name == 'push' && github.ref == 'refs/heads/stage/v3b-independent-left-hand-oracle'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: v3b-left-hand-benchmark-report
