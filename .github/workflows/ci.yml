@@ -150,6 +150,25 @@ jobs:
           node scripts/verify-a2b-temporal-composition-benchmark.mjs
           --generated a2b-generated/temporal-composition-report.json
 
+      - name: Generate A2C timeline arrangement benchmark
+        run: >-
+          node scripts/run-a2c-timeline-arrangement-benchmark.mjs
+          --output a2c-generated/timeline-arrangement-report.json
+          --assert-expectations
+
+      - name: Verify committed A2C timeline arrangement baseline
+        run: >-
+          node scripts/verify-a2c-timeline-arrangement-benchmark.mjs
+          --generated a2c-generated/timeline-arrangement-report.json
+
+      - name: Upload A2C timeline arrangement benchmark
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: a2c-timeline-arrangement-report
+          path: a2c-generated/timeline-arrangement-report.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload A2B temporal composition benchmark
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
