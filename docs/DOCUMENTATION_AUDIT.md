@@ -1,21 +1,20 @@
 # Documentation audit
 
-Fresh-read classification against the current Arrangement A1 branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A/V2B failure evidence, committed V3A/V3B physical evidence, the new arrangement alternative-set contract, package metadata, CI, and the 2026-09-16 progressive-capability directive.
+Fresh-read classification against the current Arrangement A2 branch source, tests, V1/V2 evidence, V3A/V3B physical evidence, A1/A2 arrangement code, committed A2 benchmark, CI, and the 2026-09-16 progressive-capability directive.
 
 | Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md` | CURRENT | project purpose, V1/V2/V3 closure and Arrangement A1/A2 direction |
-| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V1–V3 evidence, A1 contract and A2/V4 direction |
-| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned evidence, A1 contract reality, current CI and exact remaining work |
-| `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible V1B loop |
-| `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license and 22-case raw/probe evidence |
-| `docs/V2-FAILURE-INTELLIGENCE.md` | CURRENT | V2A taxonomy plus completed V2B cause/location refinement |
-| `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md` | CURRENT | V3A exact-position plus V3B left-hand independent physical evidence |
-| `docs/ARRANGEMENT-NBEST-CONTRACT.md` | CURRENT | A1 source-complete explicit transformation/N-best representation boundary |
-| active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents evidence-stage restrictions from becoming permanent product ceilings |
-| `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence, not runtime authority |
-| P1/P2 stage documents | CURRENT_WITH_BOUNDARY_NOTE | bounded source/physical research contracts |
-| `docs/POLYPHONY-MODEL.md`, `docs/SUPPORTED-MUSICXML.md`, `SECURITY.md` | PARTIALLY_OUTDATED | useful local details; current continuation belongs to maintained entry-point docs |
+| `README.md` | CURRENT | project purpose, V1–V3 closure, A1/A2 implementation and A2B direction |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries and current V1→V3→A1→A2 architecture |
+| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation/evidence reality including A2 benchmark and CI |
+| `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | 22-case pinned external MusicXML evidence |
+| `docs/V2-FAILURE-INTELLIGENCE.md` | CURRENT | V2A taxonomy + V2B refinement |
+| `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md` | CURRENT | V3A/V3B independent physical evidence |
+| `docs/ARRANGEMENT-NBEST-CONTRACT.md` | CURRENT_WITH_A1_BOUNDARY | explicit source-complete arrangement representation contract |
+| `docs/ARRANGEMENT-A2-BOUNDED-GENERATION.md` | CURRENT | A2 policy-driven generation, physical revalidation, benchmark and limits |
+| active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents verification restrictions from becoming permanent product ceilings |
+| `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future learned evidence, not runtime authority |
+| older P1/P2 documents | CURRENT_WITH_BOUNDARY_NOTE | useful bounded foundation records |
 | historical integration plans | ARCHIVE_CANDIDATE | historical context only |
 
 ## Authority order
@@ -24,112 +23,109 @@ When documents disagree, use:
 
 1. repository code and automated tests;
 2. `docs/REPOSITORY_REALITY.md`;
-3. `docs/ARCHITECTURE.md` plus the active progressive-capability directive;
+3. `docs/ARCHITECTURE.md` plus active progressive-capability directive;
 4. `README.md`;
 5. current stage documents;
 6. historical records.
 
-## V1 closure
+## V1/V2/V3 closure
 
-V1B reproduces pinned Engine semantic evidence for the approved internal fixture slice at Engine SHA `1d8ced644f544f7e991f7275eda77a2ce557774e`.
+V1B/V1C provide reproducible Engine/source evidence. V2A/V2B localize current failure intelligence. V3A/V3B independently separate exact-position and static left-hand physical feasibility from production search/capability behavior.
 
-V1C maintains a reproducible 22-case external baseline from `w3c-cg/musicxmlTestSuite` commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea` under MIT licensing.
-
-Pinned V1C summary:
+Key preserved facts:
 
 ```text
-Lab probe supported:      17 / 22
-Engine probe supported:    5 / 22
-semantic EQUAL:            5
-semantic MISMATCH:         0
-semantic NOT_COMPARABLE:  17
+V1C cases: 22
+semantic EQUAL: 5
+semantic MISMATCH: 0
+V2 observations: 66
+V2 unclassified: 0
+V3A proven greedy false negative: 1
+V3B cross-repo comparable status parity: 6 / 6
 ```
 
-Raw XML trust-boundary rejection remains separate from musical capability. CI-only probe transforms do not authorize application-time security weakening.
+Evidence/search limits remain distinct from physical impossibility.
 
-## V2 closure
+## Arrangement A1 closure and correction
 
-V2A classifies all 66 current unsupported observations with zero unclassified failures and forbids semantic capability evidence from becoming `BLOCKED_GLOBAL` in the Lab taxonomy.
+A1 establishes source-complete transformation provenance using production-aligned decision names.
 
-V2B refines all six formerly generic Engine projection failures:
+A2 exposed one A1 `1.0.0` modeling error: source groups were incorrectly capped at six, conflating source-score polyphony with target-guitar string count.
+
+A1 `1.1.0` corrects this by allowing bounded source groups up to 128 events. This is important for piano/non-guitar input: an 8-note source sonority remains an 8-note source fact even if a guitar arrangement later realizes fewer notes.
+
+A1 still requires every source event to be covered exactly once in every alternative, so reduction/omission cannot silently erase provenance.
+
+## Arrangement A2 closure — initial static slice
+
+A2 is implemented as:
 
 ```text
-direction          3
-harmony            2
-notation:dynamics  1
+src/arrangement/boundedArrangementGenerator.js
+test/boundedArrangementGenerator.test.js
+test/arrangementLargeSourceGroup.test.js
+fixtures/a2/benchmark.json
+artifacts/a2/arrangement-generation-baseline.json
+scripts/run-a2-arrangement-benchmark.mjs
+scripts/verify-a2-arrangement-benchmark.mjs
+docs/ARRANGEMENT-A2-BOUNDED-GENERATION.md
 ```
 
-Scope split:
+Current generated transforms:
 
 ```text
-MEASURE_CHILD      3
-NOTE_EVENT         1
-FEATURE_REGION_SET 2
-```
-
-All six are architecture-level `REVIEW_REQUIRED` candidates. The two harmony cases deliberately retain bounded multi-occurrence scope because the Engine does not identify one exact causal occurrence.
-
-## V3 closure
-
-V3A and V3B are implemented and reproducible.
-
-V3A provides exhaustive exact pitch/string/sustain reachability and preserves one proven legacy greedy false negative. V3B adds independent static left-hand finger/barre/span/reach evidence and records 6/6 normalized status parity against the pinned Engine on six comparable benchmark cases.
-
-Evidence exhaustion remains `INDETERMINATE_LIMIT`; it is never converted into physical impossibility.
-
-## Arrangement A1 closure
-
-Arrangement A1 is implemented as a Lab-only representation contract:
-
-```text
-src/arrangement/arrangementAlternativeSet.js
-test/arrangementAlternativeSet.test.js
-docs/ARRANGEMENT-NBEST-CONTRACT.md
-```
-
-A1 deliberately aligns its decision vocabulary with the existing production arrangement contract:
-
-```text
-PRESERVED
-OMITTED
-OCTAVE_DISPLACED
-VOICE_REDISTRIBUTED
 CHORD_REDUCED
-REVOICED
-ARPEGGIATED
+OCTAVE_DISPLACED
 ```
 
-A1 adds these explicit invariants:
+Every emitted static candidate is revalidated by exact fretboard candidates, distinct-string assignment, and the independent V3B left-hand oracle.
 
-- every source event is covered exactly once in every alternative;
-- source events cannot silently disappear;
-- group transformations require exact canonical group membership;
-- V1 octave displacement is whole-octave only;
-- V1 revoicing preserves pitch class;
-- chord reduction records surviving source IDs;
-- arpeggiation records exact member order and spread;
-- candidate order is not a musical/learned preference rank;
-- content-changing alternatives are review-required;
-- output is immutable and caller-owned inputs are not mutated.
+Policy supports explicit priority source events. Reduction candidates may not drop those priorities.
 
-A1 explicitly has no production, automatic-transformation, learned-ranking, or export authority.
+Candidate-space exhaustion returns:
 
-## Broad-capability interpretation rule
+```text
+PARTIAL_LIMIT
+candidateSpaceComplete = false
+```
 
-Strict evidence validation applies at the specific evidence/trust boundary. It is not a mandate for global product blocking. Known musical facts should be preserved, uncertainty localized, and provisional/editable output retained where production safety permits.
+not physical impossibility or global blocked status.
 
-V3 strict infeasibility does not authorize silent source alteration. A1 supplies an explicit provenance language for transformed alternatives instead.
+### Pinned A2 benchmark
 
-Likewise, A1 does not authorize an automatic arrangement generator merely because the representation is valid. Generation and application are separate gates.
+```text
+cases:                                   3
+complete generation:                     2
+partial-limit:                            1
+strict-infeasible cases:                  3
+cases with feasible transformed evidence: 2
+```
+
+The eight-note piano benchmark proves:
+
+```text
+8-note source truth preserved
+strict simultaneous guitar realization -> INFEASIBLE
+15 explicit six-note reduction candidates generated
+15 / 15 physically FEASIBLE in the pinned policy slice
+```
+
+The low-pitch benchmark proves an explicit +12 octave candidate can recover physical feasibility while the source pitch remains unchanged in source facts.
+
+## Broad-capability interpretation
+
+A2 is evidence that a strict-transcription failure does not have to end the workflow. It may instead lead to explicit, provenance-preserving, reviewable guitar alternatives.
+
+This does **not** mean the production Engine has been authorized to change notes automatically. Production activation is a separate consequential gate.
+
+A1 can represent arpeggiation, but A2's current physical validator is static-sonority based. Automatic arpeggiation generation is deferred until temporal validation exists; it is not declared unsupported forever.
 
 ## Current continuation
 
-The principal next stage is **Arrangement A2: bounded explicit-policy candidate generation + transformed-candidate physical revalidation**.
+Principal next stage:
 
-A2 may research generation of omission/reduction, octave/register, arpeggiation, and voice-priority alternatives, but each candidate must be represented through A1 and independently revalidated for physical feasibility.
+**Arrangement A2B — temporal validation + combined-transform research + broader piano/polyphonic benchmark corpus.**
 
-Automatic note-changing production behavior remains a separate consequential gate. No learned ranking should become authoritative at A2. V4 TabCNN/FretNet-style evidence remains shadow-only until benchmark/calibration/candidate-invariance gates are satisfied.
+A2B should add arpeggiation timing semantics, bounded transform combinations, richer melody/bass/voice-priority contracts, and corpus evidence while preserving A1 source provenance and V3 hard-physical boundaries.
 
-The two unresolved V2B harmony occurrence sets may be refined additively and do not block arrangement research.
-
-`CURRENT_RESEARCH_RECORD` means a document is accurate as a research/evidence record but is not a statement of production-engine authority.
+No learned ranking becomes authoritative at A2B; V4 remains shadow-only until benchmark/calibration/candidate-invariance gates are satisfied.
