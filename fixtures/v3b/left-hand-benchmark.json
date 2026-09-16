@@ -1,0 +1,93 @@
+{
+  "documentType": "GuitarPolyphonyV3BLeftHandBenchmark",
+  "contractVersion": "1.0.0",
+  "policy": {
+    "productionAuthority": false,
+    "standardTuning": true,
+    "maximumStaticFretSpan": 4,
+    "maximumExtraFretReach": 1,
+    "arrangementTransformsForbidden": true
+  },
+  "cases": [
+    {
+      "caseId": "open-six-strings",
+      "expectedLab": { "status": "FEASIBLE", "reason": null },
+      "compareWithEngine": true,
+      "positions": [
+        { "positionId": "s6", "string": 6, "fret": 0 },
+        { "positionId": "s5", "string": 5, "fret": 0 },
+        { "positionId": "s4", "string": 4, "fret": 0 },
+        { "positionId": "s3", "string": 3, "fret": 0 },
+        { "positionId": "s2", "string": 2, "fret": 0 },
+        { "positionId": "s1", "string": 1, "fret": 0 }
+      ]
+    },
+    {
+      "caseId": "compact-c-major",
+      "expectedLab": { "status": "FEASIBLE", "reason": null },
+      "compareWithEngine": true,
+      "positions": [
+        { "positionId": "c3", "string": 5, "fret": 3 },
+        { "positionId": "e3", "string": 4, "fret": 2 },
+        { "positionId": "g3", "string": 3, "fret": 0 },
+        { "positionId": "c4", "string": 2, "fret": 1 },
+        { "positionId": "e4", "string": 1, "fret": 0 }
+      ]
+    },
+    {
+      "caseId": "f-major-barre-shape",
+      "expectedLab": { "status": "FEASIBLE", "reason": null },
+      "compareWithEngine": true,
+      "positions": [
+        { "positionId": "f2", "string": 6, "fret": 1 },
+        { "positionId": "c3", "string": 5, "fret": 3 },
+        { "positionId": "f3", "string": 4, "fret": 3 },
+        { "positionId": "a3", "string": 3, "fret": 2 },
+        { "positionId": "c4", "string": 2, "fret": 1 },
+        { "positionId": "f4", "string": 1, "fret": 1 }
+      ]
+    },
+    {
+      "caseId": "static-fret-span-exceeded",
+      "expectedLab": { "status": "INFEASIBLE", "reason": "FRET_SPAN_EXCEEDED" },
+      "compareWithEngine": true,
+      "positions": [
+        { "positionId": "low", "string": 6, "fret": 1 },
+        { "positionId": "high", "string": 1, "fret": 6 }
+      ]
+    },
+    {
+      "caseId": "five-distinct-fretted-frets",
+      "expectedLab": { "status": "INFEASIBLE", "reason": "DISTINCT_FRET_COUNT_EXCEEDS_FINGER_COUNT" },
+      "compareWithEngine": true,
+      "positions": [
+        { "positionId": "p1", "string": 6, "fret": 1 },
+        { "positionId": "p2", "string": 5, "fret": 2 },
+        { "positionId": "p3", "string": 4, "fret": 3 },
+        { "positionId": "p4", "string": 3, "fret": 4 },
+        { "positionId": "p5", "string": 2, "fret": 5 }
+      ]
+    },
+    {
+      "caseId": "explicit-finger-reach-exceeded",
+      "expectedLab": { "status": "INFEASIBLE", "reason": "FINGER_REACH_EXCEEDED" },
+      "compareWithEngine": true,
+      "positions": [
+        { "positionId": "low", "string": 6, "fret": 1, "requiredFinger": 1 },
+        { "positionId": "high", "string": 1, "fret": 4, "requiredFinger": 2 }
+      ]
+    },
+    {
+      "caseId": "lab-assignment-limit",
+      "expectedLab": { "status": "INDETERMINATE_LIMIT", "reason": "LEFT_HAND_ASSIGNMENT_LIMIT_EXCEEDED" },
+      "compareWithEngine": false,
+      "options": { "maxAssignmentAttempts": 1 },
+      "positions": [
+        { "positionId": "p1", "string": 6, "fret": 1 },
+        { "positionId": "p2", "string": 5, "fret": 2 },
+        { "positionId": "p3", "string": 4, "fret": 3 },
+        { "positionId": "p4", "string": 3, "fret": 4 }
+      ]
+    }
+  ]
+}
