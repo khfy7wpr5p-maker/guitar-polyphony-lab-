@@ -1,6 +1,6 @@
 # Repository reality
 
-Fresh-read scope: current V3B branch, source/tests, package scripts, CI, internal compatibility fixtures, committed V1B Engine evidence, pinned V1C external evidence, V2A/V2B failure evidence, V3A exact-position evidence, and V3B left-hand comparison evidence as of 2026-09-16.
+Fresh-read scope: current Arrangement A1 branch, source/tests, package scripts, CI, internal compatibility fixtures, committed V1B Engine evidence, pinned V1C external evidence, V2A/V2B failure evidence, V3A exact-position evidence, V3B left-hand comparison evidence, and the new arrangement alternative-set contract as of 2026-09-16.
 
 This document describes repository reality, not general production capability claims for `musicxml-to-guitar-tab-engine`.
 
@@ -24,6 +24,11 @@ physical research
   -> V3A exhaustive exact-position path oracle
   -> V3B independent left-hand finger/barre/reach oracle
   -> pinned Engine physical-layer comparison evidence
+
+arrangement research
+  -> A1 source-complete N-best alternative-set contract
+  -> explicit per-decision transformation provenance
+  -> no automatic production transformation authority
 ```
 
 ## Implemented contracts
@@ -39,6 +44,7 @@ physical research
 | `src/failures/v2bProjectionRefinement.js` | V2B refinement of generic Engine projection failures | evidence-only; no automatic recovery authority |
 | `src/guitar/strictFeasibilityOracle.js` | exhaustive exact pitch/string/sustain reachability proof | no arrangement or production authority |
 | `src/guitar/leftHandFeasibilityOracle.js` | independent static finger/barre/span/reach feasibility | bounded research policy, not ergonomic preference |
+| `src/arrangement/arrangementAlternativeSet.js` | source-complete explicit arrangement/N-best contract | representation only; no automatic transform, rank, export, or production authority |
 | `scripts/run-v3a-strict-feasibility-benchmark.mjs` | deterministic five-case V3A benchmark | internal research evidence only |
 | `scripts/verify-v3a-strict-feasibility-report.mjs` | committed V3A baseline check | drift or overclaim fails CI |
 | `scripts/run-v3b-left-hand-benchmark.mjs` | seven-case Lab ↔ pinned Engine left-hand status comparison | Engine is comparison target only |
@@ -157,17 +163,62 @@ Pinned benchmark summary:
 | cross-repo comparable cases | 6 |
 | pinned Engine status parity | 6 / 6 |
 
-The cases cover open strings, compact C-major, an F-major barre shape, excessive static fret span, five distinct fretted frets, explicit finger-reach rejection, and a deliberately low assignment limit.
-
-`INDETERMINATE_LIMIT` remains evidence exhaustion, not physical impossibility.
-
-The pinned Engine is used only as a comparison target. V3B status parity does not make the Lab a wrapper around the Engine and does not make either repository production authority for final fingering.
+`INDETERMINATE_LIMIT` remains evidence exhaustion, not physical impossibility. The pinned Engine is used only as a comparison target; parity does not create production authority.
 
 Committed V3B evidence:
 
 ```text
 fixtures/v3b/left-hand-benchmark.json
 artifacts/v3b/left-hand-benchmark-baseline.json
+```
+
+## Arrangement A1 reality
+
+A1 introduces the Lab-only `GuitarArrangementAlternativeSet 1.0.0` contract.
+
+Decision vocabulary intentionally matches the existing production arrangement language:
+
+```text
+PRESERVED
+OMITTED
+OCTAVE_DISPLACED
+VOICE_REDISTRIBUTED
+CHORD_REDUCED
+REVOICED
+ARPEGGIATED
+```
+
+A1 adds these Lab invariants:
+
+```text
+every source event covered exactly once per alternative
+no overlapping source-event decisions
+no unknown source-event references
+group transforms require exact canonical group membership
+whole-octave displacement only in V1
+V1 revoicing preserves pitch class
+arpeggiation records exact event order + spread
+chord reduction records exact surviving source IDs
+candidate order is not preference rank
+```
+
+The contract explicitly declares:
+
+```text
+productionAuthority = false
+automaticTransformationAuthority = false
+learnedRankingAuthority = false
+exportAuthority = false
+```
+
+Any alternative containing a non-`PRESERVED` decision is review-required. The implementation therefore provides a safe representation for broad-capability arrangement research without silently enabling content-changing production behavior.
+
+Current evidence is unit/regression-contract evidence rather than a production arrangement benchmark. The source module and tests are:
+
+```text
+src/arrangement/arrangementAlternativeSet.js
+test/arrangementAlternativeSet.test.js
+docs/ARRANGEMENT-NBEST-CONTRACT.md
 ```
 
 ## CI reality
@@ -177,7 +228,7 @@ artifacts/v3b/left-hand-benchmark-baseline.json
 Current CI:
 
 1. installs locked Lab dependencies;
-2. runs syntax checks and tests;
+2. runs syntax checks and tests, including Arrangement A1 contract invariants;
 3. checks out the exact pinned Engine revision;
 4. regenerates and byte-compares V1B evidence;
 5. checks out the exact external V1C corpus revision;
@@ -196,46 +247,48 @@ Engine and external corpus checkouts are CI evidence dependencies only; they are
 - V2 failure evidence is localized and semantic capability failures do not become global blocks;
 - V3A can prove exact string/fret impossibility or show that exact reachability exists;
 - V3B can further distinguish left-hand physical rejection from strict shapes that remain feasible under the declared policy;
-- V3B `FEASIBLE` is not a claim of comfort, optimal fingering, or player-specific ease;
 - V3 `INDETERMINATE_LIMIT` never becomes physical impossibility;
-- production arrangement transformations are not Lab authority;
+- A1 can represent transformed alternatives without mutating source truth;
+- A1 does not automatically generate, choose, rank, export, or apply transformations in production;
 - learned guitar evidence remains future V4 research.
 
 ## Progressive-capability reality
 
 The architecture distinguishes `SUPPORTED`, `APPROXIMATE`, `REVIEW_REQUIRED`, `UNSUPPORTED_LOCAL`, and `BLOCKED_GLOBAL` as capability states. The narrowest truthful scope is preferred, and semantic musical limitations are not automatically global blocks.
 
-V2/V3 evidence remains non-authoritative until separately reviewed production work adopts it.
+V2/V3/A1 evidence remains non-authoritative until separately reviewed production work adopts it.
 
 ## Current continuation point
 
-**V1B, V1C, V2A, V2B, V3A, and V3B are reproducible evidence layers.**
+**V1B, V1C, V2A, V2B, V3A, V3B, and Arrangement A1 are implemented Lab evidence/contract layers.**
 
-The principal next stage is **provenance-tracked Arrangement / N-best contracts**:
+The principal next stage is **Arrangement A2: bounded explicit-policy candidate generation + transformed-candidate physical revalidation**:
 
 ```text
 strict source facts
       |
-strict V3 feasibility evidence
+V3 feasibility evidence
       |
-      +--> strict feasible candidate space
+A1 explicit alternative contract
       |
-      +--> strict infeasible region
-              |
-              v
-explicit transformation alternatives
-omission / octave displacement / register compression /
-arpeggiation / voice prioritization
-              |
-              v
-N-best alternatives with provenance
+      v
+bounded policy-driven candidate generation
+      |
+      +--> omission/reduction candidate
+      +--> octave/register candidate
+      +--> arpeggiation candidate
+      +--> voice-priority candidate
+      |
+      v
+independent physical revalidation of every transformed candidate
 ```
 
-The arrangement layer must preserve source truth separately and record every transformation explicitly. It may not silently rewrite MusicXML semantics.
+Automatic note-changing production behavior remains a separate consequential gate.
 
 ## Remaining known work
 
-- provenance-tracked arrangement transformation contracts and N-best alternative schema;
+- A2 bounded explicit-policy arrangement candidate generation;
+- independent V3-style physical validation of transformed candidates;
 - additive V2 harmony-location refinement if better Engine evidence becomes available;
 - additional V1C fixtures such as `.mxl`, transposition, microtones and technical metadata;
 - richer human/ergonomic benchmarks without weakening V3 hard constraints;
