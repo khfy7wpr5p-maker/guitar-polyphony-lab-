@@ -1,0 +1,47 @@
+{
+  "documentType": "A2BTemporalCompositionBenchmark",
+  "contractVersion": "1.0.0",
+  "authority": "LAB_RESEARCH_BENCHMARK_ONLY",
+  "productionAuthority": false,
+  "summary": {
+    "caseCount": 3,
+    "temporalFeasibleCount": 1,
+    "composedCount": 1,
+    "overlappingScopeCount": 1
+  },
+  "cases": [
+    {
+      "caseId": "abstract-arpeggiation-sequence",
+      "status": "FEASIBLE",
+      "reason": null,
+      "timingAuthority": false,
+      "sequenceSemantics": "ABSTRACT_SPREAD_SEQUENCE",
+      "declaredSpreadDivisions": 2,
+      "orderedSourceEventIds": [
+        "e3",
+        "e2",
+        "e1"
+      ],
+      "witnessStepCount": 3
+    },
+    {
+      "caseId": "disjoint-reduction-plus-octave",
+      "status": "COMPOSED",
+      "reason": null,
+      "transformedSourceEventCount": 4,
+      "inputAlternativeCount": 2,
+      "decisionTypes": [
+        "CHORD_REDUCED",
+        "OCTAVE_DISPLACED"
+      ],
+      "sourceCoverageComplete": true
+    },
+    {
+      "caseId": "overlapping-reduction-plus-octave",
+      "status": "OVERLAPPING_SCOPE",
+      "reason": "SOURCE_EVENT_TRANSFORMED_MORE_THAN_ONCE",
+      "overlapSourceEventId": "e2",
+      "alternativeSetProduced": false
+    }
+  ]
+}
