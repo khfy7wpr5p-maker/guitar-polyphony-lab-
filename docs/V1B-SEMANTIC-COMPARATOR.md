@@ -2,9 +2,40 @@
 
 ## Status
 
-V1B now contains an initial deterministic comparator implementation inside the Lab.
+**V1B deterministic evidence loop is complete for the approved two-fixture slice.**
 
-This slice does **not** create a runtime dependency on `musicxml-to-guitar-tab-engine` and does not give the Lab production authority. Engine evidence is supplied as a previously produced `PolyphonicSourceModel 1.0.0` value and is adapted into the Lab-owned semantic snapshot contract.
+The Lab now contains:
+
+- a deterministic semantic comparator;
+- pinned, real Engine-generated `PolyphonicSourceModel 1.0.0` evidence for the two approved compatibility fixtures;
+- fixture SHA-256, Engine repository/SHA and artifact SHA-256 provenance;
+- Lab tests that compare each pinned Engine artifact against the Lab semantic snapshot;
+- CI regeneration from the exact pinned Engine commit followed by byte-for-byte comparison with the committed evidence.
+
+This does **not** create a production runtime dependency on `musicxml-to-guitar-tab-engine`. Engine source is checked out only inside CI to reproduce evidence. Production authority remains in the Engine repository.
+
+## Pinned production evidence
+
+Engine repository:
+
+```text
+khfy7wpr5p-maker/musicxml-to-guitar-tab-engine
+```
+
+Pinned Engine commit:
+
+```text
+1d8ced644f544f7e991f7275eda77a2ce557774e
+```
+
+Approved fixtures and committed evidence:
+
+| Fixture | Fixture SHA-256 | Engine artifact SHA-256 |
+|---|---|---|
+| `fixtures/compat/ps6-counterpoint-2v.musicxml` | `33a477a500e654a5731980f494ee16d8d0b7a83048114788976f4804e3332bf7` | `967352508ca5e9f64efbdde79e74ed2167e00824064f4d16fbfa0081b6708bf4` |
+| `fixtures/compat/ps6-counterpoint-4v-tie.musicxml` | `47122b0aa38b6f9a7fdc974ec47c436ee1b2cead4f822d242b1712b399638c1a` | `be5a61a0e46314242584fbbc5a903e1aa97e241341e95836eb24f080a56ed8b1` |
+
+The provenance manifest is `artifacts/v1b-engine/manifest.json`.
 
 ## Purpose
 
@@ -28,8 +59,6 @@ MusicXML
   -> GuitarPolyphonySemanticSnapshot 1.0.0
 ```
 
-When the MusicXML contains multiple parts, `options.partId` is required.
-
 ### Engine evidence side
 
 `adaptEnginePolyphonicSourceModel(model)` accepts only:
@@ -39,21 +68,21 @@ documentType: PolyphonicSourceModel
 contractVersion: 1.0.0
 ```
 
-The adapter consumes data only. The Lab does not import Engine source code, packages, parser modules, projectors, or runtime functions.
+For reproducibility, `scripts/generate-v1b-engine-artifacts.cjs` executes the real pinned Engine parser/projector path in CI and writes deterministic evidence artifacts. The Lab runtime still imports no Engine module or package.
 
 ## Source identity
 
-The comparison key is intentionally independent from each repository's internal object identity:
+The comparison key is:
 
 ```text
 partId + measureIndex + sourceNoteIndex
 ```
 
-`sourceNoteIndex` is zero-based source `<note>` order within the measure. Source rests count in that order even though the Lab P0 note timeline does not create note intervals for rests. This preserves identity alignment across passages containing rests.
+`sourceNoteIndex` is zero-based source `<note>` order within the measure. Source rests count in that order even though the Lab P0 note timeline does not create pitched note intervals for rests.
 
 ## Compared facts
 
-For each pitched source note present on both sides, V1B compares:
+For pitched source notes present on both sides, V1B compares:
 
 - written pitch;
 - onset in MusicXML divisions;
@@ -63,7 +92,7 @@ For each pitched source note present on both sides, V1B compares:
 - tie-start evidence;
 - tie-stop evidence.
 
-For each measure, V1B also compares:
+Per measure it also compares:
 
 - measure number;
 - derived active-sonority spans;
@@ -72,7 +101,7 @@ For each measure, V1B also compares:
 
 ## Explicit non-scope
 
-This V1B slice does not compare or infer:
+V1B does not compare or infer:
 
 - cross-measure sustain-chain joining;
 - guitar string/fret assignment;
@@ -84,57 +113,33 @@ This V1B slice does not compare or infer:
 - rendering, playback, OMR or MIDI;
 - visual equivalence.
 
-Cross-measure sustain-chain comparison remains blocked until both sides expose an explicitly compatible and independently reviewed contract.
+Those are separate capabilities and must not be invented merely to make a comparator pass.
 
-## Deterministic report
+## Reproducibility loop
 
-`compareSemanticSnapshots(reference, candidate)` returns an immutable `GuitarPolyphonySemanticComparisonReport 1.0.0`.
-
-Current mismatch codes include:
-
-- `PART_ID_MISMATCH`
-- `MISSING_MEASURE`
-- `UNEXPECTED_MEASURE`
-- `MEASURE_NUMBER_MISMATCH`
-- `MISSING_NOTE`
-- `UNEXPECTED_NOTE`
-- `NOTE_FIELD_MISMATCH`
-- `PEAK_POLYPHONY_MISMATCH`
-- `MISSING_SONORITY`
-- `UNEXPECTED_SONORITY`
-- `SONORITY_MISMATCH`
-
-The report order is deterministic by measure index, source note index and compared field traversal.
-
-## Safety boundary
-
-The comparator fails closed on unsupported Engine contract versions and malformed evidence shapes. It does not normalize an unknown Engine contract into a claimed match.
-
-The Lab remains verification-only:
+CI now performs:
 
 ```text
-Lab reference semantics -------------------+
-                                            |
-Engine-produced PolyphonicSourceModel ------+--> V1B comparator
-                                                  |
-                                                  v
-                                       deterministic evidence report
-                                                  |
-                                                  v
-                                      separately reviewed production PR
+Lab fixture bytes
+  -> verify Lab tests + pinned artifact hashes
+  -> checkout Engine @ 1d8ced644f544f7e991f7275eda77a2ce557774e
+  -> real parseParsedMusicXmlDocument()
+  -> real projectParsedMusicXmlToPolyphonicSourceModel()
+  -> deterministic artifact generation
+  -> byte-for-byte diff against artifacts/v1b-engine
+  -> upload regenerated evidence artifact
 ```
 
-## Current acceptance evidence
+The committed Lab test `test/v1bEngineArtifacts.test.js` separately adapts the pinned Engine model and requires `compareSemanticSnapshots(...).equal === true` with zero mismatches.
 
-Automated tests cover:
+## Safety and authority boundary
 
-- overlapping two-voice equality;
-- source-note identity across rests;
-- deterministic note-field mismatches;
-- sonority / peak-polyphony mismatch reporting;
-- missing-note reporting;
-- fail-closed rejection of unsupported Engine evidence contract versions.
+Strict evidence validation and the broader product goal are compatible. V1B is exact about facts both sides claim to represent, while later capability layers may support localized review, approximation and explicit arrangement transformations without rewriting source truth.
 
-## Remaining V1B integration work
+The Lab remains verification-only. A V1B result does not itself change production behavior.
 
-The comparator core is implemented. The remaining integration step is to produce and pin real Engine-generated `PolyphonicSourceModel 1.0.0` artifacts for approved compatibility fixtures, then run those artifacts through this comparator in Lab CI without introducing cross-repository runtime coupling.
+## V1B completion and next stage
+
+The approved two-fixture V1B slice is complete when its final branch CI is green. The next architecture stage is **V1C**, expanding the compatibility corpus and capability classification across broader real-world MusicXML shapes.
+
+V1B completion must not be interpreted as a permanent product capability ceiling. The governing progressive-capability directive remains `handoffs/guitar_polyphony_lab_progressive_capability_developer_prompt_2026-09-16.json`.
