@@ -42,8 +42,8 @@ The Lab must not become a production runtime dependency. Evidence may move towar
 - licensed/internal fixtures;
 - pinned production artifacts;
 - semantic snapshots and deterministic mismatch reports;
+- capability reports and reproducible failure classifications;
 - benchmark results;
-- failure reproductions;
 - independent feasibility evidence;
 - separately reviewed production changes.
 
@@ -54,11 +54,12 @@ The Lab does not own production reduction policy, arrangement authority, sustain
 - **P0** — measure timeline / sonority reference semantics
 - **P1A** — bounded MusicXML trust/input gate
 - **P1B** — partwise parser adapter
-- **P1C** — compatibility corpus foundation
+- **P1C** — internal compatibility corpus foundation
 - **P2A** — deterministic fretboard candidates
 - **P2B** — bounded distinct-string sonority assignments
 - **V1A** — corpus provenance/licensing/expectation registry
 - **V1B** — Lab snapshot ↔ Engine `PolyphonicSourceModel 1.0.0` comparator
+- **V1C** — pinned external MusicXML capability regression with raw-input and semantic-probe observations
 - **configuration research** — Standard / Drop D / custom tuning / capo
 - **technique provenance** — metadata/source evidence with no automatic physical authority
 
@@ -111,6 +112,28 @@ Lab semantic snapshot              P2A candidates
                     |
                     v
        deterministic equality/mismatch
+
+PINNED EXTERNAL MusicXML 4.0 CORPUS
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+  raw trust-boundary      offline DTD-free
+     observation          semantic probe
+                              |
+                    +---------+---------+
+                    |                   |
+                    v                   v
+                  Lab               Engine
+                                      production
+                                      compatibility chain
+                    |                   |
+                    +---------+---------+
+                              |
+                              v
+                    V1C capability report
+                    local supported / unsupported
+                    + semantic equality evidence
 ```
 
 ## V1B — closed reproducible slice
@@ -139,18 +162,52 @@ No Engine module is imported by the Lab runtime/package.
 
 V1B comparison covers source-note identity, written pitch, onset/duration divisions, voice, staff, tie evidence, active-sonority membership and peak polyphony. Cross-measure sustain joining, guitar string/fret state, arrangement decisions and Canonical TAB remain outside this comparator contract.
 
-## Current continuation point — V1C
+## V1C — initial external capability baseline
+
+V1C now has an initial 11-case baseline from `w3c-cg/musicxmlTestSuite`, pinned to external commit:
+
+```text
+77c19f7e819154c70ca1a1992e80dcda8ff82fea
+```
+
+The selected upstream files carry the standard external MusicXML 4.0 DOCTYPE. V1C records raw-input rejection separately from musical-semantic capability. It does **not** relax P1A or the production Engine trust boundary.
+
+The offline CI-only probe:
+
+```text
+upstream bytes
+  -> verify commit/blob/raw SHA-256
+  -> remove exactly one pinned standard MusicXML 4.0 external DOCTYPE
+  -> verify transformed SHA-256
+  -> Lab semantic path
+  -> pinned Engine production compatibility normalization chain
+  -> local outcomes + semantic comparison
+```
+
+The first baseline records 3 semantic-equality cases and no semantic mismatches. Eight cases remain locally unsupported/not-comparable on the pinned revisions. These are exact fixture observations, not general MusicXML support claims.
+
+CI requires pinned raw/probe hashes, exact expected local outcomes, and semantic equality with `artifacts/v1c/capability-report.json`.
+
+See `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
+
+## Current continuation point — broaden V1C, then V2
 
 ```text
 V1B reproducible evidence loop ✅
         |
         v
-V1C broader real-world MusicXML corpus
+V1C initial 11-case external capability baseline ✅
         |
-        +--> provenance / licensing
-        +--> capability classification
-        +--> broader polyphony / notation shapes
-        +--> localized unsupported/review observations
+        v
+V1C isolated capability expansion  <--- YOU ARE HERE
+        |
+        +--> simple/advanced tuplets
+        +--> isolated grace subtypes
+        +--> isolated multivoice/presentation shapes
+        +--> repeat structure variants
+        +--> guitar/TAB staff-tuning and technical string/fret
+        +--> ties / octave shifts / directions
+        +--> .mxl transport boundary
         |
         v
 V2 failure intelligence
@@ -165,11 +222,13 @@ explicit arrangement / N-best research
 V4 learned/ergonomic evidence in shadow mode
 ```
 
-V1C should broaden evidence without weakening source-truth validation. Unsupported higher-level semantics should be classified precisely rather than automatically converted into whole-score failure.
+V1C broadens evidence without weakening source-truth validation. Unsupported higher-level semantics are classified precisely and locally rather than automatically converted into whole-score failure.
 
 ## P1 trust boundary
 
 P1A remains authoritative before XML parsing. It enforces bounded UTF-8 input, `score-partwise`, no DTD/entity/XInclude input, no NUL bytes, and explicit resource limits.
+
+V1C's DTD-free semantic transform is an offline regression probe only. It is not a production sanitization rule and must never bypass raw trust-boundary evidence.
 
 P1B extracts only bounded semantic facts required by the Lab. At this evidence layer, unsupported or malformed source shapes may fail closed rather than being guessed.
 
@@ -205,6 +264,8 @@ Future shared contracts should be able to represent at least:
 - `BLOCKED_GLOBAL`
 
 The narrowest truthful scope should be used: note, event, voice, measure, region, capability, export operation, part, or score. `REVIEW_REQUIRED` is not intended to be a global TAB lock.
+
+V1C currently records strict `SUPPORTED` or `UNSUPPORTED_LOCAL` evidence for exact fixtures. It does not yet authorize production `APPROXIMATE` or `REVIEW_REQUIRED` recovery behavior; those belong to later capability/recovery work backed by this evidence.
 
 ## Arrangement direction
 
@@ -245,7 +306,7 @@ A learned provider may eventually rank already-valid candidates or explicit arra
 
 - **V1A** corpus registry — ✅ initial slice
 - **V1B** real Engine/Lab semantic evidence — ✅ approved two-fixture reproducible slice
-- **V1C** broader MusicXML corpus / capability classification — **NEXT**
+- **V1C** external MusicXML capability classification — ✅ initial 11-case baseline; **isolated expansion next**
 - **V2** localized failure intelligence
 - **V3** independent feasibility oracle
 - **Arrangement / N-best** explicit transformed alternatives
