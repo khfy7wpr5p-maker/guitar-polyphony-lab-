@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Checkout pinned Engine source for V1B/V1C evidence
+      - name: Checkout pinned Engine source for V1B/V1C/V2 evidence
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: khfy7wpr5p-maker/musicxml-to-guitar-tab-engine
@@ -81,10 +81,25 @@ jobs:
       - name: Verify committed V1C report reproduces semantically
         run: node scripts/verify-v1c-committed-report.mjs --generated v1c-generated/report.json
 
+      - name: Generate V2 failure intelligence report
+        run: >-
+          node scripts/run-v2-failure-intelligence.mjs
+          --engine-root .v1b-engine
+          --output v2-generated/failure-intelligence-report.json
+          --assert-covered
+
       - name: Upload V1C capability report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: v1c-capability-report
           path: v1c-generated/report.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload V2 failure intelligence report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: v2-failure-intelligence-report
+          path: v2-generated/failure-intelligence-report.json
           if-no-files-found: error
           retention-days: 7
