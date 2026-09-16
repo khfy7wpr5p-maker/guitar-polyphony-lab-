@@ -109,6 +109,11 @@ function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
+function declaredMusicXmlVersion(xml) {
+  const match = xml.match(/<score-partwise\b[^>]*\bversion=["']([^"']+)["']/i);
+  return match ? match[1] : null;
+}
+
 function createProbe(xml, caseId) {
   if (ANY_ENTITY.test(xml)) {
     fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: entity declaration present`);
@@ -224,6 +229,7 @@ function main() {
       ...item,
       sourceSha256: sha256(bytes),
       semanticProbeSha256: sha256(Buffer.from(probe.xml, 'utf8')),
+      declaredMusicXmlVersion: declaredMusicXmlVersion(xml),
       rawInput: { lab: rawLab.summary, engine: rawEngine.summary },
       semanticProbe: {
         transform: probe.transform,
