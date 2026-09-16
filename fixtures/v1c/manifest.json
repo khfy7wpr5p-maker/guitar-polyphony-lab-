@@ -16,9 +16,12 @@
   "policy": {
     "unsupportedIsLocal": true,
     "corpusContinuesAfterCaseFailure": true,
+    "semanticProbeTransform": "REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE",
+    "rawInputSecurityPolicyRemainsUnchanged": true,
     "globalFailureOnlyFor": [
       "SOURCE_PROVENANCE_MISMATCH",
       "CORPUS_CONTRACT_INVALID",
+      "SEMANTIC_PROBE_TRANSFORM_REJECTED",
       "EXPECTED_OUTCOME_DRIFT",
       "RUNNER_FAILURE"
     ]
@@ -33,6 +36,8 @@
       "featureTags": ["rhythm", "backup", "polyphony"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -44,6 +49,8 @@
       "featureTags": ["chord", "simultaneous-notes"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -55,6 +62,8 @@
       "featureTags": ["tuplet", "time-modification"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -66,6 +75,8 @@
       "featureTags": ["grace", "ornament"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -77,6 +88,8 @@
       "featureTags": ["polyphony", "voices", "lyrics"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -88,6 +101,8 @@
       "featureTags": ["piano", "multistaff", "cross-staff-source"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -99,6 +114,8 @@
       "featureTags": ["repeat", "ending", "barline"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     },
     {
@@ -110,6 +127,8 @@
       "featureTags": ["tablature", "staff-tuning", "technical-string-fret"],
       "expectedLab": {"status": "OBSERVE", "errorCode": null},
       "expectedEngine": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeLab": {"status": "OBSERVE", "errorCode": null},
+      "expectedProbeEngine": {"status": "OBSERVE", "errorCode": null},
       "expectedSemanticComparison": "OBSERVE"
     }
   ]
