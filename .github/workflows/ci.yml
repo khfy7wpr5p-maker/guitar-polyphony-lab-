@@ -93,6 +93,26 @@ jobs:
           node scripts/verify-v2-failure-intelligence-report.mjs
           --generated v2-generated/failure-intelligence-report.json
 
+      - name: Generate V2B projection refinement report
+        run: >-
+          node scripts/run-v2b-projection-refinement.mjs
+          --external-root .v1c-musicxml-tests
+          --engine-root .v1b-engine
+          --output v2b-generated/projection-refinement-report.json
+
+      - name: Verify committed V2B projection refinement baseline
+        run: >-
+          node scripts/verify-v2b-projection-refinement-report.mjs
+          --generated v2b-generated/projection-refinement-report.json
+
+      - name: Upload V2B projection refinement report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: v2b-projection-refinement-report
+          path: v2b-generated/projection-refinement-report.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload V1C capability report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
