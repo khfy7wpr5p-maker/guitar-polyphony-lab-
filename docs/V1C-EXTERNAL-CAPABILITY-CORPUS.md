@@ -2,11 +2,26 @@
 
 ## Status
 
-V1C has an initial pinned regression slice built from 11 MusicXML 4.0 files in `w3c-cg/musicxmlTestSuite`.
+V1C has a pinned **22-case regression baseline** built from `w3c-cg/musicxmlTestSuite`.
 
 The source repository is pinned to commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea`. The selected MusicXML files are covered by that repository's MIT license. The production comparison side is pinned to `musicxml-to-guitar-tab-engine` commit `1d8ced644f544f7e991f7275eda77a2ce557774e`.
 
 This stage is a **capability map**, not a MusicXML conformance claim and not a production acceptance claim.
+
+Current pinned summary:
+
+```text
+cases:                    22
+raw Lab supported:         0
+raw Engine supported:      0
+probe Lab supported:      17
+probe Engine supported:    5
+semantic EQUAL:            5
+semantic MISMATCH:         0
+semantic NOT_COMPARABLE:  17
+```
+
+These counts are regression observations for the exact pinned corpus and Engine revision. They are not product scores.
 
 ## Why V1C exists
 
@@ -37,13 +52,11 @@ V1C does not vendor the external MusicXML files into this repository. CI checks 
 - raw file SHA-256;
 - semantic-probe SHA-256.
 
-The source paths and hashes are recorded in `fixtures/v1c/manifest.json`.
+The source paths, hashes, transforms and expected outcomes are recorded in `fixtures/v1c/manifest.json`.
 
 ## Raw input versus semantic probe
 
-The selected upstream files contain the standard external MusicXML 4.0 `DOCTYPE` declaration. Both current Lab and Engine raw-input security gates reject DTD/DOCTYPE-bearing XML.
-
-V1C preserves that fact. It does **not** weaken the production or Lab trust boundary.
+All 22 currently pinned upstream cases carry an external MusicXML `DOCTYPE`, so both current Lab and Engine raw-input security gates reject the raw files. V1C preserves that fact. It does **not** weaken the production or Lab trust boundary.
 
 Each case therefore has two observations:
 
@@ -55,20 +68,22 @@ UPSTREAM BYTES
     |       Engine trust boundary
     |
     +--> V1C OFFLINE SEMANTIC PROBE
-            remove exactly the pinned external
-            MusicXML 4.0 DOCTYPE declaration
+            execute the exact per-case approved transform
             |
             +--> Lab semantic path
             +--> production Engine compatibility chain
 ```
 
-The only approved transform in this slice is:
+The approved transform allowlist is:
 
 ```text
-REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE
+IDENTITY_NO_DOCTYPE
+REMOVE_VERIFIED_MUSICXML_PARTWISE_EXTERNAL_DOCTYPE
 ```
 
-The transform must match exactly one known declaration. Any other/multiple declaration shape fails the runner. The transformed bytes are SHA-256 pinned per case.
+For DOCTYPE-bearing cases, the runner accepts only one structurally verified Recordare MusicXML `score-partwise` PUBLIC declaration with the expected MusicXML system URI. Arbitrary, multiple, entity-bearing or otherwise unapproved declarations are rejected. The transformed bytes are SHA-256 pinned per case.
+
+The generic verified transform is intentionally able to observe historical MusicXML partwise declarations rather than assuming every external file is MusicXML 4.0. The raw security gate remains unchanged.
 
 This probe is test infrastructure only. It must not be interpreted as authorization to silently strip arbitrary DTDs from application input.
 
@@ -84,9 +99,7 @@ parseParsedMusicXmlDocument
 
 This matters because the production compatibility chain can intentionally normalize presentation-only forms before source-semantic projection.
 
-## Initial 11-case baseline
-
-The first pinned slice contains both isolated and mixed/stress fixtures:
+## Pinned 22-case baseline
 
 | Case | Focus | Probe Lab | Probe Engine | Semantic comparison |
 |---|---|---|---|---|
@@ -101,12 +114,29 @@ The first pinned slice contains both isolated and mixed/stress fixtures:
 | `45b` | repeat + alternative endings | SUPPORTED | `UNSUPPORTED_POLYPHONIC_REPEAT_BARLINE` | NOT_COMPARABLE |
 | `71c` | guitar fretboard/frame metadata | SUPPORTED | `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` | NOT_COMPARABLE |
 | `71e` | multipart TAB-staff stress fixture | `PART_SELECTION_REQUIRED` | `UNSUPPORTED_POLYPHONIC_GRACE_ORNAMENT` | NOT_COMPARABLE |
+| `23b` | tuplet styles / display variants | SUPPORTED | `UNSUPPORTED_POLYPHONIC_TIME_SIGNATURE_DISPLAY` | NOT_COMPARABLE |
+| `23d` | nested tuplets | SUPPORTED | `UNSUPPORTED_POLYPHONIC_TRIPLET_TIME_MODIFICATION` | NOT_COMPARABLE |
+| `24b` | grace chord | `UNSUPPORTED_GRACE_NOTE` | `UNSUPPORTED_POLYPHONIC_GRACE_ORNAMENT` | NOT_COMPARABLE |
+| `24c` | grace at measure end | `UNSUPPORTED_GRACE_NOTE` | `UNSUPPORTED_POLYPHONIC_GRACE_ORNAMENT` | NOT_COMPARABLE |
+| `24h` | simultaneous grace material | `UNSUPPORTED_GRACE_NOTE` | `UNSUPPORTED_POLYPHONIC_GRACE_ORNAMENT` | NOT_COMPARABLE |
+| `31c` | metronome / tempo directions | SUPPORTED | `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` | NOT_COMPARABLE |
+| `33b` | simple tie | SUPPORTED | SUPPORTED | EQUAL |
+| `33d` | octave-shift direction/spanner | SUPPORTED | `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` | NOT_COMPARABLE |
+| `43i` | single-voice multistaff staff change | SUPPORTED | SUPPORTED | EQUAL |
+| `45c` | repeat multiple-times metadata | SUPPORTED | `UNSUPPORTED_POLYPHONIC_REPEAT_BARLINE` | NOT_COMPARABLE |
+| `71d` | multistaff fretboard/frame metadata | SUPPORTED | `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` | NOT_COMPARABLE |
 
-The raw upstream input result is intentionally separate: all 11 selected files are rejected by the current raw trust boundary because they carry an external DOCTYPE (`DOCTYPE_NOT_ALLOWED` in the Lab; `UNSAFE_XML_DECLARATION` in the Engine).
+The two expansion cases `33d` and `45c` do not declare a `score-partwise version` attribute; the report records that as `null` rather than inventing a version.
 
 ## What the baseline does and does not prove
 
-The three `EQUAL` cases prove only that the compared source-semantic fields represented by V1B agree for these exact pinned fixtures after the explicit offline probe transform.
+The five `EQUAL` cases prove only that the compared source-semantic fields represented by V1B agree for these exact pinned fixtures after the explicit offline probe transform:
+
+- `03b` backup/polyphony;
+- `21a` basic chord;
+- `33b` simple tie;
+- `43a` piano/multistaff;
+- `43i` single-voice staff change.
 
 They do **not** prove:
 
@@ -117,7 +147,7 @@ They do **not** prove:
 - grace-note realization;
 - tuplet rendering or playback;
 - harmony/fretboard-frame preservation;
-- cross-measure sustain-chain equality;
+- all direction/spanner semantics;
 - production string/fret choice;
 - Canonical TAB equality.
 
@@ -133,15 +163,24 @@ Likewise, a local unsupported code is evidence about the exact fixture and pinne
 - source Git blob SHA;
 - source SHA-256;
 - semantic-probe SHA-256;
+- per-case approved semantic-probe transform;
 - raw Lab outcome;
 - raw Engine outcome;
 - probe Lab outcome;
 - probe Engine outcome;
 - semantic comparison outcome.
 
-`artifacts/v1c/capability-report.json` records the initial full report.
+Committed report evidence is sharded so corpus growth does not create one increasingly monolithic JSON file:
 
-CI regenerates the report from the pinned external repository and Engine revision, requires all expected outcomes to match, and compares the generated JSON semantically with the committed baseline report.
+```text
+artifacts/v1c/capability-report.json   # metadata, summary, shard hashes
+artifacts/v1c/cases-01.json
+artifacts/v1c/cases-02.json
+artifacts/v1c/cases-03.json
+artifacts/v1c/cases-04.json
+```
+
+CI regenerates the full report from the pinned external repository and Engine revision, requires all expected outcomes to match, verifies every shard hash, reconstructs the committed report, and compares it semantically with the generated report.
 
 ## Security and product boundary
 
@@ -153,18 +192,18 @@ V1C keeps these boundaries explicit:
 - corpus evidence never grants the Lab production authority;
 - the Engine remains the production MusicXML-to-TAB authority;
 - no external repository becomes a runtime dependency;
-- no learned model participates in this V1C slice.
+- no learned model participates in this V1C baseline.
 
 ## Continuation
 
-This initial V1C slice should be expanded by adding **isolated** fixtures before drawing broader capability conclusions. High-value next groups are:
+The initial isolated V1C expansion is complete. V1C may continue to grow additively with additional focused fixtures, especially compressed `.mxl`, transposition, microtones, more guitar technical metadata and further isolated presentation forms.
 
-1. simple versus advanced tuplets;
-2. grace subtypes and grace/chord interaction;
-3. multivoice fixtures without unrelated presentation metadata;
-4. simple repeat versus nested/alternative repeat structures;
-5. guitar/TAB-specific staff-tuning and technical string/fret cases separated from multipart/grace stress files;
-6. ties, octave shifts, articulations and directions;
-7. valid compressed `.mxl` ingestion as a separate transport boundary.
+The main architecture continuation now moves to **V2 Failure Intelligence**:
 
-V1C should then feed V2 failure intelligence: stable error taxonomy, local capability classification, reproducible failure fixtures, and production-gap prioritization. It should not be used to make unsupported input globally block provisional downstream work where a safe partial representation exists.
+1. stable localized capability/recovery taxonomy;
+2. narrowest truthful failure scope (score/part/measure/voice/event/note/sonority/region/export);
+3. distinction between unsupported source feature, normalization gap, projection gap, search failure and true physical infeasibility;
+4. recovery metadata that preserves provisional downstream work instead of turning local uncertainty into global blocking;
+5. evidence suitable for the later independent feasibility oracle and arrangement contracts.
+
+V1C evidence must not be used to make unsupported input globally block provisional downstream work where a safe partial representation exists.
