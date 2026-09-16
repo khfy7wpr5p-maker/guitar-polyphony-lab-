@@ -3,6 +3,7 @@ export const V1C_CAPABILITY_CORPUS_ERROR_CODE = 'INVALID_V1C_CAPABILITY_CORPUS';
 
 const EXPECTED_STATUSES = new Set(['OBSERVE', 'SUPPORTED', 'UNSUPPORTED_LOCAL']);
 const SEMANTIC_EXPECTATIONS = new Set(['OBSERVE', 'EQUAL', 'MISMATCH', 'NOT_COMPARABLE']);
+const SEMANTIC_PROBE_TRANSFORM = 'REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE';
 const SHA1 = /^[a-f0-9]{40}$/;
 const SHA256 = /^[a-f0-9]{64}$/;
 
@@ -113,6 +114,16 @@ export function validateV1CCapabilityManifest(rawManifest) {
       path: 'policy.corpusContinuesAfterCaseFailure',
     });
   }
+  if (rawManifest.policy.semanticProbeTransform !== SEMANTIC_PROBE_TRANSFORM) {
+    invalid('V1C semantic probe transform is not approved.', {
+      path: 'policy.semanticProbeTransform',
+    });
+  }
+  if (rawManifest.policy.rawInputSecurityPolicyRemainsUnchanged !== true) {
+    invalid('V1C semantic probing must not weaken raw input security policy.', {
+      path: 'policy.rawInputSecurityPolicyRemainsUnchanged',
+    });
+  }
   if (!Array.isArray(rawManifest.policy.globalFailureOnlyFor) || rawManifest.policy.globalFailureOnlyFor.length === 0) {
     invalid('V1C policy must declare bounded global failure reasons.', {
       path: 'policy.globalFailureOnlyFor',
@@ -151,6 +162,8 @@ export function validateV1CCapabilityManifest(rawManifest) {
     item.featureTags.forEach((tag, tagIndex) => assertText(tag, `${path}.featureTags[${tagIndex}]`, 128));
     assertExpectedOutcomeShape(item.expectedLab, `${path}.expectedLab`);
     assertExpectedOutcomeShape(item.expectedEngine, `${path}.expectedEngine`);
+    assertExpectedOutcomeShape(item.expectedProbeLab, `${path}.expectedProbeLab`);
+    assertExpectedOutcomeShape(item.expectedProbeEngine, `${path}.expectedProbeEngine`);
     if (!SEMANTIC_EXPECTATIONS.has(item.expectedSemanticComparison)) {
       invalid('V1C semantic comparison expectation is not supported.', {
         path: `${path}.expectedSemanticComparison`,
