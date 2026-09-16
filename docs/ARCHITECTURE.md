@@ -42,6 +42,7 @@ The Lab does not own production reduction policy, arrangement authority, final p
 - **V2A** — deterministic failure family/layer/scope/handling taxonomy
 - **V2B** — live generic projection cause/location refinement
 - **V3A** — exhaustive exact pitch/string/sustain reachability oracle
+- **V3B** — independent left-hand finger/barre/reach feasibility oracle with pinned Engine comparison
 - **configuration research** — Standard / Drop D / custom tuning / capo
 - **technique provenance** — source metadata sidecars without automatic physical authority
 
@@ -70,18 +71,21 @@ P0 source-polyphony facts
                     V3A EXACT POSITION ORACLE
              pitch / string / sustain reachability
                                   |
+                                  v
+                    V3B LEFT-HAND ORACLE
+              finger / barre / span / reach
+                                  |
                    +--------------+--------------+
                    |                             |
-             INFEASIBLE                       FEASIBLE
+             strict feasible              strict infeasible
                    |                             |
-          hard contradiction                     v
-                                         V3B LEFT-HAND ORACLE
-                                   finger / barre / reach evidence
-                                                |
-                                  +-------------+-------------+
-                                  |                           |
-                           physical rejection       search/capability-gap
-                                                     candidate
+                   v                             v
+           candidate/N-best space      explicit recovery /
+                                      arrangement alternatives
+                   \____________________   __________________/
+                                        \ /
+                                         v
+                           provenance-tracked arrangement
 ```
 
 ## V1 evidence foundation
@@ -118,17 +122,13 @@ Raw trust-boundary behavior remains separate from musical-semantic capability. C
 V2A classifies all current V1C unsupported observations:
 
 ```text
-failure observations:        66
-raw trust failures:           44
-semantic capability failures: 22
-unclassified:                  0
+failure observations:         66
+raw trust failures:            44
+semantic capability failures:  22
+unclassified:                   0
 ```
 
-It enforces:
-
-```text
-SEMANTIC_PROBE capability evidence -> never BLOCKED_GLOBAL in Lab taxonomy
-```
+Semantic capability evidence is forbidden from becoming `BLOCKED_GLOBAL` in the Lab taxonomy.
 
 ## V2B — live cause/location refinement
 
@@ -156,23 +156,15 @@ Four cases reach exact local scope. Two harmony cases remain bounded region sets
 
 V3A is implemented as `src/guitar/strictFeasibilityOracle.js`.
 
-It answers one narrow but important question independently of the production Engine:
+It independently asks whether at least one exact pitch-preserving string/fret path exists when simultaneous notes require distinct strings and held notes must keep the same string/fret.
 
-> Does at least one exact pitch-preserving string/fret path exist when simultaneous notes require distinct strings and held notes must keep the same string/fret?
-
-Unlike the earlier deterministic research verifier, V3A does not keep only one lexicographic path. It carries every distinct reachable state forward and deduplicates equivalent states.
-
-This prevents a greedy early choice from being mistaken for physical impossibility.
-
-V3A result states:
+Unlike the earlier greedy research verifier, V3A carries every distinct reachable state forward and deduplicates equivalent states. Its result states are:
 
 ```text
 FEASIBLE
 INFEASIBLE
 INDETERMINATE_LIMIT
 ```
-
-A configured evidence/search limit produces `INDETERMINATE_LIMIT`, never a false physical impossibility claim.
 
 Pinned benchmark:
 
@@ -184,42 +176,70 @@ INDETERMINATE_LIMIT:                 1
 proven legacy greedy false-negative: 1
 ```
 
-The proven false-negative benchmark has the older greedy verifier returning `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT` while V3A preserves six reachable initial states and finds five valid continuation states at the next point.
+A configured search/evidence limit yields `INDETERMINATE_LIMIT`, never a false physical impossibility claim.
+
+## V3B — independent left-hand physical feasibility
+
+V3B is implemented as `src/guitar/leftHandFeasibilityOracle.js` plus a pinned cross-repository benchmark.
+
+For already-fixed string/fret positions, V3B independently evaluates:
+
+- fretting fingers 1–4 and open-string finger 0;
+- one finger remaining on one fret inside a static shape;
+- ordered finger-to-fret relationships;
+- legal partial/full barre spans;
+- maximum static fret span;
+- conservative extra finger reach;
+- bounded assignment search.
+
+Result states remain:
+
+```text
+FEASIBLE
+INFEASIBLE
+INDETERMINATE_LIMIT
+```
+
+Pinned seven-case benchmark:
+
+```text
+cases:                         7
+Lab FEASIBLE:                  3
+Lab INFEASIBLE:                3
+Lab INDETERMINATE_LIMIT:       1
+cross-repo comparable:         6
+pinned Engine status parity:   6 / 6
+```
+
+The six comparable cases agree in normalized feasible/infeasible status with the pinned Engine physical layer. The Engine is used only as a comparison target; the Lab oracle is not implemented by calling the Engine physical validator.
+
+The benchmark also preserves one deliberately bounded assignment-limit case as `INDETERMINATE_LIMIT`, proving that evidence exhaustion is not silently converted into physical impossibility.
 
 Committed evidence:
 
 ```text
-fixtures/v3a/benchmark.json
-artifacts/v3a/strict-feasibility-baseline.json
+fixtures/v3b/left-hand-benchmark.json
+artifacts/v3b/left-hand-benchmark-baseline.json
+scripts/run-v3b-left-hand-benchmark.mjs
+scripts/verify-v3b-left-hand-benchmark-report.mjs
 ```
 
-CI regenerates and verifies this baseline on every stage/PR run.
+CI regenerates the report from the exact pinned Engine revision, asserts fixture expectations, and requires deep equality with the committed baseline on stage and pull-request runs.
 
-### V3A authority limit
+### V3 authority limit
 
-V3A does **not** model:
+V3A/V3B establish bounded strict-physical evidence, not complete human performance authority. They do not claim:
 
-- left-hand finger assignment;
-- barre feasibility;
-- hand-span or extra-reach policy;
-- ergonomics;
-- player-specific capability;
-- arrangement transformations.
+- ergonomic preference or comfort;
+- hand-size/player-specific capability;
+- musical quality of a fingering;
+- production final-path authority;
+- arrangement authority;
+- learned ranking authority.
 
-Therefore:
+Therefore a V3B `FEASIBLE` result means a strict shape exists within the declared physical policy, not that it is the best fingering for a player. A V3B `INFEASIBLE` result means the tested fixed-position strict shape has no admissible left-hand realization within the declared policy. A limit result remains indeterminate.
 
-```text
-V3A INFEASIBLE
-  -> exact string/fret feasibility disproven within V3A scope
-
-V3A FEASIBLE + production failure
-  -> exact string/fret impossibility is not proven
-  -> stronger left-hand physical rejection vs search/capability failure still unresolved
-```
-
-This is why V3B is required before labeling production failures as likely search/capability defects.
-
-## Current continuation point — V3B
+## Current continuation point — Arrangement contracts / N-best
 
 ```text
 V1B reproducible Engine evidence ✅
@@ -230,32 +250,31 @@ V2A failure taxonomy ✅
         |
 V2B cause/location refinement ✅
         |
-V3A exact position oracle ✅
+V3A exact-position oracle ✅
+        |
+V3B left-hand physical oracle ✅
         |
         v
-V3B INDEPENDENT LEFT-HAND PHYSICAL ORACLE  <--- NEXT
+PROVENANCE-TRACKED ARRANGEMENT CONTRACTS  <--- NEXT
         |
-        +--> independent finger assignment
-        +--> barre feasibility
-        +--> hand-span / extra-reach policy
-        +--> pinned comparison against production Engine physical failures
-        |
-        v
-explicit arrangement / N-best research
+        +--> explicit omission
+        +--> octave displacement
+        +--> register compression
+        +--> arpeggiation
+        +--> voice prioritization
+        +--> N-best transformed alternatives
         |
         v
 V4 learned/ergonomic evidence in shadow mode
 ```
 
-The unresolved exact occurrence inside the two V2B harmony region sets may be refined additively and does not block V3B.
+The unresolved exact occurrence inside the two V2B harmony region sets may be refined additively and does not block arrangement-contract research.
 
 ## Trust and physical boundaries
 
 P1A remains authoritative for bounded hostile-input rejection before Lab parsing. V1C semantic transforms remain offline regression probes only.
 
-P2A/P2B and V3A provide deterministic exact-position research evidence. Physical validity is a hard constraint: learned or preference evidence may not convert an impossible untransformed candidate into a physically valid one.
-
-V3B will add stronger left-hand physical evidence but must remain independent from production implementation details.
+P2A/P2B and V3A/V3B provide deterministic research evidence. Learned or preference evidence may not convert an impossible untransformed candidate into a physically valid one.
 
 ## Progressive capability states
 
@@ -271,9 +290,9 @@ Use the narrowest truthful scope. `REVIEW_REQUIRED` is not intended to be a glob
 
 ## Arrangement direction
 
-Future arrangement work may create explicit transformed alternatives while preserving original source facts separately. Candidate transforms include voice prioritization, melody/bass preservation, inner-voice reduction, omission, octave displacement, register compression, arpeggiation, and N-best alternatives.
+Arrangement work may create explicit transformed alternatives while preserving original source facts separately. Candidate transforms include voice prioritization, melody/bass preservation, inner-voice reduction, omission, octave displacement, register compression, arpeggiation, and N-best alternatives.
 
-Every transform must retain provenance, before/after facts, reason/policy and editability/reversibility.
+Every transform must retain provenance, before/after facts, reason/policy, and editability/reversibility. Arrangement is not permission to silently rewrite source truth.
 
 ## V4 learned evidence
 
@@ -294,6 +313,6 @@ source truth
 - **V2A** deterministic failure taxonomy — ✅
 - **V2B** live bounded cause/location refinement — ✅
 - **V3A** exhaustive exact pitch/string/sustain reachability — ✅
-- **V3B** independent left-hand physical oracle + production comparison — **NEXT**
-- **Arrangement / N-best** explicit transformed alternatives
+- **V3B** independent left-hand physical oracle + pinned Engine comparison — ✅
+- **Arrangement / N-best** explicit transformed alternatives — **NEXT**
 - **V4** ergonomic and learned evidence providers in shadow mode

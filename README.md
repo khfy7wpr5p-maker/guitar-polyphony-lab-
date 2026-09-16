@@ -28,6 +28,7 @@ Verification-stage fail-closed boundaries are evidence boundaries, not permanent
 - **V2A:** deterministic failure-family/layer/scope/handling taxonomy over current V1C failures
 - **V2B:** live Engine feature/location refinement for the six generic projection failures
 - **V3A:** exhaustive exact string/fret sustained-path feasibility oracle with committed regression evidence
+- **V3B:** independent left-hand finger/barre/reach feasibility oracle with pinned Engine comparison baseline
 - **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
 - **Technique research:** bounded source-provenance sidecars kept separate from physical authority
 
@@ -43,9 +44,9 @@ Verification-stage fail-closed boundaries are evidence boundaries, not permanent
 | External MusicXML capability corpus | ✅ V1C COMPLETE | 22 pinned MIT-licensed cases, hashed evidence, exact outcomes |
 | Failure intelligence taxonomy | ✅ V2A COMPLETE | 66 observations, 8 families, zero unclassified |
 | Generic projection refinement | ✅ V2B COMPLETE | 6/6 generic cases refined from live Engine evidence; 4 exact local scopes, 2 bounded harmony region sets |
-| Independent exact-position feasibility oracle | ✅ V3A FOUNDATION | exhaustive exact pitch/string/sustain reachability; left-hand fingering explicitly not yet modeled |
-| Independent left-hand physical oracle | 📋 V3B NEXT | separate finger/barre/reach evidence before labeling production failures as search/capability gaps |
-| Arrangement/N-best alternatives | 📋 FUTURE CAPABILITY | Explicit transformed alternatives with provenance |
+| Independent exact-position feasibility oracle | ✅ V3A COMPLETE | exhaustive exact pitch/string/sustain reachability with a proven greedy false negative |
+| Independent left-hand physical oracle | ✅ V3B COMPLETE | 7-case benchmark; 6 cross-repo comparable cases with 6/6 status parity |
+| Arrangement/N-best alternatives | 📋 NEXT | Explicit transformed alternatives with provenance; no silent source mutation |
 | Learned guitar evidence / FretNet / TabCNN | 📋 V4 RESEARCH | Future shadow evidence/ranking provider |
 
 ## V1B / V1C evidence
@@ -81,13 +82,11 @@ The current V1C evidence contains 66 unsupported observations:
 
 V2A maps them into eight deterministic failure families with zero unclassified observations. Semantic capability evidence is forbidden from being promoted to a global block by the Lab taxonomy.
 
-Before V2B, six Engine cases were intentionally left as generic `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` rather than assigning a cause from fixture metadata.
-
 ## V2B projection refinement
 
-V2B re-runs those six cases against the exact pinned Engine production compatibility chain and captures bounded live `error.details` plus exact source occurrence evidence.
+V2B re-runs the six formerly generic projection failures against the exact pinned Engine production compatibility chain and captures bounded live `error.details` plus exact source occurrence evidence.
 
-Observed Engine feature split:
+Observed feature split:
 
 ```text
 direction          3
@@ -105,17 +104,11 @@ FEATURE_REGION_SET 2
 
 All six are architecture-level `REVIEW_REQUIRED` candidates. None becomes `BLOCKED_GLOBAL` and this does not change production runtime behavior.
 
-Four cases reach exact local scope. The two harmony cases remain bounded region sets because Engine identifies `harmony` but does not identify which individual harmony occurrence is causal. V2B preserves that uncertainty instead of guessing.
-
 Committed V2B evidence: `artifacts/v2b/projection-refinement-baseline.json`.
-
-See `docs/V2-FAILURE-INTELLIGENCE.md`.
 
 ## V3A independent exact-position feasibility oracle
 
-V3A adds an independent, non-greedy feasibility oracle for exact guitar string/fret reachability.
-
-It exhaustively carries every distinct reachable physical state across sustained points while preserving exact pitch, distinct-string use, and held string/fret identity. A configured search bound produces `INDETERMINATE_LIMIT`, never a false `INFEASIBLE` conclusion.
+V3A adds an independent, non-greedy feasibility oracle for exact guitar string/fret reachability. It carries every bounded reachable physical state across sustained points while preserving exact pitch, distinct-string use, and held string/fret identity. Search bounds produce `INDETERMINATE_LIMIT`, never false physical impossibility.
 
 Pinned five-case benchmark:
 
@@ -126,13 +119,30 @@ INDETERMINATE_LIMIT:                 1
 proven legacy greedy false-negative: 1
 ```
 
-The false-negative benchmark is significant: the older greedy research verifier reports `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT`, while V3A proves a valid exact sustained path exists by keeping alternate earlier string placements alive.
-
-V3A deliberately does not yet claim finger assignment, barre feasibility, hand reach, ergonomics, or arrangement authority. Those stronger constraints are the V3B continuation.
+The false-negative benchmark proves that the older greedy research verifier can report `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT` even though a valid exact sustained path exists.
 
 Committed V3A evidence: `artifacts/v3a/strict-feasibility-baseline.json`.
 
-See `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md`.
+## V3B independent left-hand physical oracle
+
+V3B adds an independent bounded left-hand feasibility layer for fixed string/fret positions. It models ordered finger-to-fret use, reusable fingers on one fret, barre legality, a conservative maximum static fret span, explicit finger reach, and bounded assignment search.
+
+Pinned seven-case benchmark:
+
+```text
+cases:                         7
+Lab FEASIBLE:                  3
+Lab INFEASIBLE:                3
+Lab INDETERMINATE_LIMIT:       1
+cross-repo comparable:         6
+pinned Engine status parity:   6 / 6
+```
+
+Covered evidence includes open strings, a compact C-major shape, an F-major barre shape, excessive fret span, five distinct fretted frets, explicit finger-reach rejection, and a deliberately bounded assignment-limit case.
+
+The pinned Engine is a **comparison target only**. The Lab implementation remains independent. Equal status on the six comparable cases is regression evidence, not production authority and not proof that the two implementations are identical.
+
+Committed V3B evidence: `artifacts/v3b/left-hand-benchmark-baseline.json`.
 
 ## Architecture direction
 
@@ -146,21 +156,22 @@ strict source facts / provenance
       |
       v
 V2 failure intelligence
-family / layer / scope / handling
       |
       v
-V3A exact string/fret feasibility oracle
-      |
-      +---- infeasible ------> hard exact-position contradiction
-      |
-      +---- feasible --------> V3B independent left-hand physical oracle
-                                      |
-                                      +--> true stronger physical rejection
-                                      |
-                                      +--> production search/capability gap candidate
+V3A exact string/fret feasibility
       |
       v
-future explicit arrangement / N-best research
+V3B independent left-hand physical feasibility
+      |
+      +---- true strict infeasibility ----> explicit recovery/arrangement alternatives
+      |
+      +---- strict feasibility -----------> candidate / N-best space
+      |
+      v
+provenance-tracked arrangement contracts
+      |
+      v
+future editable guitar realization
 ```
 
 Source truth and hard physical validity remain separate from preference and learned ranking. Learned evidence may eventually rank already-valid candidates or explicit alternatives, but may not invent source facts or make an impossible untransformed candidate physically valid.
@@ -170,9 +181,9 @@ Source truth and hard physical validity remain separate from preference and lear
 - P1A remains authoritative for bounded hostile-input rejection before Lab parsing.
 - V1C semantic probing is offline test evidence only.
 - V2 classifications are evidence-only; candidate states do not change production runtime behavior.
-- V3A is research evidence only and explicitly does not claim complete left-hand human playability.
+- V3A/V3B are independent research evidence only; neither changes production status or final TAB authority.
+- `INDETERMINATE_LIMIT` is never re-labeled as physical impossibility.
 - No Lab module is production authority for reduction, arrangement, final fingering, Canonical TAB, rendering, playback, OMR, or application UI.
-- Higher-level musical capability gaps should be localized rather than automatically interpreted as whole-score failure.
 - External fixtures/models/datasets require provenance and licensing before promotion.
 - Learned evidence remains below source truth and hard physical constraints.
 
@@ -185,12 +196,12 @@ Source truth and hard physical validity remain separate from preference and lear
 - **V2 — Failure Intelligence**
   - V2A deterministic taxonomy ✅
   - V2B live generic projection cause/location refinement ✅
-  - additional exact harmony-location refinement is additive, not blocking
 - **V3 — Independent Feasibility Oracle**
   - V3A exhaustive exact pitch/string/sustain reachability ✅
-  - V3B independent finger/barre/reach physical layer + pinned Engine comparison **NEXT**
-- **Arrangement capability**
+  - V3B independent finger/barre/reach physical layer + pinned Engine comparison ✅
+- **Arrangement capability — NEXT**
   - explicit voice prioritization, omission, octave displacement, register compression, arpeggiation and N-best transformed alternatives
+  - every transformed alternative must preserve source provenance and before/after facts
 - **V4 — Guitar research / learned evidence**
   - ergonomic benchmarks and player profiles
   - TabCNN/FretNet-style providers in shadow mode
@@ -216,10 +227,4 @@ Node.js 22 or newer is required.
 - `docs/V2-FAILURE-INTELLIGENCE.md`
 - `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md`
 - `docs/FRETNET_RESEARCH.md`
-- `docs/P1A-INPUT-GATE.md`
-- `docs/P1B-PARSER-ADAPTER.md`
-- `docs/P1C-COMPATIBILITY-MATRIX.md`
-- `docs/POLYPHONY-MODEL.md`
-- `docs/SUPPORTED-MUSICXML.md`
-- `docs/TUNING-LAB-02.md`
 - `SECURITY.md`

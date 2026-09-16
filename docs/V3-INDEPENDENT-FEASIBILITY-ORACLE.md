@@ -2,159 +2,243 @@
 
 ## Status
 
-V3A implements the first production-independent strict guitar feasibility oracle in `guitar-polyphony-lab`.
+V3A and V3B are implemented as production-independent research evidence in `guitar-polyphony-lab`.
 
-The oracle is evidence-only. It does not change production Engine behavior, select final TAB, authorize arrangement transforms, or claim complete human left-hand playability.
+V3 does not change production Engine behavior, select final TAB, authorize arrangement transforms, or claim universal human playability. It separates strict physical evidence from production search/capability behavior.
 
 ## Why V3 exists
 
-A production solver can fail for several different reasons:
+A production solver can fail because:
 
-- the exact musical material is physically impossible under the declared guitar configuration;
-- the production search selected an earlier state that leads to a dead end;
-- a bounded search/candidate limit was reached;
-- a stricter physical layer such as finger assignment or hand reach rejects the shape;
-- the current implementation simply lacks the required capability.
+- exact musical material is physically impossible under the declared guitar configuration;
+- one search path dead-ends while another valid path exists;
+- a bounded search/candidate limit is reached;
+- a stronger left-hand constraint rejects an otherwise valid string/fret placement;
+- the implementation lacks a capability.
 
-Those cases must not be collapsed into one `BLOCKED` conclusion.
+Those cases must not collapse into one global `BLOCKED` conclusion.
 
-V3 provides an independent reference path so production failure can be compared with reproducible physical evidence.
+V3 provides two independent physical evidence layers.
 
-## V3A physical scope
+---
 
-`src/guitar/strictFeasibilityOracle.js` currently proves only this exact scope:
+## V3A — exact string/fret reachability
+
+`src/guitar/strictFeasibilityOracle.js` proves only this scope:
 
 ```text
-written/sounding pitch must remain exact
-+ pitch must exist on the declared six-string fretboard
-+ simultaneous notes must use distinct strings
-+ held/sustained notes must keep the same string and fret
-+ no arrangement transformation is allowed
+exact pitch
++ pitch exists on declared six-string fretboard
++ simultaneous notes use distinct strings
++ held notes keep the same string/fret
++ no arrangement transforms
 ```
 
-V3A deliberately does **not** yet model:
+V3A is exhaustive within its bounded state space rather than greedy. It keeps all distinct reachable string/fret states across sustained points and deduplicates equivalent states.
 
-- left-hand finger assignment;
-- barre feasibility;
-- hand-span / extra-reach policy;
-- ergonomic preference;
-- right-hand technique;
-- player-specific skill;
-- arrangement or note omission.
-
-Therefore `FEASIBLE` means feasible within the exact string/fret reachability scope above. It must not be rewritten as a claim that every resulting shape is comfortable or human-playable under all left-hand policies.
-
-## Exhaustive reachability instead of greedy selection
-
-The earlier research verifier chooses one lexicographic assignment at each point. That is useful as a deterministic baseline but can create a false negative when an early valid choice prevents a later held-note transition.
-
-V3A keeps all distinct reachable string/fret states at every point, deduplicates equivalent states, and carries all reachable states forward while preserving held string/fret identity.
-
-The maximum unique state count per six-note point is bounded by the six-string assignment space. A user-requested lower search bound produces:
+Result states:
 
 ```text
+FEASIBLE
+INFEASIBLE
 INDETERMINATE_LIMIT
 ```
 
-not `INFEASIBLE`.
+A search/evidence limit produces `INDETERMINATE_LIMIT`, not physical impossibility.
 
-This distinction is required: reaching a computational boundary is not proof of physical impossibility.
+### V3A reproducible benchmark
 
-## Result states
-
-The oracle returns one of:
-
-- `FEASIBLE` — at least one exact path exists within V3A scope;
-- `INFEASIBLE` — no exact path exists and the oracle completed the bounded exhaustive proof;
-- `INDETERMINATE_LIMIT` — the configured evidence/search bound was reached before proof.
-
-Current hard reasons include:
-
-- `NO_EXACT_FRETBOARD_CANDIDATE`;
-- `ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT`;
-- `NO_DISTINCT_STRING_ASSIGNMENT`;
-- `NO_SUSTAINED_PATH`.
-
-Malformed sustain evidence is rejected as `INVALID_ORACLE_INPUT`; it is not mislabeled as a physical impossibility.
-
-## Reproducible benchmark
-
-V3A commits a five-case internal benchmark under:
+Committed evidence:
 
 ```text
 fixtures/v3a/benchmark.json
 artifacts/v3a/strict-feasibility-baseline.json
+scripts/run-v3a-strict-feasibility-benchmark.mjs
+scripts/verify-v3a-strict-feasibility-report.mjs
 ```
 
 Pinned result:
 
 ```text
-cases:                              5
-FEASIBLE:                           2
-INFEASIBLE:                         2
-INDETERMINATE_LIMIT:                1
-proven legacy greedy false-negative:1
+cases:                               5
+FEASIBLE:                            2
+INFEASIBLE:                          2
+INDETERMINATE_LIMIT:                 1
+proven legacy greedy false-negative: 1
 ```
 
-The false-negative case is intentionally important: the legacy greedy verifier reports `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT`, while V3A proves an exact sustained path exists by preserving alternate earlier string choices.
+The false-negative case demonstrates that the older greedy verifier can report `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT` while an exact sustained path actually exists.
 
-CI regenerates the report with:
-
-```text
-scripts/run-v3a-strict-feasibility-benchmark.mjs
-```
-
-and requires exact agreement with the committed baseline through:
+Safe interpretation:
 
 ```text
-scripts/verify-v3a-strict-feasibility-report.mjs
-```
+V3A INFEASIBLE
+  -> exact string/fret reachability disproven within scope
 
-## Authority boundary
+V3A FEASIBLE
+  -> exact string/fret impossibility not proven
+  -> continue to left-hand physical validation
 
-V3A is not production runtime authority.
-
-It may prove that a current failure is **not justified by exact pitch/string/sustain reachability alone**. It may not yet conclude that the production Engine has a bug when Engine rejection comes from a stronger left-hand physical policy that V3A does not model.
-
-The safe interpretation is:
-
-```text
-Oracle INFEASIBLE
-  -> exact string/fret feasibility is disproven within V3A scope
-
-Oracle FEASIBLE + production failure
-  -> exact string/fret impossibility is NOT proven
-  -> investigate stronger left-hand constraints vs production search/capability failure
-
-Oracle INDETERMINATE_LIMIT
+V3A INDETERMINATE_LIMIT
   -> no physical conclusion
 ```
 
-## Next — V3B
+---
 
-V3B should add an independent left-hand physical layer and a cross-repository comparison contract against the pinned production Engine.
+## V3B — independent left-hand physical feasibility
 
-The next evidence split is:
+`src/guitar/leftHandFeasibilityOracle.js` evaluates static left-hand feasibility for fixed string/fret positions independently from the production Engine implementation.
+
+The declared policy models:
+
+- finger `0` for open strings;
+- fretting fingers `1..4`;
+- one finger staying on one fret inside a static shape;
+- ordered finger/fret relationships;
+- reusable same-fret fingers through legal barre shapes;
+- legal partial/full barre spans;
+- maximum static fret span of `4`;
+- conservative extra finger reach of `1`;
+- bounded finger-assignment enumeration.
+
+Result states remain:
 
 ```text
-production failure
-      |
-      v
-V3A exact string/fret oracle
-      |
-      +--> INFEASIBLE: hard exact-position contradiction
-      |
-      +--> FEASIBLE
-              |
-              v
-       V3B independent left-hand oracle
-              |
-              +--> left-hand impossible
-              |
-              +--> left-hand feasible
-                        |
-                        v
-              production search/capability gap candidate
+FEASIBLE
+INFEASIBLE
+INDETERMINATE_LIMIT
 ```
 
-Only after that second physical layer is independently reproduced should the Lab call an Engine failure a likely search/capability failure rather than a stronger physical rejection.
+The oracle may emit physical reasons such as:
+
+```text
+FRET_SPAN_EXCEEDED
+DISTINCT_FRET_COUNT_EXCEEDS_FINGER_COUNT
+FINGER_REACH_EXCEEDED
+```
+
+and preserves assignment-bound exhaustion as:
+
+```text
+LEFT_HAND_ASSIGNMENT_LIMIT_EXCEEDED
+-> INDETERMINATE_LIMIT
+```
+
+### V3B reproducible benchmark
+
+Committed evidence:
+
+```text
+fixtures/v3b/left-hand-benchmark.json
+artifacts/v3b/left-hand-benchmark-baseline.json
+scripts/run-v3b-left-hand-benchmark.mjs
+scripts/verify-v3b-left-hand-benchmark-report.mjs
+```
+
+Pinned result:
+
+```text
+cases:                       7
+Lab FEASIBLE:                3
+Lab INFEASIBLE:              3
+Lab INDETERMINATE_LIMIT:     1
+cross-repo comparable:       6
+pinned Engine status parity: 6 / 6
+```
+
+Covered cases include:
+
+- six open strings;
+- compact C-major;
+- F-major barre shape;
+- static fret-span violation;
+- five distinct fretted frets;
+- explicit finger-reach violation;
+- deliberately low assignment limit.
+
+For the six comparable cases, normalized feasible/infeasible status matches the pinned Engine physical layer. The Engine is comparison evidence only; the Lab oracle is independently implemented.
+
+Parity does **not** mean both implementations enumerate the same shapes or have identical internal search behavior. For example, candidate and assignment counts can differ while final normalized physical status agrees.
+
+## V3 authority boundary
+
+V3 provides bounded hard-constraint evidence. It does not claim:
+
+- comfort or ergonomic quality;
+- player-specific hand size/capability;
+- musical preference;
+- right-hand technique quality;
+- final production fingering authority;
+- arrangement authority;
+- learned-model authority.
+
+Therefore:
+
+```text
+V3B FEASIBLE
+  -> at least one strict static left-hand realization exists under the declared policy
+  -> not necessarily the best or most comfortable fingering
+
+V3B INFEASIBLE
+  -> the tested strict fixed-position realization has no admissible left-hand shape under policy
+  -> recovery must be explicit, not a silent source rewrite
+
+V3B INDETERMINATE_LIMIT
+  -> no physical conclusion
+```
+
+## CI contract
+
+Every stage/PR CI run now:
+
+1. regenerates V3A evidence;
+2. requires exact equality with the committed V3A baseline;
+3. checks out the exact pinned production Engine SHA;
+4. regenerates the V3B Lab ↔ Engine comparison benchmark;
+5. asserts fixture expectations;
+6. requires all comparable V3B cases to preserve status parity;
+7. requires exact equality with the committed V3B baseline.
+
+The pinned production Engine SHA is:
+
+```text
+1d8ced644f544f7e991f7275eda77a2ce557774e
+```
+
+## Next — provenance-tracked Arrangement / N-best contracts
+
+With V3A and V3B complete, the next research layer is explicit recovery for material that cannot or should not remain a strict transcription.
+
+The architecture should distinguish:
+
+```text
+SOURCE FACTS
+    |
+    +--> strict transcription candidate
+    |        |
+    |        +--> V3 feasible -> preserve as strict candidate
+    |        |
+    |        +--> V3 infeasible -> strict physical contradiction
+    |
+    v
+ARRANGEMENT ALTERNATIVES
+    |
+    +--> omission
+    +--> octave displacement
+    +--> register compression
+    +--> arpeggiation
+    +--> voice prioritization
+    +--> N-best transformed alternatives
+```
+
+Every transformed alternative must preserve original facts separately and record:
+
+- transformation type;
+- exact source targets;
+- before facts;
+- after facts;
+- reason/policy;
+- reversibility/editability;
+- strict-feasibility evidence before and after transformation.
+
+Arrangement contracts are the next step before any learned ranking system becomes authoritative.

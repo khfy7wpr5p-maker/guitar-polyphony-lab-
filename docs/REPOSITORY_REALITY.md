@@ -1,6 +1,6 @@
 # Repository reality
 
-Fresh-read scope: current V3A branch, source/tests, package scripts, CI, internal compatibility fixtures, committed V1B Engine evidence, pinned V1C external evidence, V2A taxonomy evidence, V2B cause/location refinement evidence, and V3A strict-feasibility evidence as of 2026-09-16.
+Fresh-read scope: current V3B branch, source/tests, package scripts, CI, internal compatibility fixtures, committed V1B Engine evidence, pinned V1C external evidence, V2A/V2B failure evidence, V3A exact-position evidence, and V3B left-hand comparison evidence as of 2026-09-16.
 
 This document describes repository reality, not general production capability claims for `musicxml-to-guitar-tab-engine`.
 
@@ -21,8 +21,9 @@ pinned external MusicXML corpus
 physical research
   -> P2A fretboard candidates
   -> P2B distinct-string assignments
-  -> legacy deterministic sustained/grace verifiers
-  -> V3A exhaustive exact-position sustained-path oracle
+  -> V3A exhaustive exact-position path oracle
+  -> V3B independent left-hand finger/barre/reach oracle
+  -> pinned Engine physical-layer comparison evidence
 ```
 
 ## Implemented contracts
@@ -36,10 +37,12 @@ physical research
 | `src/corpus/v1cCapabilityCorpus.js` | V1C provenance/hash/outcome contract | local unsupported states remain valid evidence |
 | `src/failures/v2FailureIntelligence.js` | V2A failure taxonomy | semantic failures cannot become global blocks |
 | `src/failures/v2bProjectionRefinement.js` | V2B refinement of generic Engine projection failures | evidence-only; no automatic recovery authority |
-| `src/guitar/strictFeasibilityOracle.js` | exhaustive exact pitch/string/sustain reachability proof | no left-hand finger/barre/reach or production authority |
+| `src/guitar/strictFeasibilityOracle.js` | exhaustive exact pitch/string/sustain reachability proof | no arrangement or production authority |
+| `src/guitar/leftHandFeasibilityOracle.js` | independent static finger/barre/span/reach feasibility | bounded research policy, not ergonomic preference |
 | `scripts/run-v3a-strict-feasibility-benchmark.mjs` | deterministic five-case V3A benchmark | internal research evidence only |
 | `scripts/verify-v3a-strict-feasibility-report.mjs` | committed V3A baseline check | drift or overclaim fails CI |
-| P2 guitar modules | fretboard and distinct-string physical primitives | not production arrangement authority |
+| `scripts/run-v3b-left-hand-benchmark.mjs` | seven-case Lab ↔ pinned Engine left-hand status comparison | Engine is comparison target only |
+| `scripts/verify-v3b-left-hand-benchmark-report.mjs` | committed V3B baseline check | drift, parity loss, or authority overclaim fails CI |
 
 ## Pinned repositories and revisions
 
@@ -62,8 +65,6 @@ MIT
 
 The schema-v2 V1C manifest contains 22 pinned cases with source blob SHA, raw SHA-256, semantic-probe SHA-256, approved transform, Lab/Engine outcomes, and semantic comparison outcome.
 
-Current probe summary:
-
 | Observation | Count |
 |---|---:|
 | Lab `SUPPORTED` | 17 |
@@ -76,7 +77,7 @@ Current probe summary:
 
 Raw DOCTYPE rejection is security evidence, not musical-support evidence. CI-only semantic probing does not alter raw production security behavior.
 
-## V2A reality
+## V2A/V2B reality
 
 V2A classifies all 66 current unsupported observations:
 
@@ -86,37 +87,18 @@ V2A classifies all 66 current unsupported observations:
 | semantic capability failures | 22 |
 | unclassified | 0 |
 
-Committed V2A baseline: `artifacts/v2/failure-intelligence-baseline.json`.
+V2B refines the six formerly generic Engine projection cases into `direction` (3), `harmony` (2), and `notation:dynamics` (1). Four cases reach exact local scope; two harmony cases remain bounded region sets. All six are architecture-level `REVIEW_REQUIRED` candidates and V2B has zero semantic `BLOCKED_GLOBAL`.
 
-## V2B reality
+Committed baselines:
 
-V2B re-runs the six formerly generic Engine projection cases against the pinned Engine production compatibility chain.
-
-Observed feature split:
-
-| Feature | Cases |
-|---|---:|
-| `direction` | 3 |
-| `harmony` | 2 |
-| `notation:dynamics` | 1 |
-
-Refined scope split:
-
-| Scope | Cases |
-|---|---:|
-| `MEASURE_CHILD` | 3 |
-| `NOTE_EVENT` | 1 |
-| `FEATURE_REGION_SET` | 2 |
-
-Four cases reach exact local scope. Two harmony cases remain bounded region sets because the Engine identifies `harmony` but not the single causal occurrence. All six are architecture-level `REVIEW_REQUIRED` candidates and V2B has zero semantic `BLOCKED_GLOBAL`.
-
-Committed V2B baseline: `artifacts/v2b/projection-refinement-baseline.json`.
+```text
+artifacts/v2/failure-intelligence-baseline.json
+artifacts/v2b/projection-refinement-baseline.json
+```
 
 ## V3A reality
 
-V3A introduces an independent exact-position feasibility oracle.
-
-Current physical proof scope:
+V3A introduces an independent exact-position feasibility oracle with this proof scope:
 
 ```text
 exact pitch
@@ -126,18 +108,9 @@ exact pitch
 + no arrangement transforms
 ```
 
-Not modeled yet:
-
-```text
-left-hand finger assignment
-barre feasibility
-hand span / extra reach
-ergonomics / player profile
-```
-
 The oracle carries every distinct reachable string/fret state forward instead of choosing one greedy path.
 
-Pinned benchmark summary:
+Pinned benchmark:
 
 | Observation | Count |
 |---|---:|
@@ -147,9 +120,7 @@ Pinned benchmark summary:
 | `INDETERMINATE_LIMIT` | 1 |
 | demonstrated legacy greedy false negatives | 1 |
 
-The false-negative benchmark is concrete: the previous greedy verifier returns `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT`, while V3A retains six initial exact placements and finds five exact continuation states at the next point.
-
-This proves that a single-path verifier failure is not automatically proof of physical impossibility.
+The false-negative benchmark is concrete: the previous greedy verifier returns `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT`, while V3A retains alternate exact placements and finds a valid continuation path.
 
 Committed V3A evidence:
 
@@ -158,7 +129,46 @@ fixtures/v3a/benchmark.json
 artifacts/v3a/strict-feasibility-baseline.json
 ```
 
-`INDETERMINATE_LIMIT` is intentionally separate from `INFEASIBLE`; a configured evidence bound is not physical proof.
+## V3B reality
+
+V3B adds an independent left-hand feasibility layer for fixed string/fret positions.
+
+Current declared policy models:
+
+```text
+fretting fingers 1..4
+open string finger 0
+one finger -> one fret inside a static shape
+ordered finger/fret relationships
+partial/full barre legality
+maximum static fret span = 4
+maximum extra finger reach = 1
+bounded assignment enumeration
+```
+
+Pinned benchmark summary:
+
+| Observation | Count |
+|---|---:|
+| benchmark cases | 7 |
+| Lab `FEASIBLE` | 3 |
+| Lab `INFEASIBLE` | 3 |
+| Lab `INDETERMINATE_LIMIT` | 1 |
+| cross-repo comparable cases | 6 |
+| pinned Engine status parity | 6 / 6 |
+
+The cases cover open strings, compact C-major, an F-major barre shape, excessive static fret span, five distinct fretted frets, explicit finger-reach rejection, and a deliberately low assignment limit.
+
+`INDETERMINATE_LIMIT` remains evidence exhaustion, not physical impossibility.
+
+The pinned Engine is used only as a comparison target. V3B status parity does not make the Lab a wrapper around the Engine and does not make either repository production authority for final fingering.
+
+Committed V3B evidence:
+
+```text
+fixtures/v3b/left-hand-benchmark.json
+artifacts/v3b/left-hand-benchmark-baseline.json
+```
 
 ## CI reality
 
@@ -168,24 +178,26 @@ Current CI:
 
 1. installs locked Lab dependencies;
 2. runs syntax checks and tests;
-3. checks out exact pinned Engine revision;
+3. checks out the exact pinned Engine revision;
 4. regenerates and byte-compares V1B evidence;
-5. checks out exact external V1C corpus revision;
+5. checks out the exact external V1C corpus revision;
 6. regenerates/validates V1C evidence and committed shards;
 7. regenerates/validates V2A failure intelligence;
 8. regenerates/validates V2B cause/location evidence;
-9. runs the V3A five-case exhaustive feasibility benchmark;
-10. compares regenerated V3A evidence with the committed baseline;
-11. uploads reproducible evidence artifacts.
+9. regenerates and verifies V3A strict-feasibility evidence;
+10. regenerates V3B Lab ↔ Engine left-hand comparison evidence;
+11. requires exact equality with the committed V3B baseline;
+12. uploads reproducible evidence artifacts.
 
 Engine and external corpus checkouts are CI evidence dependencies only; they are not Lab runtime dependencies.
 
 ## Capability interpretation
 
 - V2 failure evidence is localized and semantic capability failures do not become global blocks;
-- V3A can prove exact string/fret impossibility or show that exact reachability still exists;
-- V3A `FEASIBLE` does **not** yet prove left-hand finger/barre/reach feasibility;
-- therefore an Engine failure with V3A `FEASIBLE` is not yet automatically a search bug: stronger left-hand physics must be independently checked in V3B;
+- V3A can prove exact string/fret impossibility or show that exact reachability exists;
+- V3B can further distinguish left-hand physical rejection from strict shapes that remain feasible under the declared policy;
+- V3B `FEASIBLE` is not a claim of comfort, optimal fingering, or player-specific ease;
+- V3 `INDETERMINATE_LIMIT` never becomes physical impossibility;
 - production arrangement transformations are not Lab authority;
 - learned guitar evidence remains future V4 research.
 
@@ -197,29 +209,35 @@ V2/V3 evidence remains non-authoritative until separately reviewed production wo
 
 ## Current continuation point
 
-**V1B, V1C, V2A, V2B, and V3A are reproducible evidence layers.**
+**V1B, V1C, V2A, V2B, V3A, and V3B are reproducible evidence layers.**
 
-The principal next stage is **V3B Independent Left-Hand Physical Oracle**:
+The principal next stage is **provenance-tracked Arrangement / N-best contracts**:
 
 ```text
-V3A exact-position FEASIBLE
-          |
-          v
-independent finger / barre / reach validation
-          |
-          +--> physically impossible under explicit left-hand policy
-          |
-          +--> physically feasible -> production search/capability-gap candidate
+strict source facts
+      |
+strict V3 feasibility evidence
+      |
+      +--> strict feasible candidate space
+      |
+      +--> strict infeasible region
+              |
+              v
+explicit transformation alternatives
+omission / octave displacement / register compression /
+arpeggiation / voice prioritization
+              |
+              v
+N-best alternatives with provenance
 ```
 
-Additive V2 harmony-location refinement does not block V3B.
+The arrangement layer must preserve source truth separately and record every transformation explicitly. It may not silently rewrite MusicXML semantics.
 
 ## Remaining known work
 
-- V3B independent finger/barre/reach physical model;
-- V3B pinned cross-repository comparison against production Engine physical failures;
+- provenance-tracked arrangement transformation contracts and N-best alternative schema;
 - additive V2 harmony-location refinement if better Engine evidence becomes available;
 - additional V1C fixtures such as `.mxl`, transposition, microtones and technical metadata;
-- explicit provenance-tracked arrangement/N-best contracts;
-- V4 ergonomic/TabCNN/FretNet-style shadow evidence after benchmark/calibration gates;
+- richer human/ergonomic benchmarks without weakening V3 hard constraints;
+- V4 TabCNN/FretNet-style shadow evidence after benchmark/calibration gates;
 - repository ruleset enforcement remains a separate administration concern.
