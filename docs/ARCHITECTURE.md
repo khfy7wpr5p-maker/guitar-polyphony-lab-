@@ -9,6 +9,7 @@ It exists to produce deterministic, reproducible evidence about:
 - MusicXML source facts and active polyphony;
 - guitar physical feasibility under declared tuning/capo;
 - differences between Lab reference semantics and production Engine semantics;
+- why a current capability fails and at what scope;
 - whether a production failure is a strict physical impossibility or a search/capability limitation;
 - future arrangement alternatives and soft ergonomic/learned ranking evidence.
 
@@ -23,11 +24,12 @@ The architecture separates:
 1. **source truth** — immutable facts from the input;
 2. **strict physical feasibility** — what can be realized without changing musical content;
 3. **capability availability** — what the current implementation can interpret;
-4. **local approximation/review** — recoverable uncertainty that must not erase unrelated valid output;
-5. **arrangement transformation** — explicit musical changes such as omission or octave displacement;
-6. **soft ranking/evidence** — ergonomics, style, player profile, or learned evidence;
-7. **teacher edits** — human replacement of provisional decisions;
-8. **export readiness** — independent from provisional on-screen visibility.
+4. **failure intelligence** — family, layer, reliable scope and recovery class;
+5. **local approximation/review** — recoverable uncertainty that must not erase unrelated valid output;
+6. **arrangement transformation** — explicit musical changes such as omission or octave displacement;
+7. **soft ranking/evidence** — ergonomics, style, player profile, or learned evidence;
+8. **teacher edits** — human replacement of provisional decisions;
+9. **export readiness** — independent from provisional on-screen visibility.
 
 Verification contracts may fail closed on malformed evidence or trust-boundary violations. That does not imply that a future product should globally block a score because one musical feature is unsupported.
 
@@ -37,15 +39,7 @@ The active policy is documented in `handoffs/guitar_polyphony_lab_progressive_ca
 
 The production polyphony/TAB authority is `musicxml-to-guitar-tab-engine`.
 
-The Lab must not become a production runtime dependency. Evidence may move toward production through:
-
-- licensed/internal fixtures;
-- pinned production artifacts;
-- semantic snapshots and deterministic mismatch reports;
-- capability reports and reproducible failure classifications;
-- benchmark results;
-- independent feasibility evidence;
-- separately reviewed production changes.
+The Lab must not become a production runtime dependency. Evidence may move toward production through licensed/internal fixtures, pinned production artifacts, semantic snapshots, deterministic mismatch reports, capability reports, failure-intelligence reports, benchmark results, independent feasibility evidence and separately reviewed production changes.
 
 The Lab does not own production reduction policy, arrangement authority, sustained-path selection, Canonical TAB contracts, writer behavior, rendering, playback, OMR, or application UI.
 
@@ -60,6 +54,7 @@ The Lab does not own production reduction policy, arrangement authority, sustain
 - **V1A** — corpus provenance/licensing/expectation registry
 - **V1B** — Lab snapshot ↔ Engine `PolyphonicSourceModel 1.0.0` comparator
 - **V1C** — 22-case pinned external MusicXML capability regression with raw-input and semantic-probe observations
+- **V2A** — deterministic failure-family / layer / scope / handling taxonomy over current V1C failures
 - **configuration research** — Standard / Drop D / custom tuning / capo
 - **technique provenance** — metadata/source evidence with no automatic physical authority
 
@@ -132,12 +127,15 @@ PINNED EXTERNAL MusicXML CORPUS
                               |
                               v
                     V1C capability report
-                    local supported / unsupported
-                    + semantic equality evidence
                               |
                               v
-                    V2 FAILURE INTELLIGENCE
-                    layer / scope / recovery reason
+                    V2A FAILURE INTELLIGENCE
+                    family / layer / scope / handling
+                              |
+                              +--> exact local review candidates
+                              |
+                              +--> generic projection cases
+                                   remain UNKNOWN_LOCAL
 ```
 
 ## V1B — closed reproducible slice
@@ -150,9 +148,7 @@ Pinned Engine commit:
 1d8ced644f544f7e991f7275eda77a2ce557774e
 ```
 
-Evidence files are committed under `artifacts/v1b-engine/` with fixture hashes, Engine identity and artifact hashes. `test/v1bEngineArtifacts.test.js` requires semantic equality between each pinned Engine artifact and the Lab snapshot.
-
-CI additionally checks out the exact Engine SHA, regenerates both artifacts, requires byte-for-byte reproduction, and uploads the regenerated evidence. No Engine module is imported by the Lab runtime/package.
+Evidence files are committed under `artifacts/v1b-engine/` with fixture hashes, Engine identity and artifact hashes. CI checks out the exact Engine SHA, regenerates both artifacts, requires byte-for-byte reproduction, and runs Lab semantic-comparison tests.
 
 V1B comparison covers source-note identity, written pitch, onset/duration divisions, voice, staff, tie evidence, active-sonority membership and peak polyphony. Cross-measure sustain joining, guitar string/fret state, arrangement decisions and Canonical TAB remain outside this comparator contract.
 
@@ -177,21 +173,51 @@ semantic MISMATCH:         0
 semantic NOT_COMPARABLE:  17
 ```
 
-The five equality fixtures are exact evidence for:
-
-- backup/polyphony (`03b`);
-- basic chord (`21a`);
-- simple tie (`33b`);
-- piano/multistaff (`43a`);
-- single-voice multistaff staff-change (`43i`).
-
-These are fixture-specific observations, not general MusicXML support claims.
-
-Committed V1C report evidence is sharded and hash-verified. CI regenerates the full 22-case report from the pinned corpus and Engine revision, verifies exact expected local outcomes, verifies shard hashes, reconstructs the committed report, and requires semantic equality with the regenerated report.
+Committed V1C report evidence is sharded and hash-verified. CI regenerates the full report from the pinned corpus and Engine revision and requires exact local-outcome and committed-report agreement.
 
 See `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
 
-## Current continuation point — V2 Failure Intelligence
+## V2A — failure intelligence foundation
+
+V2A is implemented for every unsupported observation in the current V1C baseline.
+
+Current deterministic evidence:
+
+```text
+failure observations:             66
+raw trust-boundary failures:       44
+semantic capability failures:      22
+semantic REVIEW_REQUIRED candidates:16
+semantic UNSUPPORTED_LOCAL refined-later: 6
+unclassified observed failures:     0
+```
+
+Eight current failure families are represented:
+
+- `INPUT_SECURITY`;
+- `SOURCE_SELECTION`;
+- `SOURCE_SEMANTIC_CAPABILITY`;
+- `RHYTHM_COMPATIBILITY`;
+- `ORNAMENT_COMPATIBILITY`;
+- `PLAYBACK_STRUCTURE`;
+- `PRESENTATION_COMPATIBILITY`;
+- `GENERIC_PROJECTION_CAPABILITY`.
+
+V2A enforces one critical invariant:
+
+```text
+SEMANTIC_PROBE failure -> never BLOCKED_GLOBAL in Lab taxonomy
+```
+
+The only current `BLOCKED_GLOBAL` candidate is a raw trust-boundary rejection at score-input scope.
+
+`UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` remains deliberately generic because the code has multiple emitters. The six current cases are `UNKNOWN_LOCAL / NEEDS_FEATURE_REFINEMENT`; case names and feature tags are context, not causal proof.
+
+CI verifies mapped error-code source anchors in the pinned Engine checkout, regenerates the full V2 report, and requires exact agreement with `artifacts/v2/failure-intelligence-baseline.json` after context-only metadata is projected out.
+
+See `docs/V2-FAILURE-INTELLIGENCE.md`.
+
+## Current continuation point — V2B cause/location refinement
 
 ```text
 V1B reproducible evidence loop ✅
@@ -199,16 +225,16 @@ V1B reproducible evidence loop ✅
         v
 V1C 22-case external capability baseline ✅
         |
-        +--> further corpus growth remains additive
-        |    (.mxl, transposition, microtones, more guitar metadata)
+        v
+V2A deterministic failure taxonomy ✅
         |
         v
-V2 FAILURE INTELLIGENCE  <--- CURRENT NEXT STAGE
+V2B GENERIC CAUSE + LOCATION REFINEMENT  <--- NEXT
         |
-        +--> stable localized failure/recovery taxonomy
-        +--> classify source / normalization / projection / search failures
-        +--> narrowest truthful scope
-        +--> preserve provisional downstream work where safe
+        +--> capture bounded error.name / error.details
+        +--> prove exact feature cause where available
+        +--> narrow scope to event / measure / region when evidence permits
+        +--> keep UNKNOWN_LOCAL when evidence is insufficient
         |
         v
 V3 independent strict feasibility oracle
@@ -220,7 +246,7 @@ explicit arrangement / N-best research
 V4 learned/ergonomic evidence in shadow mode
 ```
 
-V1C broadens evidence without weakening source-truth validation. V2 must now convert that evidence into precise, local, machine-readable failure intelligence rather than turning unsupported musical details into whole-score blocking.
+Further V1C corpus growth remains additive and does not block V2B.
 
 ## P1 trust boundary
 
@@ -242,7 +268,7 @@ Physical validity is a hard constraint. A future arrangement layer may transform
 
 ## Progressive capability states
 
-Future shared contracts should be able to represent at least:
+Shared architecture contracts use or plan around:
 
 - `SUPPORTED`
 - `APPROXIMATE`
@@ -252,7 +278,7 @@ Future shared contracts should be able to represent at least:
 
 The narrowest truthful scope should be used: note, event, voice, measure, region, capability, export operation, part, or score. `REVIEW_REQUIRED` is not intended to be a global TAB lock.
 
-V1C records strict `SUPPORTED` or `UNSUPPORTED_LOCAL` evidence for exact fixtures. V2 is the next layer that must classify why a capability failed and what recovery scope is safe. Production recovery behavior remains separately reviewed work.
+V2A `progressiveStateCandidate` is evidence-only architecture metadata. Production recovery behavior remains separately reviewed work.
 
 ## Arrangement direction
 
@@ -281,10 +307,12 @@ A learned provider may eventually rank already-valid candidates or explicit arra
 
 ## Roadmap
 
-- **V1A** corpus registry — ✅ initial slice
-- **V1B** real Engine/Lab semantic evidence — ✅ approved two-fixture reproducible slice
-- **V1C** external MusicXML capability classification — ✅ 22-case pinned baseline; further expansion additive
-- **V2** localized failure intelligence — **NEXT**
+- **V1A** corpus registry — ✅
+- **V1B** real Engine/Lab semantic evidence — ✅
+- **V1C** external MusicXML capability classification — ✅ 22-case pinned baseline
+- **V2A** failure taxonomy + deterministic baseline — ✅
+- **V2B** live bounded cause/location refinement — **NEXT**
+- **V2C** semantic mismatch classification — pending mismatch evidence
 - **V3** independent feasibility oracle
 - **Arrangement / N-best** explicit transformed alternatives
 - **V4** ergonomic and learned evidence providers in shadow mode
