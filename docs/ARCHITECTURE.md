@@ -30,7 +30,7 @@ SOURCE MUSICXML
 P1 trust boundary + parser
       |
       v
-P0 source-polyphony facts
+P0 source-polyphony facts / onset / duration / tie
       |
       +--> V1 semantic/capability evidence
       |
@@ -51,21 +51,29 @@ V3B left-hand finger/barre/span/reach feasibility
 A1 source-complete explicit N-best alternative contract
                     |
                     v
-A2 bounded explicit-policy static candidate generation
+A2 bounded reduction / octave generation
                     |
                     v
-fretboard -> distinct strings -> V3B physical revalidation
+A2B abstract arpeggio validation + safe disjoint composition
                     |
                     v
-A2B temporal / combined-transform research
+A2C P0-backed source timing + no-loss arpeggio generation
                     |
                     v
-future deterministic / teacher / learned ranking
+A3 real piano/non-guitar corpus validation
+                    |
+                    v
+ARRANGEMENT_CONTRACT_STABLE
+                    |
+          =====================
+          PRODUCTION INTEGRATION GATE
+          =====================
+                    |
+                    v
+musicxml-to-guitar-tab-engine
 ```
 
-## Evidence layers
-
-### V1
+## V1 / V2 / V3 evidence
 
 Pinned production Engine comparison target:
 
@@ -75,31 +83,13 @@ Pinned production Engine comparison target:
 
 V1C external corpus is pinned to `w3c-cg/musicxmlTestSuite` commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea`.
 
-Current 22-case probe summary:
+V2A classifies 66 unsupported observations with zero unclassified. V2B refines generic projection failures into bounded local capability families instead of global blocks.
 
-```text
-Lab supported:            17
-Engine supported:          5
-semantic EQUAL:            5
-semantic MISMATCH:         0
-semantic NOT_COMPARABLE:  17
-```
-
-### V2
-
-V2A classifies 66 unsupported observations with zero unclassified. V2B refines the six generic Engine projection failures into `direction`, `harmony`, and `notation:dynamics` families with bounded local scope. Semantic musical gaps remain local evidence and are not automatic `BLOCKED_GLOBAL` states.
-
-### V3
-
-V3A carries all bounded exact string/fret states instead of one greedy path and contains a proven legacy greedy false negative.
-
-V3B independently evaluates static left-hand feasibility. Its seven-case benchmark includes six cases comparable to the pinned Engine physical slice, with 6/6 normalized status parity.
-
-`INDETERMINATE_LIMIT` is always distinct from `INFEASIBLE`.
+V3A independently proves exact string/fret paths and contains a real greedy false-negative counterexample. V3B independently checks static finger/barre/span/reach feasibility; its comparable pinned slice matches production physical status 6/6. `INDETERMINATE_LIMIT` remains distinct from `INFEASIBLE`.
 
 ## Arrangement A1 — representation contract
 
-A1 defines explicit transformation provenance with production-aligned decision names:
+A1 defines explicit transformation provenance:
 
 ```text
 PRESERVED
@@ -111,124 +101,101 @@ REVOICED
 ARPEGGIATED
 ```
 
-Every alternative must cover every source event exactly once. Silent omission and invented group membership are invalid.
-
-A2 exposed an important target/source boundary error in A1 `1.0.0`: source sonorities were mistakenly bounded by the guitar's six strings. A1 `1.1.0` corrects this:
-
-```text
-source group != target guitar string count
-maxSourceGroupEvents = 128
-```
-
-Thus an 8-note piano sonority remains an 8-note source fact even if a guitar realization later keeps only six notes.
-
-A1 candidate order is enumeration only, never preference rank. Content-changing alternatives are review-required and have no production/export authority.
+Every alternative covers every source event exactly once. Silent omission is invalid. Source groups are independent from the guitar's six-string target capacity.
 
 ## Arrangement A2 — bounded static generator
 
-A2 implements:
+A2 generates `CHORD_REDUCED` and `OCTAVE_DISPLACED` research candidates. Every static candidate is revalidated through exact target pitch, fretboard candidates, distinct-string assignment, and the independent left-hand oracle.
+
+Candidate exhaustion returns `PARTIAL_LIMIT`, not impossibility.
+
+## Arrangement A2B — abstract temporal slice
+
+A2B validates an explicit arpeggio as an ordered exact-pitch position path while deliberately keeping `timingAuthority=false`. It also composes transforms with disjoint source-event scopes; same-event overlap remains explicit `OVERLAPPING_SCOPE`.
+
+## Arrangement A2C — P0-backed timeline + no-loss generation
+
+A2C adds three layers:
 
 ```text
-src/arrangement/boundedArrangementGenerator.js
+arrangementTimelineSidecar.js
+  -> exact/explicit source-event to P0 timing mapping
+
+timelineBackedArpeggiationValidator.js
+  -> proves the source group was actually simultaneous
+
+timelineBackedArpeggiationGenerator.js
+  -> emits bounded full-source arpeggio alternatives
 ```
 
-Initial automatic research transforms:
+The source side of timing can now be authoritative where P0 evidence is complete:
 
 ```text
-CHORD_REDUCED
-OCTAVE_DISPLACED
+sourceTimingAuthority = true
+targetTimingAuthority = false
 ```
 
-The generator accepts explicit policy inputs including target source group, allowed transforms, priority event IDs, candidate bounds, kept-note bounds, allowed octave deltas, and physical-search bounds.
+Target `spreadDivisions` must be supplied explicitly. A2C never infers arpeggio speed from source note duration.
 
-### Priority preservation
+### Eight-note no-loss evidence
 
-Reduction generation must preserve all declared `priorityEventIds`. A policy that asks to preserve more priority notes than the realized guitar candidate may contain fails explicitly rather than silently dropping them.
-
-### Candidate-bound semantics
-
-When `maxAlternatives` cuts off the generation space:
+The committed benchmark contains an 8-note simultaneous piano sonority. Strict simultaneous realization exceeds the six-string capacity, but A2C preserves all eight source events and emits two unique deterministic arpeggio orders. Both are physically feasible as exact-pitch guitar sequences.
 
 ```text
-status = PARTIAL_LIMIT
-candidateSpaceComplete = false
+source events:                 8
+feasible no-loss candidates:   2
+sourceNoteLossAllowed:          false
+sourceTimingAuthority:          true
+targetTimingAuthority:          false
 ```
 
-No claim is made that no other arrangement exists.
-
-### Physical revalidation
-
-Every emitted static candidate is realized from A1 provenance and independently validated through:
-
-```text
-exact target pitch set
- -> fretboard candidates
- -> distinct-string assignment
- -> V3B left-hand oracle
-```
-
-Possible results include `FEASIBLE`, `INFEASIBLE`, and `INDETERMINATE_LIMIT`.
-
-A1 can represent `ARPEGGIATED`, but A2 does not automatically generate it yet because arpeggiation requires temporal validation. Current static validation returns `INDETERMINATE_TRANSFORM_SCOPE / TEMPORAL_REVALIDATION_REQUIRED` rather than false physical rejection.
-
-## A2 committed benchmark
+This means chord reduction remains available, but it is no longer the only recovery mechanism for >6-note source sonorities.
 
 Evidence:
 
 ```text
-fixtures/a2/benchmark.json
-artifacts/a2/arrangement-generation-baseline.json
-scripts/run-a2-arrangement-benchmark.mjs
-scripts/verify-a2-arrangement-benchmark.mjs
+artifacts/a2c/timeline-arrangement-baseline.json
+scripts/run-a2c-timeline-arrangement-benchmark.mjs
+scripts/verify-a2c-timeline-arrangement-benchmark.mjs
 ```
-
-Pinned summary:
-
-```text
-cases:                                   3
-complete generation:                     2
-partial-limit:                            1
-strict-infeasible cases:                  3
-cases with feasible transformed evidence: 2
-```
-
-The principal benchmark starts with an 8-note piano source sonority. Strict realization is infeasible because simultaneous active notes exceed six strings. A2 preserves all eight source facts and generates 15 six-note reduction alternatives; all 15 are physically feasible under the pinned research policy.
-
-A second benchmark converts a strict out-of-range MIDI 28 pitch into a physically feasible explicit `+12` octave alternative without modifying the source event itself.
 
 ## Authority boundary
 
-A2 explicitly remains:
+All current arrangement stages remain Lab-only:
 
 ```text
-authority = LAB_RESEARCH_GENERATOR_ONLY
 productionAuthority = false
 automaticProductionTransformationAuthority = false
-learnedRankingAuthority = false
+exportAuthority = false
 candidateOrderIsPreferenceRank = false
 ```
 
-Production activation of automatic content-changing arrangement remains a separate consequential review gate.
+A2C does not yet claim target playback timing, sustain/ringing behavior across generated steps, performance-speed feasibility, ergonomic ranking, or learned preference.
 
 ## Current continuation point
 
 ```text
-V1 evidence ✅
-V2 failure intelligence ✅
-V3 independent physical evidence ✅
-A1 explicit N-best provenance ✅
-A2 bounded static generation + physical validation ✅
+V1 ✅
+V2 ✅
+V3 ✅
+A1 ✅
+A2 ✅
+A2B ✅
+A2C initial P0-backed no-loss slice ✅
         |
         v
-A2B TEMPORAL + COMBINED ARRANGEMENT RESEARCH  <--- NEXT
+A3 REAL PIANO / NON-GUITAR CORPUS VALIDATION  <--- NEXT
         |
-        +--> arpeggiation temporal validation
-        +--> bounded combined transforms
-        +--> richer melody/bass/voice priority contracts
-        +--> broader piano/polyphonic arrangement corpus
+        +--> broaden no-loss/reduction/octave evidence
+        +--> quantify coverage and local review outcomes
+        +--> define explicit ordered same-event transform pipeline
+        +--> stabilize Lab -> production integration contract
         |
         v
-future ranking / teacher selection
+PRODUCTION INTEGRATION GATE
+        |
+        v
+musicxml-to-guitar-tab-engine
 ```
 
 ## Learned evidence

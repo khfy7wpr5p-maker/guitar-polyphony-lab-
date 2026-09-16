@@ -1,0 +1,50 @@
+{
+  "documentType": "A2CTimelineArrangementBenchmark",
+  "contractVersion": "1.0.0",
+  "authority": "LAB_RESEARCH_EVIDENCE_ONLY",
+  "productionAuthority": false,
+  "summary": {
+    "caseCount": 3,
+    "eightNoteNoLossFeasibleCandidates": 2,
+    "timelineConflictCases": 1,
+    "partialLimitCases": 1
+  },
+  "cases": [
+    {
+      "id": "eight-note-piano-no-loss",
+      "generationStatus": "COMPLETE",
+      "candidateSpaceComplete": true,
+      "emittedAlternativeCount": 2,
+      "feasibleCount": 2,
+      "sourceTimelineStatus": "COMPLETE",
+      "sourceGroupWasSimultaneous": true,
+      "sourceNoteLossAllowed": false,
+      "targetTimingAuthority": false,
+      "arpeggiatedSourceCounts": [8, 8]
+    },
+    {
+      "id": "non-simultaneous-group-conflict",
+      "generationStatus": "TIMELINE_CONFLICT",
+      "candidateSpaceComplete": false,
+      "emittedAlternativeCount": 0,
+      "feasibleCount": 0,
+      "sourceTimelineStatus": "TIMELINE_CONFLICT",
+      "sourceGroupWasSimultaneous": false,
+      "sourceNoteLossAllowed": false,
+      "targetTimingAuthority": false,
+      "arpeggiatedSourceCounts": []
+    },
+    {
+      "id": "candidate-limit-is-partial",
+      "generationStatus": "PARTIAL_LIMIT",
+      "candidateSpaceComplete": false,
+      "emittedAlternativeCount": 1,
+      "feasibleCount": 1,
+      "sourceTimelineStatus": "COMPLETE",
+      "sourceGroupWasSimultaneous": true,
+      "sourceNoteLossAllowed": false,
+      "targetTimingAuthority": false,
+      "arpeggiatedSourceCounts": [8]
+    }
+  ]
+}
