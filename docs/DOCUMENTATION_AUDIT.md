@@ -1,14 +1,15 @@
 # Documentation audit
 
-Fresh-read classification against the current V1C branch source, tests, internal fixtures, committed V1B Engine evidence, pinned 22-case V1C external evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
+Fresh-read classification against the current V2A branch source, tests, internal fixtures, committed V1B Engine evidence, pinned 22-case V1C external evidence, committed V2A failure-intelligence evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
 
 | Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md` | CURRENT | project purpose, broad-capability direction, V1B closure, 22-case V1C baseline and V2 continuation |
-| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, progressive capability states, V1C evidence architecture, V2/V3/arrangement/ML direction |
-| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned V1B/V1C evidence, CI reality, exact current gaps |
+| `README.md` | CURRENT | project purpose, broad-capability direction, V1/V2A status and V2B continuation |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, progressive states, V1C evidence architecture, implemented V2A taxonomy and V2B/V3/arrangement/ML direction |
+| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned V1B/V1C/V2A evidence, CI reality and exact current gaps |
 | `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible two-fixture V1B loop |
 | `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license, raw/probe distinction, 22-case local capability baseline, sharded evidence and limitations |
+| `docs/V2-FAILURE-INTELLIGENCE.md` | CURRENT | V2A taxonomy, counts, authority boundary, generic-projection refinement rule and V2B target |
 | active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents current verification boundaries from becoming permanent product capability ceilings |
 | `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence; not current runtime authority |
 | `docs/P1A-INPUT-GATE.md`, `docs/P1B-PARSER-ADAPTER.md`, `docs/P1C-COMPATIBILITY-MATRIX.md` | CURRENT | bounded input/parser/internal corpus behavior |
@@ -25,55 +26,24 @@ When documents disagree, use:
 2. `docs/REPOSITORY_REALITY.md` for implementation inventory;
 3. `docs/ARCHITECTURE.md` plus the active progressive-capability directive for current architecture direction;
 4. `README.md` for project-level summary;
-5. current stage documents such as `docs/V1B-SEMANTIC-COMPARATOR.md` and `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`;
+5. current stage documents including `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` and `docs/V2-FAILURE-INTELLIGENCE.md`;
 6. historical stage records and archived integration plans.
 
-## V1B documentation closure
+## V1B closure
 
-The previous V1B continuation — pin real Engine-generated artifacts and run them in Lab CI — is completed for the approved two-fixture slice.
-
-Current V1B evidence includes:
+V1B real Engine evidence is closed for the approved two-fixture slice at pinned Engine SHA:
 
 ```text
-production Engine SHA
 1d8ced644f544f7e991f7275eda77a2ce557774e
-
-+ two approved fixture SHA-256 identities
-+ two committed PolyphonicSourceModel 1.0.0 artifacts
-+ artifact SHA-256 identities
-+ Lab semantic equality tests
-+ CI regeneration from the exact Engine SHA
-+ byte-for-byte reproduction check
 ```
 
-## V1C documentation closure
+The repository retains fixture/artifact hashes, semantic equality tests, exact Engine regeneration and byte-for-byte CI reproduction.
 
-V1C now has a reproducible 22-case external baseline rather than a planning/discovery-only continuation.
+## V1C closure
 
-Current V1C evidence includes:
+V1C has a reproducible 22-case external baseline from `w3c-cg/musicxmlTestSuite` commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea` under MIT licensing.
 
-```text
-external repository: w3c-cg/musicxmlTestSuite
-external commit:     77c19f7e819154c70ca1a1992e80dcda8ff82fea
-license:             MIT
-cases:               22
-
-+ per-case Git blob SHA
-+ per-case raw SHA-256
-+ per-case semantic-probe SHA-256
-+ per-case approved transform
-+ pinned raw Lab/Engine outcome
-+ pinned probe Lab/Engine outcome
-+ pinned semantic comparison outcome
-+ 4 hash-pinned committed evidence shards
-+ CI expected-outcome drift gate
-+ CI shard-hash verification and report reconstruction
-+ CI regenerated-report comparison
-```
-
-Raw input rejection remains evidence and security behavior. Semantic probe transforms are explicitly CI-only evidence operations. The transform allowlist supports already-safe identity probing and structurally verified Recordare MusicXML partwise DOCTYPE removal; arbitrary/multiple declarations and entities remain rejected. This must not be described as production sanitization.
-
-Current pinned summary:
+Pinned summary:
 
 ```text
 probe Lab supported:      17 / 22
@@ -83,31 +53,67 @@ semantic MISMATCH:         0
 semantic NOT_COMPARABLE:  17
 ```
 
-The equality cases are the exact pinned backup/polyphony, basic-chord, simple-tie, piano/multistaff and single-voice staff-change fixtures. These counts are not a general MusicXML conformance percentage.
+Raw XML trust-boundary rejection remains separate from musical capability. Semantic probe transforms remain CI-only evidence operations and do not authorize application-time DTD stripping.
 
-The temporary discovery workflow has been removed after promotion. Further V1C corpus growth is additive and may include `.mxl`, transposition, microtones and additional guitar/presentation fixtures.
+Further V1C corpus growth is additive and no longer gates V2 work.
 
-The principal architectural continuation is now **V2 Failure Intelligence**, not another prerequisite V1C discovery cycle, not FretNet integration, and not production-authoritative learned ranking.
+## V2A closure
 
-## V2 documentation requirement
+V2A is no longer planning-only. The repository now contains:
 
-The next maintained documentation must distinguish at least:
+```text
+src/failures/v2FailureIntelligence.js
+scripts/run-v2-failure-intelligence.mjs
+scripts/verify-v2-failure-intelligence-report.mjs
+artifacts/v2/failure-intelligence-baseline.json
+test/v2FailureIntelligence.test.js
+docs/V2-FAILURE-INTELLIGENCE.md
+```
 
-- source-feature limitation;
-- normalization limitation;
-- semantic projection limitation;
-- search/path-selection limitation;
-- strict physical infeasibility;
-- recoverable approximation/review state;
-- true global trust/parse/invariant failure.
+Current pinned V2A evidence:
 
-Each failure/recovery record should use the narrowest truthful scope and preserve enough provenance to support later V3 feasibility evidence and arrangement/recovery contracts.
+```text
+failure observations:              66
+raw trust-boundary failures:        44
+semantic capability failures:       22
+semantic REVIEW_REQUIRED candidates:16
+semantic UNSUPPORTED_LOCAL pending refinement: 6
+unclassified observed failures:      0
+```
+
+Eight current failure families are represented: input security, source selection, source semantic capability, rhythm compatibility, ornament compatibility, playback structure, presentation compatibility and generic projection capability.
+
+V2A additionally verifies each mapped code against Lab or pinned Engine source anchors. This guards against documentation-only taxonomy drift.
+
+The semantic no-global-block invariant is explicit and tested: a semantic-probe failure cannot be classified as `BLOCKED_GLOBAL` by the V2 taxonomy.
+
+## Generic projection limitation
+
+Six V1C observations still use `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE`.
+
+They intentionally remain:
+
+```text
+GENERIC_PROJECTION_CAPABILITY
+PROJECTION_OR_COMPATIBILITY
+UNKNOWN_LOCAL
+NEEDS_FEATURE_REFINEMENT
+UNSUPPORTED_LOCAL
+```
+
+Fixture names, categories and feature tags are context only. They must not be treated as proof of the causal unsupported feature.
+
+The next maintained continuation is therefore **V2B bounded live cause/location refinement**, not V3 yet and not learned-ranking integration.
 
 ## Broad-capability interpretation rule
 
-Strict evidence validation remains intentional. Historical wording such as “unsupported semantics fail closed” must be read at the specific evidence/trust boundary where it applies; it is not a mandate for the final product to return global `BLOCKED` for every unsupported musical detail.
+Strict evidence validation remains intentional. Historical wording such as “unsupported semantics fail closed” must be read at the specific evidence/trust boundary where it applies; it is not a mandate for final product-wide blocking.
 
-V1C reinforces this by treating exact musical capability failures as local case outcomes while reserving corpus failure for broken provenance, invalid contracts, rejected probe transforms, expected-outcome drift, or runner failure.
+Current architecture distinguishes:
+
+- unsafe raw input, which may be globally rejected for the import operation;
+- semantic capability gaps, which stay local and may become review/recovery candidates;
+- generic failures whose cause is not yet proven, which stay explicitly unrefined.
 
 Future product-facing contracts should preserve known facts, localize uncertainty, keep provisional editable output where safe, and record arrangement transformations explicitly.
 

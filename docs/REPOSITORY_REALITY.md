@@ -1,6 +1,6 @@
 # Repository reality
 
-Fresh-read scope: current `stage/v1c-isolated-capability-expansion` branch, source/tests, package scripts, CI, internal compatibility fixtures, committed V1B Engine evidence, pinned V1C external evidence, and the active progressive-capability directive as of 2026-09-16.
+Fresh-read scope: current `stage/v2-failure-intelligence-foundation` branch, source/tests, package scripts, CI, internal compatibility fixtures, committed V1B Engine evidence, pinned V1C external evidence, V2A failure-intelligence evidence, and the active progressive-capability directive as of 2026-09-16.
 
 This document describes repository reality, not general production capability claims for `musicxml-to-guitar-tab-engine`.
 
@@ -27,7 +27,8 @@ pinned external MusicXML corpus
   -> pinned offline semantic probes
   -> Lab + pinned Engine production compatibility chain
   -> V1C local capability report
-  -> V2 failure intelligence input
+  -> V2A failure intelligence
+       family / layer / scope / handling
 
 P0 facts may also feed:
   -> P2A fretboard candidates
@@ -49,6 +50,9 @@ Technique provenance is a parallel metadata/source-evidence sidecar and currentl
 | `src/corpus/v1cCapabilityCorpus.js` | validates schema-v2 pinned external corpus provenance, hashes, per-case transform and local outcomes | rejects unpinned/observational manifest entries; local musical unsupported states remain valid evidence |
 | `scripts/run-v1c-capability-corpus.mjs` | CI-only raw/probe observation against pinned external source and pinned Engine compatibility chain | raw security stays unchanged; transform/provenance/outcome drift fails |
 | `scripts/verify-v1c-committed-report.mjs` | verifies hash-pinned V1C evidence shards and reconstructs committed report | shard/path/hash/case drift fails |
+| `src/failures/v2FailureIntelligence.js` | deterministic mapping from observed failure codes to family/layer/scope/handling evidence | semantic failures cannot become global blocks; unknown codes remain local and unrefined |
+| `scripts/run-v2-failure-intelligence.mjs` | derives V2A evidence from V1C shards and verifies Lab/Engine code-emission anchors | pinned Engine identity, source-anchor drift and unmapped observed codes fail |
+| `scripts/verify-v2-failure-intelligence-report.mjs` | projects regenerated V2 report to the committed stable baseline | context-only fixture metadata is excluded from causal baseline comparison |
 | `src/guitar/tuningConfiguration.js` | six-string tuning/capo configuration | bounded deterministic research contract |
 | `src/guitar/fretboardCandidates.js` | physical string/fret candidates per pitch | impossible pitch yields factual no-candidate evidence |
 | `src/guitar/sonorityAssignments.js` | bounded distinct-string assignments | strict physical feasibility; not arrangement authority |
@@ -94,15 +98,6 @@ Engine: UNSUPPORTED_LOCAL / UNSAFE_XML_DECLARATION
 
 This is security-boundary evidence, not a musical support result.
 
-For semantic observation, V1C permits only an explicit transform allowlist. The current DOCTYPE-bearing cases use `REMOVE_VERIFIED_MUSICXML_PARTWISE_EXTERNAL_DOCTYPE`, which accepts only one structurally verified Recordare `score-partwise` PUBLIC declaration with the expected system URI. Arbitrary/multiple declarations and entities are rejected. `IDENTITY_NO_DOCTYPE` is allowed for future already-safe fixtures. Raw P1A/Engine behavior is not modified.
-
-The Engine probe path is the pinned production compatibility normalization chain, not the bare low-level projector:
-
-```text
-parseParsedMusicXmlDocument
-  -> projectParsedMusicXmlThroughPolyProductionCompatibilityChain
-```
-
 Current 22-case probe summary:
 
 | Observation | Count |
@@ -115,29 +110,61 @@ Current 22-case probe summary:
 | semantic `MISMATCH` | 0 |
 | semantic `NOT_COMPARABLE` | 17 |
 
-The five exact equality cases are:
+The five exact equality cases are `03b`, `21a`, `33b`, `43a`, and `43i`. This is an exact-fixture baseline, not a general support percentage or conformance score.
 
-- `03b` backup/polyphony;
-- `21a` basic chord;
-- `33b` simple tie;
-- `43a` piano/multistaff;
-- `43i` single-voice multistaff staff change.
-
-This is an exact-fixture baseline, not a general support percentage or conformance score.
-
-Committed V1C evidence is sharded:
-
-```text
-artifacts/v1c/capability-report.json
-artifacts/v1c/cases-01.json
-artifacts/v1c/cases-02.json
-artifacts/v1c/cases-03.json
-artifacts/v1c/cases-04.json
-```
-
-The index pins each shard SHA-256. CI reconstructs the committed report and compares it with the freshly generated report.
+Committed V1C evidence is sharded under `artifacts/v1c/`, and the report index pins each shard SHA-256.
 
 Detailed contract: `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
+
+## V2A failure intelligence evidence
+
+V2A classifies every currently observed V1C unsupported result.
+
+Committed baseline:
+
+```text
+artifacts/v2/failure-intelligence-baseline.json
+```
+
+Current summary:
+
+| Observation | Count |
+|---|---:|
+| total failure observations | 66 |
+| raw input trust-boundary failures | 44 |
+| semantic-probe capability failures | 22 |
+| semantic `REVIEW_REQUIRED` candidates | 16 |
+| semantic `UNSUPPORTED_LOCAL` pending refinement | 6 |
+| unclassified observed failures | 0 |
+
+Current family counts:
+
+| Failure family | Count |
+|---|---:|
+| `INPUT_SECURITY` | 44 |
+| `GENERIC_PROJECTION_CAPABILITY` | 6 |
+| `ORNAMENT_COMPATIBILITY` | 5 |
+| `SOURCE_SEMANTIC_CAPABILITY` | 4 |
+| `PLAYBACK_STRUCTURE` | 3 |
+| `RHYTHM_COMPATIBILITY` | 2 |
+| `SOURCE_SELECTION` | 1 |
+| `PRESENTATION_COMPATIBILITY` | 1 |
+
+The raw trust-boundary codes are the only current `BLOCKED_GLOBAL` candidates. All semantic-probe classifications are prevented from becoming global blocks.
+
+Six `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` observations remain intentionally generic:
+
+```text
+failureFamily: GENERIC_PROJECTION_CAPABILITY
+layer: PROJECTION_OR_COMPATIBILITY
+scopeClass: UNKNOWN_LOCAL
+handlingClass: NEEDS_FEATURE_REFINEMENT
+progressiveStateCandidate: UNSUPPORTED_LOCAL
+```
+
+Their fixture categories and feature tags are context, not causal proof.
+
+Detailed contract: `docs/V2-FAILURE-INTELLIGENCE.md`.
 
 ## CI reality
 
@@ -155,32 +182,37 @@ Current CI performs:
 8. checkout exact external V1C corpus commit;
 9. verify V1C source/blob/raw/probe provenance;
 10. run all 22 V1C raw and semantic-probe observations through Lab and pinned Engine production compatibility chain;
-11. fail on pinned outcome drift;
-12. verify every committed V1C shard hash and reconstruct the full expected report;
-13. semantically compare regenerated V1C report with the reconstructed committed baseline;
-14. upload regenerated V1B and V1C evidence.
+11. fail on pinned V1C outcome drift;
+12. verify every committed V1C shard hash and reconstruct the full expected V1C report;
+13. compare regenerated V1C report with committed V1C baseline;
+14. generate V2A failure-intelligence report from the verified V1C evidence;
+15. verify every V2 taxonomy source anchor against Lab or the exact pinned Engine checkout;
+16. fail if any currently observed failure is unclassified;
+17. enforce the no-semantic-global-block invariant;
+18. compare the regenerated stable V2 projection with the committed V2 baseline;
+19. upload regenerated V1B, V1C and V2 evidence.
 
-The temporary V1C discovery workflow has been removed after promotion. These remain CI evidence dependencies only; the Lab runtime/package does not import the Engine or external corpus as runtime dependencies.
+These remain CI evidence dependencies only. The Lab runtime/package does not import the Engine or external corpus as runtime dependencies.
 
 ## Polyphony / capability coverage
 
 | Feature | Current reality |
 |---|---|
 | 2-voice sustained overlap | ✅ internal pinned fixture + V1B real Engine evidence |
-| 3-voice external shape | 🟡 V1C `42b`: Lab parses probe, pinned Engine records local unsupported projection feature |
+| 3-voice external shape | 🟡 V1C `42b`: Lab parses probe, pinned Engine records generic local projection gap; V2B refinement required |
 | 4-voice/tie evidence | ✅ internal pinned fixture + V1B real Engine evidence |
 | backup/polyphony external shape | ✅ V1C equality for exact `03b` fixture |
 | basic chord external shape | ✅ V1C equality for exact `21a` fixture |
 | simple tie external shape | ✅ V1C equality for exact `33b` fixture |
 | piano/multistaff external shape | ✅ V1C equality for exact `43a` fixture |
 | single-voice staff change | ✅ V1C equality for exact `43i` fixture |
-| tuplets | 🟡 `23a`/`23d` expose local Engine triplet-time-modification limits; `23b` additionally exposes time-signature-display limit |
-| grace notation | 🟡 `24a`/`24b`/`24c`/`24h` remain local unsupported evidence in current Lab/Engine paths |
-| metronome / direction metadata | 🟡 `31c` Lab-supported probe; pinned Engine generic local projection gap |
-| octave-shift direction/spanner | 🟡 `33d` Lab-supported probe; pinned Engine generic local projection gap |
-| simple/alternative/multiple repeat structures | 🟡 current pinned Engine records local repeat-barline limits |
-| fretboard/frame metadata | 🟡 `71c`/`71d` isolate current pinned Engine projection gaps; not a claim about all guitar metadata |
-| multipart TAB-staff stress fixture | 🟡 `71e` remains mixed; Lab requires part selection and Engine encounters grace limitation first |
+| tuplets | 🟡 V2A classifies triplet/time-modification as local rhythm compatibility; `23b` time-signature display is local presentation compatibility |
+| grace notation | 🟡 V2A separates Lab source-semantic grace limitation from Engine ornament compatibility limitation |
+| metronome / direction metadata | 🟡 generic projection gap; V2B must collect live cause details before narrowing |
+| octave-shift direction/spanner | 🟡 generic projection gap; V2B must collect live cause details before narrowing |
+| repeat structures | 🟡 V2A classifies current repeat-barline failures as measure-region playback-structure review candidates |
+| fretboard/frame metadata | 🟡 generic projection gap; V2B refinement required |
+| multipart TAB-staff stress fixture | 🟡 V2A separates Lab part-selection requirement from Engine grace limitation |
 | Lab ↔ Engine semantic comparator | ✅ V1B approved slice + five equal V1C external probes |
 | cross-measure sustain-chain joining | ⚠️ outside V1B/V1C semantic comparison contract |
 | six-string candidate enumeration | ✅ deterministic Lab research contract |
@@ -189,36 +221,22 @@ The temporary V1C discovery workflow has been removed after promotion. These rem
 | MIDI/audio runtime evidence | ❌ not current runtime capability |
 | learned guitar evidence | 📋 V4 research direction |
 
-## Comparator boundary
-
-V1B/V1C semantic comparison covers source-note identity, written pitch, onset/duration divisions, voice, staff, tie start/stop evidence, active-sonority membership and peak polyphony.
-
-It does not compare cross-measure sustain chains, physical string/fret state, arrangement/reduction decisions, Canonical TAB, rendering, playback, OMR, or MIDI.
-
 ## Progressive-capability reality
 
 The active architecture directive prevents treating verification boundaries as the permanent product ceiling.
 
-Future capability contracts are expected to distinguish:
-
-- `SUPPORTED`;
-- `APPROXIMATE`;
-- `REVIEW_REQUIRED`;
-- `UNSUPPORTED_LOCAL`;
-- `BLOCKED_GLOBAL`.
-
-V1C records strict evidence states for exact fixtures and deliberately keeps musical unsupported states local to each case. It does not itself implement production approximation/recovery; it provides reproducible inputs to V2 and later product recovery work.
+V2A now provides evidence-level candidates for `REVIEW_REQUIRED`, `UNSUPPORTED_LOCAL`, and raw-operation `BLOCKED_GLOBAL`, but these are not production runtime decisions.
 
 Unsupported musical detail should ultimately be localized to the smallest truthful scope when surrounding facts remain usable. Global blocking is reserved for genuine global trust/parse/invariant failures or an explicitly strict operation whose global precondition is absent.
 
 ## Current continuation point
 
-**V1B is complete and V1C now has a reproducible 22-case pinned external baseline.**
+**V1B, V1C, and V2A are implemented as reproducible evidence layers.**
 
-The principal continuation is **V2 Failure Intelligence**. Additional V1C fixtures may still be added incrementally for `.mxl` transport, transposition, microtones, more guitar technical metadata and further isolated presentation forms, but they no longer gate starting V2.
+The principal continuation is **V2B bounded cause/location refinement** for the six generic projection observations. Additional V1C fixtures may still be added incrementally but do not gate V2B.
 
 ```text
-V2 localized failure intelligence
+V2B live bounded failure detail/location refinement
   -> V3 independent strict feasibility oracle
   -> explicit arrangement / N-best alternatives
   -> V4 ergonomic + learned evidence in shadow mode
@@ -226,9 +244,10 @@ V2 localized failure intelligence
 
 ## Remaining known work
 
-- V2: replace broad/generic failure observations with a stable localized failure/recovery taxonomy where evidence justifies specificity.
-- V2: classify source-feature, normalization, projection, search and downstream recovery layers without conflating them.
-- V2: attach narrowest truthful scope and safe recovery metadata so local uncertainty need not become global blocking.
+- V2B: capture bounded live Engine `error.name`, safe `error.details`, and location evidence for generic projection cases.
+- V2B: split generic projection observations only where exact runtime evidence proves the cause/layer.
+- V2B: preserve `UNKNOWN_LOCAL` when exact cause or scope cannot be proven.
+- V2C: semantic mismatch classification if/when mismatch evidence exists.
 - Add further V1C fixtures incrementally, especially `.mxl`, transposition, microtones and guitar technical metadata.
 - V3 independent feasibility oracle.
 - Explicit arrangement contracts and provenance-tracked transformations.
