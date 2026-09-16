@@ -1,0 +1,351 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "AUTONOMOUS_DEVELOPER_DIRECTIVE",
+  "generated_date": "2026-09-16",
+  "project": {
+    "name": "Guitar Polyphony Lab",
+    "repository": "khfy7wpr5p-maker/guitar-polyphony-lab-",
+    "active_branch": "stage/v1b-semantic-comparator",
+    "active_pull_request": 19,
+    "production_target_repository": "khfy7wpr5p-maker/musicxml-to-guitar-tab-engine",
+    "execution_mode": "AUTONOMOUS_PROGRESSIVE_CAPABILITY",
+    "directive_name": "BROAD_CAPABILITY_NON_BLOCKING_ARCHITECTURE"
+  },
+  "user_product_decision": {
+    "summary": "Do not design an excessively narrow system that becomes safe by refusing useful work. Design contracts now for broad, extensible capability, graceful degradation, provisional editable output and future arrangement/ML expansion.",
+    "primary_principle": "Process everything that can be processed safely. Local uncertainty must remain local. Unsupported detail must not automatically become a whole-score failure.",
+    "product_goal": "Accept a very broad range of MusicXML, including complex polyphony and non-guitar source material, produce the best available guitar realization, preserve uncertainty and provenance, and let a teacher or arranger edit the result.",
+    "anti_goal": "A system that returns BLOCKED or ERROR for most real scores because one notation feature, one measure, one voice, one rhythm detail or one unsupported technique falls outside a narrow contract."
+  },
+  "core_architecture_policy": {
+    "name": "PROGRESSIVE_CAPABILITY_WITH_LOCAL_DEGRADATION",
+    "rules": [
+      "Do not equate unsupported detail with unusable score.",
+      "Do not make REVIEW_REQUIRED a global lock.",
+      "Do not discard usable musical facts because some related fact is uncertain.",
+      "Keep source facts immutable and separately record assumptions, approximations, omissions and transformations.",
+      "Prefer producing provisional editable output over returning no output.",
+      "Keep failures scoped to the smallest meaningful unit: event, note, voice, measure, region, capability or export operation.",
+      "Allow future capability providers, heuristics and learned models to contribute without redesigning the core contracts.",
+      "Use strict validation at trust/security boundaries, but flexible capability handling at musical interpretation boundaries.",
+      "Never silently pretend an approximation is exact. Mark it, preserve its reason and keep it editable."
+    ]
+  },
+  "capability_status_contract": {
+    "statuses": [
+      {
+        "id": "SUPPORTED",
+        "meaning": "The capability is represented and processed under a reviewed deterministic contract.",
+        "default_behavior": "Process normally and preserve full provenance."
+      },
+      {
+        "id": "APPROXIMATE",
+        "meaning": "A useful result can be produced but one or more semantics are approximated.",
+        "default_behavior": "Produce output, attach assumptions and confidence/reason metadata, keep editable."
+      },
+      {
+        "id": "REVIEW_REQUIRED",
+        "meaning": "A human should inspect the local result, but enough information exists to continue processing.",
+        "default_behavior": "Produce provisional output and mark the smallest affected region. Do not globally disable TAB or playback."
+      },
+      {
+        "id": "UNSUPPORTED_LOCAL",
+        "meaning": "A local feature cannot yet be interpreted safely, while surrounding musical facts remain usable.",
+        "default_behavior": "Preserve raw/source evidence, ignore or neutralize only the unsupported semantic effect, continue with surrounding processing and mark the location."
+      },
+      {
+        "id": "BLOCKED_GLOBAL",
+        "meaning": "The input cannot be safely or meaningfully processed at all under the current trust/instrument boundary.",
+        "default_behavior": "Stop only for genuinely global conditions such as unsafe input, unrecoverable parse failure, corrupt structure preventing musical identity, or explicitly disallowed execution."
+      }
+    ],
+    "forbidden_policy": "Do not map every unknown, incomplete or unsupported musical feature to BLOCKED_GLOBAL."
+  },
+  "scope_localization_contract": {
+    "required_fields": [
+      "scopeType",
+      "partId",
+      "measureIndex",
+      "eventId_or_sourceIdentity_when_available",
+      "capability",
+      "status",
+      "reasonCode",
+      "humanMessage",
+      "provenance",
+      "recoverable",
+      "suggestedFallback"
+    ],
+    "allowed_scope_types": [
+      "SCORE",
+      "PART",
+      "MEASURE",
+      "VOICE",
+      "EVENT",
+      "NOTE",
+      "SONORITY",
+      "REGION",
+      "EXPORT_OPERATION"
+    ],
+    "rule": "Choose the narrowest truthful scope. A measure-level ambiguity must not automatically mark the score blocked."
+  },
+  "provisional_output_contract": {
+    "goal": "Ensure a useful, editable musical result survives partial uncertainty.",
+    "required_properties": [
+      "source identities remain traceable",
+      "exact facts are distinguishable from transformed/assumed facts",
+      "warnings are attached to local output regions",
+      "provisional TAB remains visible",
+      "human edits can replace provisional decisions without destroying source provenance",
+      "export eligibility is independent from on-screen provisional visibility",
+      "approximate playback may remain available when exact timing semantics are incomplete"
+    ],
+    "recommended_output_states": [
+      "FINAL_VERIFIED",
+      "PROVISIONAL_EDITABLE",
+      "REVIEW_REQUIRED_EDITABLE",
+      "PARTIAL_RECOVERED",
+      "UNAVAILABLE_ONLY_FOR_THIS_REGION"
+    ]
+  },
+  "musicxml_behavior_policy": {
+    "general_rule": "Preserve and process all musical facts that are independently understandable even when another notation feature is unsupported.",
+    "examples": [
+      {
+        "feature": "tempo or performance direction",
+        "desired_behavior": "Do not block TAB generation. Preserve direction metadata; allow playback approximation or review if exact interpretation is missing."
+      },
+      {
+        "feature": "repeat, first/second ending, navigation symbols",
+        "desired_behavior": "Do not block physical note-to-guitar projection. Preserve structural evidence and mark playback/export navigation separately if incomplete."
+      },
+      {
+        "feature": "tuplet or irregular timing",
+        "desired_behavior": "Keep pitch/voice/source identity and produce provisional placement when safe; localize timing review instead of deleting TAB for the score."
+      },
+      {
+        "feature": "grace notes",
+        "desired_behavior": "Retain the grace event and generate candidates where possible; timing/ornament realization may be approximate or review-required."
+      },
+      {
+        "feature": "cross-staff or unusual voice layout",
+        "desired_behavior": "Do not infer unsupported visual semantics as facts, but retain pitches/onsets/voices that are independently known and continue guitar realization."
+      },
+      {
+        "feature": "guitar technique with unknown physical semantics",
+        "desired_behavior": "Preserve technique provenance, continue with pitch/timing/fret candidates, mark technique realization locally for review."
+      },
+      {
+        "feature": "more simultaneous notes than six-string guitar can physically sustain",
+        "desired_behavior": "Do not globally fail. Report strict infeasibility for the exact sonority, then permit arrangement/reduction strategies to create provisional playable alternatives with explicit transformation provenance."
+      },
+      {
+        "feature": "piano or other non-guitar MusicXML",
+        "desired_behavior": "Treat source instrumentation as arrangement input, not as automatic rejection. Preserve source score and route through future arrangement capabilities for register transfer, reduction, omission, octave displacement and N-best guitar realizations."
+      }
+    ]
+  },
+  "operating_modes": {
+    "modes": [
+      {
+        "id": "STRICT_TRANSCRIPTION",
+        "purpose": "Verify whether the source can be represented on guitar without changing musical content.",
+        "behavior": "No hidden note omission or octave displacement. Infeasible regions are reported precisely, while other regions continue."
+      },
+      {
+        "id": "PLAYABLE_ARRANGEMENT",
+        "purpose": "Produce a playable guitar arrangement from arbitrary polyphonic source material.",
+        "behavior": "May use explicit reviewed transformations such as omission, voice prioritization, octave displacement, arpeggiation, redistribution and simplification. Every transformation must be provenance-tracked and editable."
+      },
+      {
+        "id": "BEST_EFFORT_PROVISIONAL",
+        "purpose": "Maximize usable output when semantics or capabilities are incomplete.",
+        "behavior": "Use bounded approximations, generate provisional TAB/N-best alternatives, attach warnings and allow teacher correction."
+      }
+    ],
+    "architecture_requirement": "Core contracts must support all three modes without requiring separate incompatible data models."
+  },
+  "arrangement_contract_direction": {
+    "status": "DESIGN_FOR_EXTENSION_NOW_IMPLEMENT_INCREMENTALLY",
+    "future_capabilities": [
+      "voice prioritization",
+      "melody preservation",
+      "bass preservation",
+      "inner-voice reduction",
+      "octave displacement",
+      "register compression",
+      "arpeggiation of impossible simultaneities",
+      "sustain-aware omission",
+      "ergonomic position selection",
+      "N-best alternative arrangements",
+      "teacher preference profiles",
+      "style/skill-level profiles",
+      "classical-guitar specific voicing policies",
+      "learned ranking over deterministically valid alternatives"
+    ],
+    "transformation_record": {
+      "required_fields": [
+        "transformationType",
+        "sourceIdentity_or_region",
+        "beforeFacts",
+        "afterFacts",
+        "reason",
+        "policyOrProvider",
+        "confidence_when_probabilistic",
+        "reversible_or_editable"
+      ],
+      "rule": "No arrangement transformation may masquerade as original MusicXML truth."
+    }
+  },
+  "candidate_and_solution_contract": {
+    "candidate_principle": "Keep physical validity separate from preference/ranking.",
+    "solution_shape_should_allow": [
+      "one or more physically valid string/fret candidates per note",
+      "multiple sonority assignments",
+      "multiple path/arrangement alternatives",
+      "N-best solutions rather than forced single-answer collapse",
+      "deterministic costs",
+      "heuristic scores",
+      "learned evidence scores",
+      "ergonomic annotations",
+      "transformation penalties",
+      "review flags",
+      "provider provenance"
+    ],
+    "hard_vs_soft": {
+      "hard_constraints": "instrument/tuning/capo/range/distinct-string and other proven physical constraints",
+      "soft_preferences": "position continuity, ergonomics, style, player profile, learned likelihood, timbral preference and arrangement policy",
+      "rule": "Soft scores cannot relabel a proven physically impossible candidate as physically valid. Arrangement mode may create a transformed musical alternative, but that alternative must explicitly record the transformation."
+    }
+  },
+  "ml_and_evidence_provider_contract": {
+    "goal": "Avoid locking future research to TabCNN, FretNet or any single model family.",
+    "provider_interface_concept": {
+      "providerId": "stable model/provider identity",
+      "providerVersion": "model/checkpoint/contract version",
+      "inputDomain": [
+        "AUDIO",
+        "SYMBOLIC",
+        "PLAYER_PROFILE",
+        "ERGONOMIC_MODEL",
+        "HYBRID"
+      ],
+      "outputKinds": [
+        "CANDIDATE_SCORE",
+        "STRING_FRET_EVIDENCE",
+        "ONSET_EVIDENCE",
+        "CONTINUOUS_PITCH_EVIDENCE",
+        "ERGONOMIC_SCORE",
+        "ARRANGEMENT_SCORE",
+        "CONFIDENCE",
+        "EXPLANATION_METADATA"
+      ],
+      "required_metadata": [
+        "provenance",
+        "model identity",
+        "contract version",
+        "confidence or score semantics",
+        "applicable tuning/instrument assumptions",
+        "calibration status when applicable"
+      ]
+    },
+    "TabCNN_role": "Baseline/reference guitar audio transcription and string/fret evidence model for comparison experiments.",
+    "FretNet_role": "Richer future string-aware audio evidence source, including continuous relative-pitch/onset evidence where useful.",
+    "future_role": "After shadow validation, learned providers may influence ranking among valid candidates or arrangement alternatives through a reviewed policy layer. Do not hard-code the architecture so ML can only ever produce reports.",
+    "current_boundary": "No production runtime integration is requested in the present V1B slice. Design contracts so later integration does not require replacing core semantic/solution objects."
+  },
+  "blocking_policy": {
+    "global_block_only_when": [
+      "input violates trust/security constraints and cannot be safely parsed",
+      "encoding/XML corruption prevents reliable source identity and recovery",
+      "the user explicitly requested a strict operation whose required global precondition is absent",
+      "an export format cannot be generated without inventing mandatory facts; block that export operation rather than unrelated analysis",
+      "internal invariant corruption makes continuing unsafe or misleading"
+    ],
+    "must_not_global_block_for": [
+      "unknown tempo text",
+      "performance directions irrelevant to fret assignment",
+      "repeat/ending semantics not needed for local note projection",
+      "one unsupported technique",
+      "one ambiguous measure",
+      "one voice requiring review",
+      "approximate rhythm in a recoverable region",
+      "local unplayable sonority when arrangement mode can propose alternatives",
+      "non-guitar source instrumentation",
+      "missing learned-model evidence",
+      "low ML confidence"
+    ]
+  },
+  "current_stage_and_sequence": {
+    "current_stage": "V1B_REAL_ENGINE_ARTIFACT_INTEGRATION",
+    "sequence": [
+      "Finish V1B real Engine artifact comparison and provenance loop.",
+      "Expand V1C corpus with broader real-world MusicXML shapes and capability classifications.",
+      "Build V2 failure intelligence around localized capability/recovery reasons rather than binary pass/fail only.",
+      "Build V3 independent feasibility oracle to separate strict physical impossibility from production-search failure.",
+      "Develop arrangement contracts and N-best transformed alternatives for music exceeding strict guitar feasibility.",
+      "Introduce V4 TabCNN/FretNet/ergonomic/learned evidence providers in shadow mode.",
+      "Promote learned ranking influence only after benchmark, calibration and candidate-invariance evidence."
+    ],
+    "critical_instruction": "Do not interpret the current V1B safety boundaries as the permanent product capability ceiling. They are verification-stage boundaries, not a mandate to make the final product narrow."
+  },
+  "v1b_compatibility_with_broad_goal": {
+    "instruction": "Keep V1B comparator exact for facts both sides claim to represent. Exact evidence comparison and broad product capability are compatible: strict truth/provenance at the evidence layer enables flexible recovery at higher capability layers.",
+    "do_not_do": [
+      "Do not weaken source-fact comparison just to support more features.",
+      "Do not use broad capability as permission to invent source facts.",
+      "Do not force unsupported higher-level semantics into V1B source-fact equality.",
+      "Do not mark the entire fixture unusable merely because one higher-level capability is absent."
+    ]
+  },
+  "developer_execution_directive": {
+    "autonomous_behavior": [
+      "Continue autonomously through safe branch-local implementation, tests, documentation and CI fixes within the approved stage.",
+      "When creating or revising contracts, prefer additive/versionable fields and provider interfaces over closed enums that make future expansion expensive.",
+      "Do not prematurely require every optional field to exist before a useful result can be represented.",
+      "Separate required identity/trust fields from optional capability/evidence fields.",
+      "Use extension bags only when typed versioned fields are genuinely impractical; do not create an untyped dumping ground.",
+      "Write tests proving local unsupported/review states do not unnecessarily erase unrelated valid output.",
+      "Keep output deterministic when the same deterministic providers/policies are used.",
+      "For probabilistic providers, record provider/version/seed or inference configuration needed for reproducibility where applicable."
+    ],
+    "human_or_separate_review_gate": [
+      "production behavior changes in musicxml-to-guitar-tab-engine",
+      "new automatic arrangement transformations that change musical content",
+      "learned ranking becoming production-authoritative",
+      "external model/data/code ingestion with unclear licensing",
+      "changes that weaken security/trust boundaries",
+      "destructive history or evidence deletion"
+    ]
+  },
+  "acceptance_tests_for_future_contracts": [
+    "A score with one unsupported local technique still exposes usable TAB candidates for unaffected notes.",
+    "A recoverable rhythm ambiguity produces REVIEW_REQUIRED/APPROXIMATE output rather than a global empty result.",
+    "A strict physically impossible six-plus-note sonority can be reported infeasible while arrangement mode returns explicit transformed alternatives.",
+    "Piano-origin MusicXML is accepted as arrangement input rather than rejected solely because the source instrument is not guitar.",
+    "Final/provisional visibility is separate from export eligibility.",
+    "N-best alternatives preserve source identities and transformation provenance.",
+    "Disabling all learned providers leaves deterministic candidate validity unchanged.",
+    "Enabling a learned provider can change soft ranking only under an explicitly selected ranking policy.",
+    "No low-confidence ML prediction can create a hard source fact.",
+    "Local review annotations survive round-trip into teacher-editable workflows."
+  ],
+  "documentation_directive": {
+    "required_message": "The Lab is evidence-first, but the end product goal is broad-capability MusicXML-to-guitar realization, not a narrow rejection engine.",
+    "future_docs_should_distinguish": [
+      "source truth",
+      "strict physical feasibility",
+      "capability availability",
+      "approximation/recovery",
+      "arrangement transformation",
+      "soft ranking/evidence",
+      "teacher edits",
+      "production export readiness"
+    ]
+  },
+  "definition_of_success": {
+    "short_term": "V1B closes a reproducible exact evidence loop without narrowing future contracts.",
+    "medium_term": "Real-world MusicXML increasingly yields localized diagnostics and provisional useful guitar results instead of global BLOCKED states.",
+    "long_term": "Arbitrary score material can flow through strict source parsing, guitar feasibility, explicit arrangement transformations, N-best solutions, ergonomic/learned ranking and teacher editing, with every decision traceable and no single unsupported detail destroying the entire workflow."
+  },
+  "final_instruction_to_developer": "Continue from the current repository reality. Build rigorously, but do not confuse rigor with refusal. Protect source truth, security and physical invariants while designing the capability contracts to remain broad, recoverable, extensible and useful. The preferred system behavior is: understand what is known, preserve what is unknown, produce what is safely possible, mark what requires review, offer alternatives where strict transcription is impossible, and reserve whole-score blocking for genuinely global failures."
+}

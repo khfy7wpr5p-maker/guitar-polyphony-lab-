@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "AUTONOMOUS_DEVELOPER_HANDOFF_POINTER",
+  "generated_date": "2026-09-16",
+  "project": "Guitar Polyphony Lab",
+  "repository": "khfy7wpr5p-maker/guitar-polyphony-lab-",
+  "status": "SUPERSEDED_BY_BROADER_PRODUCT_DIRECTIVE",
+  "primary_continuation_prompt": "handoffs/guitar_polyphony_lab_progressive_capability_developer_prompt_2026-09-16.json",
+  "precedence": "PRIMARY",
+  "instruction": "Use the progressive-capability directive as the authoritative continuation prompt. Preserve exact source-truth/security contracts and deterministic physical validity, but do not let verification-stage fail-closed boundaries become permanent product limitations. Local uncertainty degrades locally; provisional editable output survives; strict transcription, playable arrangement and best-effort provisional modes share extensible contracts; future TabCNN/FretNet/other learned providers remain pluggable evidence/ranking contributors rather than architecture-defining dependencies.",
+  "current_stage": "V1B_REAL_ENGINE_ARTIFACT_INTEGRATION"
+}
