@@ -29,6 +29,7 @@ Verification-stage fail-closed boundaries are evidence boundaries, not permanent
 - **V2B:** live Engine feature/location refinement for the six generic projection failures
 - **V3A:** exhaustive exact string/fret sustained-path feasibility oracle with committed regression evidence
 - **V3B:** independent left-hand finger/barre/reach feasibility oracle with pinned Engine comparison baseline
+- **Arrangement A1:** provenance-tracked N-best alternative-set contract with exact source coverage and explicit transformation facts
 - **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
 - **Technique research:** bounded source-provenance sidecars kept separate from physical authority
 
@@ -46,7 +47,8 @@ Verification-stage fail-closed boundaries are evidence boundaries, not permanent
 | Generic projection refinement | ✅ V2B COMPLETE | 6/6 generic cases refined from live Engine evidence; 4 exact local scopes, 2 bounded harmony region sets |
 | Independent exact-position feasibility oracle | ✅ V3A COMPLETE | exhaustive exact pitch/string/sustain reachability with a proven greedy false negative |
 | Independent left-hand physical oracle | ✅ V3B COMPLETE | 7-case benchmark; 6 cross-repo comparable cases with 6/6 status parity |
-| Arrangement/N-best alternatives | 📋 NEXT | Explicit transformed alternatives with provenance; no silent source mutation |
+| Arrangement/N-best contract | ✅ A1 FOUNDATION | explicit source coverage, transform provenance, review boundary; no automatic production authority |
+| Arrangement candidate generation + transformed-physical validation | 📋 A2 NEXT | bounded explicit-policy candidate generation; every candidate revalidated physically |
 | Learned guitar evidence / FretNet / TabCNN | 📋 V4 RESEARCH | Future shadow evidence/ranking provider |
 
 ## V1B / V1C evidence
@@ -144,6 +146,44 @@ The pinned Engine is a **comparison target only**. The Lab implementation remain
 
 Committed V3B evidence: `artifacts/v3b/left-hand-benchmark-baseline.json`.
 
+## Arrangement A1 — provenance-tracked N-best contract
+
+A1 introduces `GuitarArrangementAlternativeSet 1.0.0` as a Lab-only representation for multiple explicit guitar-arrangement candidates.
+
+It deliberately reuses the production arrangement vocabulary:
+
+```text
+PRESERVED
+OMITTED
+OCTAVE_DISPLACED
+VOICE_REDISTRIBUTED
+CHORD_REDUCED
+REVOICED
+ARPEGGIATED
+```
+
+Every alternative must cover every source note event **exactly once**. This makes silent note loss structurally invalid. Group transformations must bind to exact source-group membership, and content-changing decisions carry explicit target provenance.
+
+Supported V1 target facts include whole-octave displacement, target voice, chord survivors, pitch-class-preserving register revoicing, and explicit arpeggio order/spread.
+
+N-best candidate order is deterministic enumeration only:
+
+```text
+candidateOrderIsPreferenceRank = false
+qualityRankingNotImplied = true
+```
+
+Any content-changing alternative is review-required. A1 explicitly declares:
+
+```text
+productionAuthority = false
+automaticTransformationAuthority = false
+learnedRankingAuthority = false
+exportAuthority = false
+```
+
+See `docs/ARRANGEMENT-NBEST-CONTRACT.md`.
+
 ## Architecture direction
 
 ```text
@@ -165,10 +205,13 @@ V3B independent left-hand physical feasibility
       |
       +---- true strict infeasibility ----> explicit recovery/arrangement alternatives
       |
-      +---- strict feasibility -----------> candidate / N-best space
+      +---- strict feasibility -----------> strict transcription candidate space
       |
       v
-provenance-tracked arrangement contracts
+A1 provenance-tracked N-best arrangement contract
+      |
+      v
+A2 bounded candidate generation + physical revalidation
       |
       v
 future editable guitar realization
@@ -183,7 +226,9 @@ Source truth and hard physical validity remain separate from preference and lear
 - V2 classifications are evidence-only; candidate states do not change production runtime behavior.
 - V3A/V3B are independent research evidence only; neither changes production status or final TAB authority.
 - `INDETERMINATE_LIMIT` is never re-labeled as physical impossibility.
-- No Lab module is production authority for reduction, arrangement, final fingering, Canonical TAB, rendering, playback, OMR, or application UI.
+- Arrangement A1 represents explicit transformed alternatives but does not authorize automatic production transformations.
+- Every A1 alternative must explain every source event exactly once; silent omission is invalid.
+- No Lab module is production authority for final reduction policy, final fingering, Canonical TAB, rendering, playback, OMR, or application UI.
 - External fixtures/models/datasets require provenance and licensing before promotion.
 - Learned evidence remains below source truth and hard physical constraints.
 
@@ -199,9 +244,10 @@ Source truth and hard physical validity remain separate from preference and lear
 - **V3 — Independent Feasibility Oracle**
   - V3A exhaustive exact pitch/string/sustain reachability ✅
   - V3B independent finger/barre/reach physical layer + pinned Engine comparison ✅
-- **Arrangement capability — NEXT**
-  - explicit voice prioritization, omission, octave displacement, register compression, arpeggiation and N-best transformed alternatives
-  - every transformed alternative must preserve source provenance and before/after facts
+- **Arrangement capability**
+  - A1 provenance-tracked N-best alternative-set contract ✅
+  - A2 bounded explicit-policy candidate generation + transformed-candidate physical validation **NEXT**
+  - later deterministic/teacher/learned ranking only after validation gates
 - **V4 — Guitar research / learned evidence**
   - ergonomic benchmarks and player profiles
   - TabCNN/FretNet-style providers in shadow mode
@@ -226,5 +272,6 @@ Node.js 22 or newer is required.
 - `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`
 - `docs/V2-FAILURE-INTELLIGENCE.md`
 - `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md`
+- `docs/ARRANGEMENT-NBEST-CONTRACT.md`
 - `docs/FRETNET_RESEARCH.md`
 - `SECURITY.md`
