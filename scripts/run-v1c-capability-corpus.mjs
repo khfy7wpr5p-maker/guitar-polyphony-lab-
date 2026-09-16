@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
 import {
   assertExpectedOutcome,
@@ -17,7 +18,8 @@ import {
 } from '../src/verification/semanticComparator.js';
 
 const require = createRequire(import.meta.url);
-const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const PINNED_DOCTYPE = /<!DOCTYPE\s+score-partwise\s+PUBLIC\s+"-\/\/Recordare\/\/DTD MusicXML 4\.0 Partwise\/\/EN"\s+"http:\/\/www\.musicxml\.org\/dtds\/partwise\.dtd"\s*>\s*/g;
 
 function fail(message) {
   throw new Error(message);
@@ -72,6 +74,18 @@ function declaredMusicXmlVersion(xml) {
 
 function requireEngineModule(engineRoot, relativePath) {
   return require(path.resolve(engineRoot, relativePath));
+}
+
+function createSemanticProbeXml(xml, caseId) {
+  const matches = [...xml.matchAll(PINNED_DOCTYPE)];
+  if (matches.length !== 1) {
+    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: expected exactly one pinned MusicXML 4.0 external DOCTYPE, observed ${matches.length}`);
+  }
+  const transformed = xml.replace(PINNED_DOCTYPE, '');
+  if (/<!DOCTYPE/i.test(transformed) || /<!ENTITY/i.test(transformed)) {
+    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: declaration remains after pinned transform`);
+  }
+  return transformed;
 }
 
 function labObservation(xml) {
@@ -165,17 +179,27 @@ function main() {
       fail(`SOURCE_PROVENANCE_MISMATCH ${item.caseId}: expected SHA-256 ${item.sourceSha256}, got ${observedSha256}`);
     }
     const xml = bytes.toString('utf8');
-    const lab = labObservation(xml);
-    const engine = engineObservation(
+    const rawLab = labObservation(xml);
+    const rawEngine = engineObservation(
       xml,
       parseParsedMusicXmlDocument,
       projectParsedMusicXmlToPolyphonicSourceModel,
     );
-    const semantic = semanticObservation(lab, engine);
+
+    const probeXml = createSemanticProbeXml(xml, item.caseId);
+    const probeLab = labObservation(probeXml);
+    const probeEngine = engineObservation(
+      probeXml,
+      parseParsedMusicXmlDocument,
+      projectParsedMusicXmlToPolyphonicSourceModel,
+    );
+    const semantic = semanticObservation(probeLab, probeEngine);
 
     if (options.assertExpectations) {
-      assertExpectedOutcome(item.expectedLab, lab.summary, `${item.caseId}.lab`);
-      assertExpectedOutcome(item.expectedEngine, engine.summary, `${item.caseId}.engine`);
+      assertExpectedOutcome(item.expectedLab, rawLab.summary, `${item.caseId}.rawLab`);
+      assertExpectedOutcome(item.expectedEngine, rawEngine.summary, `${item.caseId}.rawEngine`);
+      assertExpectedOutcome(item.expectedProbeLab, probeLab.summary, `${item.caseId}.probeLab`);
+      assertExpectedOutcome(item.expectedProbeEngine, probeEngine.summary, `${item.caseId}.probeEngine`);
       assertExpectedSemanticComparison(
         item.expectedSemanticComparison,
         semantic.status,
@@ -191,16 +215,30 @@ function main() {
       declaredMusicXmlVersion: declaredMusicXmlVersion(xml),
       category: item.category,
       featureTags: item.featureTags,
-      lab: lab.summary,
-      engine: engine.summary,
-      semanticComparison: semantic,
+      rawInput: {
+        lab: rawLab.summary,
+        engine: rawEngine.summary,
+      },
+      semanticProbe: {
+        transform: manifest.policy.semanticProbeTransform,
+        transformedSha256: sha256(Buffer.from(probeXml, 'utf8')),
+        lab: probeLab.summary,
+        engine: probeEngine.summary,
+        semanticComparison: semantic,
+      },
     });
   }
 
-  const count = (side, status) => cases.filter((item) => item[side].status === status).length;
+  const rawCount = (side, status) => cases.filter(
+    (item) => item.rawInput[side].status === status,
+  ).length;
+  const probeCount = (side, status) => cases.filter(
+    (item) => item.semanticProbe[side].status === status,
+  ).length;
+
   const report = {
     documentType: 'GuitarPolyphonyV1CCapabilityReport',
-    contractVersion: '1.0.0',
+    contractVersion: '1.1.0',
     sourceRepository: manifest.source.repository,
     sourceCommitSha: manifest.source.commitSha,
     engineRepository: manifest.engine.repository,
@@ -208,13 +246,17 @@ function main() {
     policy: manifest.policy,
     summary: {
       caseCount: cases.length,
-      labSupported: count('lab', 'SUPPORTED'),
-      labUnsupportedLocal: count('lab', 'UNSUPPORTED_LOCAL'),
-      engineSupported: count('engine', 'SUPPORTED'),
-      engineUnsupportedLocal: count('engine', 'UNSUPPORTED_LOCAL'),
-      semanticEqual: cases.filter((item) => item.semanticComparison.status === 'EQUAL').length,
-      semanticMismatch: cases.filter((item) => item.semanticComparison.status === 'MISMATCH').length,
-      semanticNotComparable: cases.filter((item) => item.semanticComparison.status === 'NOT_COMPARABLE').length,
+      rawLabSupported: rawCount('lab', 'SUPPORTED'),
+      rawLabUnsupportedLocal: rawCount('lab', 'UNSUPPORTED_LOCAL'),
+      rawEngineSupported: rawCount('engine', 'SUPPORTED'),
+      rawEngineUnsupportedLocal: rawCount('engine', 'UNSUPPORTED_LOCAL'),
+      probeLabSupported: probeCount('lab', 'SUPPORTED'),
+      probeLabUnsupportedLocal: probeCount('lab', 'UNSUPPORTED_LOCAL'),
+      probeEngineSupported: probeCount('engine', 'SUPPORTED'),
+      probeEngineUnsupportedLocal: probeCount('engine', 'UNSUPPORTED_LOCAL'),
+      semanticEqual: cases.filter((item) => item.semanticProbe.semanticComparison.status === 'EQUAL').length,
+      semanticMismatch: cases.filter((item) => item.semanticProbe.semanticComparison.status === 'MISMATCH').length,
+      semanticNotComparable: cases.filter((item) => item.semanticProbe.semanticComparison.status === 'NOT_COMPARABLE').length,
     },
     cases,
   };
