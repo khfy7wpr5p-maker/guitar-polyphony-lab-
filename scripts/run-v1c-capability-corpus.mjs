@@ -168,7 +168,7 @@ function main() {
 
     const bytes = fs.readFileSync(sourceFile);
     const observedSha256 = sha256(bytes);
-    if (item.sourceSha256 !== null && item.sourceSha256 !== observedSha256) {
+    if (item.sourceSha256 !== observedSha256) {
       fail(`SOURCE_PROVENANCE_MISMATCH ${item.caseId}: expected SHA-256 ${item.sourceSha256}, got ${observedSha256}`);
     }
     const xml = bytes.toString('utf8');
@@ -180,6 +180,10 @@ function main() {
     );
 
     const probeXml = createSemanticProbeXml(xml, item.caseId);
+    const observedProbeSha256 = sha256(Buffer.from(probeXml, 'utf8'));
+    if (item.semanticProbeSha256 !== observedProbeSha256) {
+      fail(`SOURCE_PROVENANCE_MISMATCH ${item.caseId}: expected semantic probe SHA-256 ${item.semanticProbeSha256}, got ${observedProbeSha256}`);
+    }
     const probeLab = labObservation(probeXml);
     const probeEngine = engineObservation(
       probeXml,
@@ -207,7 +211,7 @@ function main() {
       rawInput: { lab: rawLab.summary, engine: rawEngine.summary },
       semanticProbe: {
         transform: manifest.policy.semanticProbeTransform,
-        transformedSha256: sha256(Buffer.from(probeXml, 'utf8')),
+        transformedSha256: observedProbeSha256,
         lab: probeLab.summary,
         engine: probeEngine.summary,
         semanticComparison: semantic,
