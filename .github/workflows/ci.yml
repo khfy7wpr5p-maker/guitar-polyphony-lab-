@@ -105,6 +105,22 @@ jobs:
           node scripts/verify-v2b-projection-refinement-report.mjs
           --generated v2b-generated/projection-refinement-report.json
 
+      - name: Generate V3A strict feasibility benchmark
+        if: github.event_name == 'push' && github.ref == 'refs/heads/stage/v3-independent-feasibility-oracle'
+        run: >-
+          node scripts/run-v3a-strict-feasibility-benchmark.mjs
+          --output v3a-generated/strict-feasibility-report.json
+          --assert-expectations
+
+      - name: Upload V3A strict feasibility benchmark
+        if: github.event_name == 'push' && github.ref == 'refs/heads/stage/v3-independent-feasibility-oracle'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: v3a-strict-feasibility-report
+          path: v3a-generated/strict-feasibility-report.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload V2B projection refinement report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
