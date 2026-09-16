@@ -1,48 +1,56 @@
 # Documentation audit
 
-This classification is a fresh-read comparison of maintained documents against the current V1B branch source, tests, fixtures, package metadata, CI, and the 2026-09-16 external FretNet research review. Historical documents remain in place because they preserve evidence and do not by themselves change runtime behavior.
+Fresh-read classification against the current V1B branch source, tests, fixtures, committed Engine evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
 
-| Document set | Classification | Action / reason |
+| Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md`, `docs/ARCHITECTURE.md` | CURRENT | refreshed project purpose, authority boundary, current architecture map, explicit V1B continuation point, V3 feasibility direction, and V4 FretNet/learned-evidence boundary |
-| `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | matches the implemented comparator core and correctly identifies pinned Engine-generated artifact integration as remaining V1B work |
-| `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | records authoritative ICASSP FretNet source, maturity/licensing observations, non-authority rules, and future V4 shadow-ranking boundary |
-| `docs/POLYPHONY-MODEL.md` | PARTIALLY_OUTDATED | older stage wording remains; current authority and continuation rules are superseded by `ARCHITECTURE.md` and `REPOSITORY_REALITY.md` where they differ |
-| `docs/SUPPORTED-MUSICXML.md` | PARTIALLY_OUTDATED | core bounded support remains useful, but architecture status and future learned-evidence work must be read from current entry-point docs |
-| `docs/P1A-INPUT-GATE.md`, `docs/P1B-PARSER-ADAPTER.md`, `docs/P1C-COMPATIBILITY-MATRIX.md` | CURRENT | matches bounded input/parser/corpus behavior |
-| `docs/P2A-FRETBOARD-CANDIDATES.md` | CURRENT_WITH_BOUNDARY_NOTE | deterministic physical candidates remain valid; future learned evidence may rank only already-valid candidates and may not alter candidate validity |
-| `docs/P2B-SONORITY-ASSIGNMENTS.md` | CURRENT | matches bounded enumeration and fail-closed limits |
-| `docs/TUNING-LAB-01.md`, `docs/TUNING-LAB-02.md`, `docs/TUNING_REQUEST_CONTRACT.md` | CURRENT_RESEARCH_RECORD | valid Lab evidence and external production plans; not a statement of present production integration |
-| `docs/LAB_TECH_01_*` through `LAB_TECH_05_*` | CURRENT_RESEARCH_RECORD | stage evidence; authority is bounded by the physical-semantics gate |
-| `PRODUCTION_INTEGRATION_PLAN.md`, `PRODUCTION_CAPO_TUNING_INTEGRATION_PLAN.md` | ARCHIVE_CANDIDATE | dated external-repository plans, retained for history; they are not current production evidence |
-| `SECURITY.md` | PARTIALLY_OUTDATED | policy remains relevant, but some stage wording predates implemented P1A/P1B and V1B boundaries |
-| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation/contract/corpus/CI inventory; architecture direction is additionally clarified by `ARCHITECTURE.md` |
+| `README.md` | CURRENT | project purpose, broad-capability direction, V1B closure and V1C continuation |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, progressive capability states, arrangement/ML direction, V1C continuation |
+| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned Engine evidence, CI reality, current gaps |
+| `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible two-fixture V1B loop |
+| active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents current verification boundaries from becoming permanent product capability ceilings |
+| `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence; not current runtime authority |
+| `docs/P1A-INPUT-GATE.md`, `docs/P1B-PARSER-ADAPTER.md`, `docs/P1C-COMPATIBILITY-MATRIX.md` | CURRENT | bounded input/parser/corpus behavior |
+| `docs/P2A-FRETBOARD-CANDIDATES.md`, `docs/P2B-SONORITY-ASSIGNMENTS.md` | CURRENT_WITH_BOUNDARY_NOTE | deterministic physical evidence; not arrangement or learned authority |
+| technique research documents | CURRENT_RESEARCH_RECORD | source/provenance research with separate physical-semantics gate |
+| `docs/POLYPHONY-MODEL.md`, `docs/SUPPORTED-MUSICXML.md`, `SECURITY.md` | PARTIALLY_OUTDATED | useful bounded details remain, but current architecture/continuation must be read from maintained entry-point docs |
+| historical production integration plans | ARCHIVE_CANDIDATE | retained for history; not current production evidence |
 
-## Current document authority order
+## Document authority order
 
-When documents disagree, use this order:
+When documents disagree, use:
 
 1. repository code and automated tests;
 2. `docs/REPOSITORY_REALITY.md` for implementation inventory;
-3. `docs/ARCHITECTURE.md` for present authority boundaries and continuation point;
+3. `docs/ARCHITECTURE.md` plus the active progressive-capability directive for current architecture direction;
 4. `README.md` for project-level summary;
-5. current stage-specific documents such as `V1B-SEMANTIC-COMPARATOR.md` and `FRETNET_RESEARCH.md`;
+5. current stage documents such as `docs/V1B-SEMANTIC-COMPARATOR.md`;
 6. historical stage records and archived integration plans.
 
-## Current architectural continuation
+## V1B documentation closure
 
-The next implementation step is **not** FretNet integration.
+The previous continuation text — “pin real Engine-generated artifacts and run them in Lab CI” — is now completed for the approved two-fixture slice.
 
-The required continuation remains:
+Current evidence includes:
 
 ```text
-V1B comparator core
-  -> pin real Engine-generated PolyphonicSourceModel 1.0.0 artifacts
-  -> validate provenance/version/hash
-  -> compare in Lab CI
-  -> close V1B
+production Engine SHA
+1d8ced644f544f7e991f7275eda77a2ce557774e
+
++ two approved fixture SHA-256 identities
++ two committed PolyphonicSourceModel 1.0.0 artifacts
++ artifact SHA-256 identities
++ Lab semantic equality tests
++ CI regeneration from the exact Engine SHA
++ byte-for-byte reproduction check
 ```
 
-FretNet-style learned evidence is a V4 research direction after deterministic verification and feasibility infrastructure are established.
+The next architectural continuation is **V1C broader MusicXML compatibility/capability corpus work**, not FretNet integration and not production-authoritative learned ranking.
 
-`CURRENT_RESEARCH_RECORD` means the document is accurate as a research/evidence record but must not be read as production-engine status or runtime authority.
+## Broad-capability interpretation rule
+
+Strict evidence validation remains intentional. However, historical wording such as “unsupported semantics fail closed” must be read at the specific evidence/trust boundary where it applies; it is not a mandate for the final product to return global `BLOCKED` for every unsupported musical detail.
+
+Future product-facing contracts should preserve known facts, localize uncertainty, keep provisional editable output where safe, and record arrangement transformations explicitly.
+
+`CURRENT_RESEARCH_RECORD` means a document is accurate as a research/evidence record but is not a statement of present production-engine runtime authority.
