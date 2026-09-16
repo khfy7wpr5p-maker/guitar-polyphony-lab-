@@ -1,0 +1,116 @@
+{
+  "documentType": "GuitarPolyphonyV3AStrictFeasibilityBenchmark",
+  "contractVersion": "1.0.0",
+  "policy": {
+    "standardTuningOnly": true,
+    "productionAuthority": false,
+    "arrangementTransformsForbidden": true,
+    "leftHandFingeringNotModeled": true
+  },
+  "cases": [
+    {
+      "caseId": "simple-open-four-note",
+      "expected": { "status": "FEASIBLE", "reason": null },
+      "points": [
+        {
+          "pointId": "p0",
+          "measureIndex": 0,
+          "timeDivisions": 0,
+          "notes": [
+            { "logicalNoteId": "n1", "sustainId": "s1", "pitch": "E2", "disposition": "ATTACK", "tie": null, "voice": "1", "staff": 1 },
+            { "logicalNoteId": "n2", "sustainId": "s2", "pitch": "A2", "disposition": "ATTACK", "tie": null, "voice": "2", "staff": 1 },
+            { "logicalNoteId": "n3", "sustainId": "s3", "pitch": "D3", "disposition": "ATTACK", "tie": null, "voice": "3", "staff": 1 },
+            { "logicalNoteId": "n4", "sustainId": "s4", "pitch": "G3", "disposition": "ATTACK", "tie": null, "voice": "4", "staff": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "greedy-dead-end-but-feasible",
+      "expected": { "status": "FEASIBLE", "reason": null },
+      "legacyGreedyExpected": { "status": "BLOCKED", "reason": "NO_DISTINCT_STRING_ASSIGNMENT" },
+      "points": [
+        {
+          "pointId": "p0",
+          "measureIndex": 0,
+          "timeDivisions": 0,
+          "notes": [
+            { "logicalNoteId": "held-e4", "sustainId": "s-e4", "pitch": "E4", "disposition": "ATTACK", "tie": null, "voice": "1", "staff": 1 }
+          ]
+        },
+        {
+          "pointId": "p1",
+          "measureIndex": 0,
+          "timeDivisions": 1,
+          "notes": [
+            { "logicalNoteId": "held-e4", "sustainId": "s-e4", "pitch": "E4", "disposition": "HOLD", "tie": "CONTINUE", "voice": "1", "staff": 1 },
+            { "logicalNoteId": "new-e6", "sustainId": "s-e6", "pitch": "E6", "disposition": "ATTACK", "tie": null, "voice": "2", "staff": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "sustained-path-impossible",
+      "expected": { "status": "INFEASIBLE", "reason": "NO_SUSTAINED_PATH" },
+      "points": [
+        {
+          "pointId": "forced-open-stack",
+          "measureIndex": 0,
+          "timeDivisions": 0,
+          "notes": [
+            { "logicalNoteId": "e4", "sustainId": "held-e4", "pitch": "E4", "disposition": "ATTACK", "tie": null, "voice": "1", "staff": 1 },
+            { "logicalNoteId": "b3", "sustainId": "s-b3", "pitch": "B3", "disposition": "ATTACK", "tie": null, "voice": "2", "staff": 1 },
+            { "logicalNoteId": "g3", "sustainId": "s-g3", "pitch": "G3", "disposition": "ATTACK", "tie": null, "voice": "3", "staff": 1 },
+            { "logicalNoteId": "d3", "sustainId": "s-d3", "pitch": "D3", "disposition": "ATTACK", "tie": null, "voice": "4", "staff": 1 },
+            { "logicalNoteId": "a2", "sustainId": "s-a2", "pitch": "A2", "disposition": "ATTACK", "tie": null, "voice": "5", "staff": 1 },
+            { "logicalNoteId": "e2", "sustainId": "s-e2", "pitch": "E2", "disposition": "ATTACK", "tie": null, "voice": "6", "staff": 1 }
+          ]
+        },
+        {
+          "pointId": "held-conflict",
+          "measureIndex": 0,
+          "timeDivisions": 1,
+          "notes": [
+            { "logicalNoteId": "e4", "sustainId": "held-e4", "pitch": "E4", "disposition": "HOLD", "tie": "CONTINUE", "voice": "1", "staff": 1 },
+            { "logicalNoteId": "e6", "sustainId": "new-e6", "pitch": "E6", "disposition": "ATTACK", "tie": null, "voice": "2", "staff": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "seven-note-hard-impossible",
+      "expected": { "status": "INFEASIBLE", "reason": "ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT" },
+      "points": [
+        {
+          "pointId": "seven-notes",
+          "measureIndex": 0,
+          "timeDivisions": 0,
+          "notes": [
+            { "logicalNoteId": "n1", "sustainId": "s1", "pitch": "E2", "disposition": "ATTACK", "tie": null, "voice": "1", "staff": 1 },
+            { "logicalNoteId": "n2", "sustainId": "s2", "pitch": "F2", "disposition": "ATTACK", "tie": null, "voice": "2", "staff": 1 },
+            { "logicalNoteId": "n3", "sustainId": "s3", "pitch": "G2", "disposition": "ATTACK", "tie": null, "voice": "3", "staff": 1 },
+            { "logicalNoteId": "n4", "sustainId": "s4", "pitch": "A2", "disposition": "ATTACK", "tie": null, "voice": "4", "staff": 1 },
+            { "logicalNoteId": "n5", "sustainId": "s5", "pitch": "B2", "disposition": "ATTACK", "tie": null, "voice": "5", "staff": 1 },
+            { "logicalNoteId": "n6", "sustainId": "s6", "pitch": "C3", "disposition": "ATTACK", "tie": null, "voice": "6", "staff": 1 },
+            { "logicalNoteId": "n7", "sustainId": "s7", "pitch": "D3", "disposition": "ATTACK", "tie": null, "voice": "7", "staff": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "bounded-state-space",
+      "options": { "maxStatesPerPoint": 1 },
+      "expected": { "status": "INDETERMINATE_LIMIT", "reason": "STATE_SPACE_LIMIT_EXCEEDED" },
+      "points": [
+        {
+          "pointId": "many-placements",
+          "measureIndex": 0,
+          "timeDivisions": 0,
+          "notes": [
+            { "logicalNoteId": "e4", "sustainId": "s-e4", "pitch": "E4", "disposition": "ATTACK", "tie": null, "voice": "1", "staff": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

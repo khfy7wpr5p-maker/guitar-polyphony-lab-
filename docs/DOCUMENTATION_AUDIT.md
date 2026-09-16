@@ -1,15 +1,16 @@
 # Documentation audit
 
-Fresh-read classification against the current V2B branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A taxonomy evidence, committed V2B projection-refinement evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
+Fresh-read classification against the current V3A branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A taxonomy evidence, committed V2B projection-refinement evidence, committed V3A strict-feasibility evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
 
 | Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md` | CURRENT | project purpose, V1/V2 closure and V3 continuation |
-| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V2A/V2B evidence layers and V3/arrangement/V4 direction |
-| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned V1/V2 evidence, current CI and exact remaining uncertainty |
+| `README.md` | CURRENT | project purpose, V1/V2 closure, V3A implementation and V3B continuation |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V1/V2/V3A evidence layers and V3B/arrangement/V4 direction |
+| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned evidence, current CI and exact remaining physical-authority gap |
 | `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible V1B loop |
 | `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license and 22-case raw/probe evidence |
 | `docs/V2-FAILURE-INTELLIGENCE.md` | CURRENT | V2A taxonomy plus completed V2B cause/location refinement |
+| `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md` | CURRENT | V3A exhaustive exact-position oracle, benchmark, limits and V3B boundary |
 | active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents evidence-stage restrictions from becoming permanent product ceilings |
 | `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence, not runtime authority |
 | P1/P2 stage documents | CURRENT_WITH_BOUNDARY_NOTE | bounded source/physical research contracts |
@@ -45,26 +46,11 @@ semantic NOT_COMPARABLE:  17
 
 Raw XML trust-boundary rejection remains separate from musical capability. CI-only probe transforms do not authorize application-time security weakening.
 
-## V2A closure
+## V2 closure
 
-V2A is implemented and reproducible:
+V2A classifies all 66 current unsupported observations with zero unclassified failures and forbids semantic capability evidence from becoming `BLOCKED_GLOBAL` in the Lab taxonomy.
 
-```text
-66 failure observations
-44 raw trust-boundary failures
-22 semantic capability failures
-0 unclassified failures
-```
-
-The committed taxonomy verifies source-code anchors and explicitly forbids semantic capability evidence from becoming `BLOCKED_GLOBAL` in the Lab classification layer.
-
-Baseline: `artifacts/v2/failure-intelligence-baseline.json`.
-
-## V2B closure
-
-V2B refines all six V1C Engine cases previously left as generic `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE`.
-
-Live Engine cause split:
+V2B refines all six formerly generic Engine projection failures:
 
 ```text
 direction          3
@@ -80,33 +66,60 @@ NOTE_EVENT         1
 FEATURE_REGION_SET 2
 ```
 
-Four cases have exact local scope. The two harmony cases deliberately keep a multi-occurrence region set because Engine evidence does not identify one exact causal harmony occurrence.
+All six are architecture-level `REVIEW_REQUIRED` candidates. The two harmony cases deliberately retain bounded multi-occurrence scope because the Engine does not identify one exact causal occurrence.
 
-All six are architecture-level `REVIEW_REQUIRED` candidates; none becomes a semantic global block and none authorizes automatic recovery.
+## V3A closure
 
-V2B implementation/evidence:
+V3A is implemented and reproducible.
+
+Core implementation/evidence:
 
 ```text
-src/failures/v2bProjectionRefinement.js
-scripts/run-v2b-projection-refinement-discovery.mjs
-scripts/run-v2b-projection-refinement.mjs
-scripts/verify-v2b-projection-refinement-report.mjs
-artifacts/v2b/projection-refinement-baseline.json
-test/v2bProjectionRefinement.test.js
+src/guitar/strictFeasibilityOracle.js
+fixtures/v3a/benchmark.json
+artifacts/v3a/strict-feasibility-baseline.json
+scripts/run-v3a-strict-feasibility-benchmark.mjs
+scripts/verify-v3a-strict-feasibility-report.mjs
+test/strictFeasibilityOracle.test.js
+docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md
 ```
 
-CI regenerates V2B evidence from the exact pinned Engine and external corpus and requires equality with the committed baseline.
+V3A proves exact feasibility only for:
+
+```text
+pitch on declared fretboard
++ simultaneous distinct-string assignment
++ sustained string/fret stability
+```
+
+It does not yet claim finger assignment, barre feasibility, hand reach, ergonomics, or arrangement authority.
+
+Pinned benchmark:
+
+```text
+cases:                               5
+FEASIBLE:                            2
+INFEASIBLE:                          2
+INDETERMINATE_LIMIT:                 1
+proven legacy greedy false-negative: 1
+```
+
+The false-negative case is important architecture evidence: a greedy verifier can report `BLOCKED` even though an exact sustained path exists. Therefore a single-path solver failure cannot be treated as physical impossibility without independent reachability evidence.
+
+`INDETERMINATE_LIMIT` is explicitly separate from `INFEASIBLE` so computational/evidence bounds cannot masquerade as physical proof.
 
 ## Broad-capability interpretation rule
 
 Strict evidence validation applies at the specific evidence/trust boundary. It is not a mandate for global product blocking. Known musical facts should be preserved, uncertainty localized, and provisional/editable output retained where production safety permits.
 
-Fixture/category metadata is context, not causal proof. V2B narrows a generic failure only when live Engine evidence and/or a unique exact source occurrence support that narrowing.
+V3A `FEASIBLE` means exact string/fret reachability exists within its declared scope. If production still rejects the material, the remaining question is stronger left-hand physics versus search/capability failure; V3A alone must not guess which one.
 
 ## Current continuation
 
-The principal next stage is **V3 Independent Feasibility Oracle**. It should distinguish true strict untransformed guitar impossibility from implementation/search/capability failure while remaining offline/CI evidence.
+The principal next stage is **V3B Independent Left-Hand Physical Oracle + pinned Engine comparison**.
 
-The two unresolved harmony occurrence sets may be refined additively if better Engine location evidence becomes available; they do not block V3.
+V3B should independently reproduce finger assignment, barre feasibility, hand-span/extra-reach constraints, then compare those facts with production Engine physical failures. Only after that layer is independent can an Engine rejection be promoted to a likely search/capability-gap classification.
+
+The two unresolved V2B harmony occurrence sets may be refined additively and do not block V3B.
 
 `CURRENT_RESEARCH_RECORD` means a document is accurate as a research/evidence record but is not a statement of production-engine authority.

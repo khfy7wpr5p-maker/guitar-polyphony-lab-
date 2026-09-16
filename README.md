@@ -27,6 +27,7 @@ Verification-stage fail-closed boundaries are evidence boundaries, not permanent
 - **V1C:** 22-case pinned external MusicXML capability regression
 - **V2A:** deterministic failure-family/layer/scope/handling taxonomy over current V1C failures
 - **V2B:** live Engine feature/location refinement for the six generic projection failures
+- **V3A:** exhaustive exact string/fret sustained-path feasibility oracle with committed regression evidence
 - **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
 - **Technique research:** bounded source-provenance sidecars kept separate from physical authority
 
@@ -42,7 +43,8 @@ Verification-stage fail-closed boundaries are evidence boundaries, not permanent
 | External MusicXML capability corpus | ✅ V1C COMPLETE | 22 pinned MIT-licensed cases, hashed evidence, exact outcomes |
 | Failure intelligence taxonomy | ✅ V2A COMPLETE | 66 observations, 8 families, zero unclassified |
 | Generic projection refinement | ✅ V2B COMPLETE | 6/6 generic cases refined from live Engine evidence; 4 exact local scopes, 2 bounded harmony region sets |
-| Independent feasibility oracle | 📋 V3 NEXT | Separate strict-physical oracle; offline/CI evidence only |
+| Independent exact-position feasibility oracle | ✅ V3A FOUNDATION | exhaustive exact pitch/string/sustain reachability; left-hand fingering explicitly not yet modeled |
+| Independent left-hand physical oracle | 📋 V3B NEXT | separate finger/barre/reach evidence before labeling production failures as search/capability gaps |
 | Arrangement/N-best alternatives | 📋 FUTURE CAPABILITY | Explicit transformed alternatives with provenance |
 | Learned guitar evidence / FretNet / TabCNN | 📋 V4 RESEARCH | Future shadow evidence/ranking provider |
 
@@ -109,6 +111,29 @@ Committed V2B evidence: `artifacts/v2b/projection-refinement-baseline.json`.
 
 See `docs/V2-FAILURE-INTELLIGENCE.md`.
 
+## V3A independent exact-position feasibility oracle
+
+V3A adds an independent, non-greedy feasibility oracle for exact guitar string/fret reachability.
+
+It exhaustively carries every distinct reachable physical state across sustained points while preserving exact pitch, distinct-string use, and held string/fret identity. A configured search bound produces `INDETERMINATE_LIMIT`, never a false `INFEASIBLE` conclusion.
+
+Pinned five-case benchmark:
+
+```text
+FEASIBLE:                            2
+INFEASIBLE:                          2
+INDETERMINATE_LIMIT:                 1
+proven legacy greedy false-negative: 1
+```
+
+The false-negative benchmark is significant: the older greedy research verifier reports `BLOCKED / NO_DISTINCT_STRING_ASSIGNMENT`, while V3A proves a valid exact sustained path exists by keeping alternate earlier string placements alive.
+
+V3A deliberately does not yet claim finger assignment, barre feasibility, hand reach, ergonomics, or arrangement authority. Those stronger constraints are the V3B continuation.
+
+Committed V3A evidence: `artifacts/v3a/strict-feasibility-baseline.json`.
+
+See `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md`.
+
 ## Architecture direction
 
 ```text
@@ -124,14 +149,18 @@ V2 failure intelligence
 family / layer / scope / handling
       |
       v
-V3 independent strict feasibility oracle
+V3A exact string/fret feasibility oracle
       |
-      +---- physically feasible ------> candidate / N-best space
+      +---- infeasible ------> hard exact-position contradiction
       |
-      +---- truly infeasible ----------> explicit recovery / arrangement research
+      +---- feasible --------> V3B independent left-hand physical oracle
+                                      |
+                                      +--> true stronger physical rejection
+                                      |
+                                      +--> production search/capability gap candidate
       |
       v
-future editable guitar realization
+future explicit arrangement / N-best research
 ```
 
 Source truth and hard physical validity remain separate from preference and learned ranking. Learned evidence may eventually rank already-valid candidates or explicit alternatives, but may not invent source facts or make an impossible untransformed candidate physically valid.
@@ -141,6 +170,7 @@ Source truth and hard physical validity remain separate from preference and lear
 - P1A remains authoritative for bounded hostile-input rejection before Lab parsing.
 - V1C semantic probing is offline test evidence only.
 - V2 classifications are evidence-only; candidate states do not change production runtime behavior.
+- V3A is research evidence only and explicitly does not claim complete left-hand human playability.
 - No Lab module is production authority for reduction, arrangement, final fingering, Canonical TAB, rendering, playback, OMR, or application UI.
 - Higher-level musical capability gaps should be localized rather than automatically interpreted as whole-score failure.
 - External fixtures/models/datasets require provenance and licensing before promotion.
@@ -156,9 +186,9 @@ Source truth and hard physical validity remain separate from preference and lear
   - V2A deterministic taxonomy ✅
   - V2B live generic projection cause/location refinement ✅
   - additional exact harmony-location refinement is additive, not blocking
-- **V3 — Independent Feasibility Oracle** **NEXT**
-  - distinguish true strict guitar infeasibility from implementation/search/capability failure
-  - offline/CI evidence only
+- **V3 — Independent Feasibility Oracle**
+  - V3A exhaustive exact pitch/string/sustain reachability ✅
+  - V3B independent finger/barre/reach physical layer + pinned Engine comparison **NEXT**
 - **Arrangement capability**
   - explicit voice prioritization, omission, octave displacement, register compression, arpeggiation and N-best transformed alternatives
 - **V4 — Guitar research / learned evidence**
@@ -184,6 +214,7 @@ Node.js 22 or newer is required.
 - `docs/V1B-SEMANTIC-COMPARATOR.md`
 - `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`
 - `docs/V2-FAILURE-INTELLIGENCE.md`
+- `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md`
 - `docs/FRETNET_RESEARCH.md`
 - `docs/P1A-INPUT-GATE.md`
 - `docs/P1B-PARSER-ADAPTER.md`
