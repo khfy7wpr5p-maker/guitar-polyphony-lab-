@@ -1,0 +1,229 @@
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+
+import {
+  assertExpectedOutcome,
+  assertExpectedSemanticComparison,
+  observedFailure,
+  validateV1CCapabilityManifest,
+} from '../src/corpus/v1cCapabilityCorpus.js';
+import {
+  adaptEnginePolyphonicSourceModel,
+  buildLabSemanticSnapshot,
+  compareSemanticSnapshots,
+} from '../src/verification/semanticComparator.js';
+
+const require = createRequire(import.meta.url);
+const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+
+function fail(message) {
+  throw new Error(message);
+}
+
+function parseArgs(argv) {
+  const options = {
+    externalRoot: null,
+    engineRoot: null,
+    output: null,
+    assertExpectations: false,
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (token === '--external-root') {
+      options.externalRoot = argv[index + 1] || null;
+      index += 1;
+    } else if (token === '--engine-root') {
+      options.engineRoot = argv[index + 1] || null;
+      index += 1;
+    } else if (token === '--output') {
+      options.output = argv[index + 1] || null;
+      index += 1;
+    } else if (token === '--assert-expectations') {
+      options.assertExpectations = true;
+    } else {
+      fail(`Unknown argument: ${token}`);
+    }
+  }
+  if (!options.externalRoot || !options.engineRoot || !options.output) {
+    fail('Usage: node scripts/run-v1c-capability-corpus.mjs --external-root <path> --engine-root <path> --output <file> [--assert-expectations]');
+  }
+  return options;
+}
+
+function gitHead(root) {
+  return execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+}
+
+function gitBlobSha(filePath) {
+  return execFileSync('git', ['hash-object', filePath], { encoding: 'utf8' }).trim();
+}
+
+function sha256(buffer) {
+  return crypto.createHash('sha256').update(buffer).digest('hex');
+}
+
+function declaredMusicXmlVersion(xml) {
+  const match = xml.match(/<score-partwise\b[^>]*\bversion=["']([^"']+)["']/i);
+  return match ? match[1] : null;
+}
+
+function requireEngineModule(engineRoot, relativePath) {
+  return require(path.resolve(engineRoot, relativePath));
+}
+
+function labObservation(xml) {
+  try {
+    const snapshot = buildLabSemanticSnapshot(xml);
+    const noteCount = snapshot.measures.reduce((sum, measure) => sum + measure.notes.length, 0);
+    return {
+      summary: Object.freeze({
+        status: 'SUPPORTED',
+        errorCode: null,
+        measureCount: snapshot.measures.length,
+        noteCount,
+      }),
+      snapshot,
+    };
+  } catch (error) {
+    return { summary: observedFailure(error), snapshot: null };
+  }
+}
+
+function engineObservation(xml, parseParsedMusicXmlDocument, projectParsedMusicXmlToPolyphonicSourceModel) {
+  try {
+    const parsed = parseParsedMusicXmlDocument(xml);
+    const model = projectParsedMusicXmlToPolyphonicSourceModel(parsed);
+    return {
+      summary: Object.freeze({
+        status: 'SUPPORTED',
+        errorCode: null,
+        measureCount: model.measureCount,
+        noteCount: model.eventCount,
+      }),
+      model,
+    };
+  } catch (error) {
+    return { summary: observedFailure(error), model: null };
+  }
+}
+
+function semanticObservation(lab, engine) {
+  if (!lab.snapshot || !engine.model) {
+    return { status: 'NOT_COMPARABLE', mismatchCount: null };
+  }
+  const engineSnapshot = adaptEnginePolyphonicSourceModel(engine.model);
+  const report = compareSemanticSnapshots(lab.snapshot, engineSnapshot);
+  return {
+    status: report.equal ? 'EQUAL' : 'MISMATCH',
+    mismatchCount: report.mismatchCount,
+  };
+}
+
+function main() {
+  const options = parseArgs(process.argv.slice(2));
+  const manifest = validateV1CCapabilityManifest(JSON.parse(
+    fs.readFileSync(path.join(repoRoot, 'fixtures/v1c/manifest.json'), 'utf8'),
+  ));
+  const externalRoot = path.resolve(options.externalRoot);
+  const engineRoot = path.resolve(options.engineRoot);
+
+  const observedExternalHead = gitHead(externalRoot);
+  if (observedExternalHead !== manifest.source.commitSha) {
+    fail(`SOURCE_PROVENANCE_MISMATCH external commit: expected ${manifest.source.commitSha}, got ${observedExternalHead}`);
+  }
+  const observedEngineHead = gitHead(engineRoot);
+  if (observedEngineHead !== manifest.engine.commitSha) {
+    fail(`SOURCE_PROVENANCE_MISMATCH engine commit: expected ${manifest.engine.commitSha}, got ${observedEngineHead}`);
+  }
+
+  const { parseParsedMusicXmlDocument } = requireEngineModule(
+    engineRoot,
+    'src/parser/parsedMusicXmlDocument.js',
+  );
+  const { projectParsedMusicXmlToPolyphonicSourceModel } = requireEngineModule(
+    engineRoot,
+    'src/parser/polyphonicMusicXmlProjector.js',
+  );
+
+  const cases = [];
+  for (const item of manifest.cases) {
+    const sourceFile = path.resolve(externalRoot, item.sourcePath);
+    if (!sourceFile.startsWith(`${externalRoot}${path.sep}`)) {
+      fail(`SOURCE_PROVENANCE_MISMATCH path escapes external root: ${item.sourcePath}`);
+    }
+    const observedBlobSha = gitBlobSha(sourceFile);
+    if (observedBlobSha !== item.sourceBlobSha) {
+      fail(`SOURCE_PROVENANCE_MISMATCH ${item.caseId}: expected blob ${item.sourceBlobSha}, got ${observedBlobSha}`);
+    }
+
+    const bytes = fs.readFileSync(sourceFile);
+    const observedSha256 = sha256(bytes);
+    if (item.sourceSha256 !== null && item.sourceSha256 !== observedSha256) {
+      fail(`SOURCE_PROVENANCE_MISMATCH ${item.caseId}: expected SHA-256 ${item.sourceSha256}, got ${observedSha256}`);
+    }
+    const xml = bytes.toString('utf8');
+    const lab = labObservation(xml);
+    const engine = engineObservation(
+      xml,
+      parseParsedMusicXmlDocument,
+      projectParsedMusicXmlToPolyphonicSourceModel,
+    );
+    const semantic = semanticObservation(lab, engine);
+
+    if (options.assertExpectations) {
+      assertExpectedOutcome(item.expectedLab, lab.summary, `${item.caseId}.lab`);
+      assertExpectedOutcome(item.expectedEngine, engine.summary, `${item.caseId}.engine`);
+      assertExpectedSemanticComparison(
+        item.expectedSemanticComparison,
+        semantic.status,
+        `${item.caseId}.semantic`,
+      );
+    }
+
+    cases.push({
+      caseId: item.caseId,
+      sourcePath: item.sourcePath,
+      sourceBlobSha: item.sourceBlobSha,
+      sourceSha256: observedSha256,
+      declaredMusicXmlVersion: declaredMusicXmlVersion(xml),
+      category: item.category,
+      featureTags: item.featureTags,
+      lab: lab.summary,
+      engine: engine.summary,
+      semanticComparison: semantic,
+    });
+  }
+
+  const count = (side, status) => cases.filter((item) => item[side].status === status).length;
+  const report = {
+    documentType: 'GuitarPolyphonyV1CCapabilityReport',
+    contractVersion: '1.0.0',
+    sourceRepository: manifest.source.repository,
+    sourceCommitSha: manifest.source.commitSha,
+    engineRepository: manifest.engine.repository,
+    engineCommitSha: manifest.engine.commitSha,
+    policy: manifest.policy,
+    summary: {
+      caseCount: cases.length,
+      labSupported: count('lab', 'SUPPORTED'),
+      labUnsupportedLocal: count('lab', 'UNSUPPORTED_LOCAL'),
+      engineSupported: count('engine', 'SUPPORTED'),
+      engineUnsupportedLocal: count('engine', 'UNSUPPORTED_LOCAL'),
+      semanticEqual: cases.filter((item) => item.semanticComparison.status === 'EQUAL').length,
+      semanticMismatch: cases.filter((item) => item.semanticComparison.status === 'MISMATCH').length,
+      semanticNotComparable: cases.filter((item) => item.semanticComparison.status === 'NOT_COMPARABLE').length,
+    },
+    cases,
+  };
+
+  const outputPath = path.resolve(options.output);
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  const text = `${JSON.stringify(report, null, 2)}\n`;
+  fs.writeFileSync(outputPath, text, 'utf8');
+  process.stdout.write(text);
+}
+
+main();
