@@ -48,7 +48,7 @@ function sha256Buffer(buffer) {
 }
 
 function canonicalJson(value) {
-  return `${JSON.stringify(value, null, 2)}\n`;
+  return `${JSON.stringify(value)}\n`;
 }
 
 function requireEngineModule(engineRoot, relativePath) {
