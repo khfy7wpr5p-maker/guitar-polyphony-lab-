@@ -1,0 +1,97 @@
+{
+  "documentType": "GuitarArrangementA2Benchmark",
+  "contractVersion": "1.0.0",
+  "cases": [
+    {
+      "caseId": "piano-eight-reduction",
+      "source": {
+        "partId": "P1",
+        "events": [
+          { "sourceEventId": "e1", "midi": 40, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e2", "midi": 45, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e3", "midi": 50, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e4", "midi": 55, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e5", "midi": 59, "voice": "2", "staff": 2 },
+          { "sourceEventId": "e6", "midi": 64, "voice": "2", "staff": 2 },
+          { "sourceEventId": "e7", "midi": 67, "voice": "2", "staff": 2 },
+          { "sourceEventId": "e8", "midi": 72, "voice": "2", "staff": 2 }
+        ],
+        "groups": [
+          { "sourceGroupId": "piano-8", "sourceEventIds": ["e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"] }
+        ]
+      },
+      "policy": {
+        "sourceGroupId": "piano-8",
+        "allowedTransforms": ["CHORD_REDUCED"],
+        "priorityEventIds": ["e1", "e6"],
+        "maxAlternatives": 16,
+        "maxKeptNotes": 6,
+        "minKeptNotes": 6
+      },
+      "expect": {
+        "generationStatus": "COMPLETE",
+        "strictStatus": "INFEASIBLE",
+        "strictReason": "ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT",
+        "requiredFeasibleReductionSurvivors": ["e1", "e2", "e3", "e4", "e5", "e6"]
+      }
+    },
+    {
+      "caseId": "low-pitch-octave-recovery",
+      "source": {
+        "partId": "P1",
+        "events": [
+          { "sourceEventId": "low-e", "midi": 28, "voice": "1", "staff": 1 },
+          { "sourceEventId": "a2", "midi": 45, "voice": "1", "staff": 1 }
+        ],
+        "groups": [
+          { "sourceGroupId": "g1", "sourceEventIds": ["low-e", "a2"] }
+        ]
+      },
+      "policy": {
+        "sourceGroupId": "g1",
+        "allowedTransforms": ["OCTAVE_DISPLACED"],
+        "priorityEventIds": [],
+        "maxAlternatives": 4,
+        "octaveSemitoneDeltas": [12]
+      },
+      "expect": {
+        "generationStatus": "COMPLETE",
+        "strictStatus": "INFEASIBLE",
+        "strictReason": "NO_EXACT_FRETBOARD_CANDIDATE",
+        "requiredFeasibleAlternativeId": "a2:octave:low-e:12"
+      }
+    },
+    {
+      "caseId": "candidate-limit-is-indeterminate",
+      "source": {
+        "partId": "P1",
+        "events": [
+          { "sourceEventId": "e1", "midi": 40, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e2", "midi": 45, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e3", "midi": 50, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e4", "midi": 55, "voice": "1", "staff": 1 },
+          { "sourceEventId": "e5", "midi": 59, "voice": "2", "staff": 2 },
+          { "sourceEventId": "e6", "midi": 64, "voice": "2", "staff": 2 },
+          { "sourceEventId": "e7", "midi": 67, "voice": "2", "staff": 2 },
+          { "sourceEventId": "e8", "midi": 72, "voice": "2", "staff": 2 }
+        ],
+        "groups": [
+          { "sourceGroupId": "piano-8", "sourceEventIds": ["e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"] }
+        ]
+      },
+      "policy": {
+        "sourceGroupId": "piano-8",
+        "allowedTransforms": ["CHORD_REDUCED"],
+        "priorityEventIds": [],
+        "maxAlternatives": 2,
+        "maxKeptNotes": 6,
+        "minKeptNotes": 4
+      },
+      "expect": {
+        "generationStatus": "PARTIAL_LIMIT",
+        "candidateSpaceComplete": false,
+        "emittedAlternativeCount": 2
+      }
+    }
+  ]
+}

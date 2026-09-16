@@ -68,11 +68,10 @@ function buildAlternatives() {
 }
 
 test('builds immutable N-best alternatives without implying quality rank', () => {
-  const alternatives = buildAlternatives();
-  const result = createArrangementAlternativeSet(source, alternatives);
+  const result = createArrangementAlternativeSet(source, buildAlternatives());
 
   assert.equal(result.documentType, 'GuitarArrangementAlternativeSet');
-  assert.equal(result.contractVersion, '1.0.0');
+  assert.equal(result.contractVersion, '1.1.0');
   assert.equal(result.productionAuthority, false);
   assert.equal(result.automaticTransformationAuthority, false);
   assert.equal(result.learnedRankingAuthority, false);
@@ -159,7 +158,7 @@ test('revoicing V1 preserves pitch class and changes only register', () => {
 });
 
 test('arpeggiation requires an exact group permutation and explicit spread', () => {
-  const alternatives = [{
+  const result = createArrangementAlternativeSet(source, [{
     alternativeId: 'arp',
     strategyTags: ['ARPEGGIATION'],
     decisions: [
@@ -173,9 +172,8 @@ test('arpeggiation requires an exact group permutation and explicit spread', () 
       },
       preserved('arp:d1', 'e4'),
     ],
-  }];
+  }]);
 
-  const result = createArrangementAlternativeSet(source, alternatives);
   assert.deepEqual(
     result.alternatives[0].decisions[0].target.orderedSourceEventIds,
     ['e3', 'e2', 'e1'],
@@ -184,7 +182,7 @@ test('arpeggiation requires an exact group permutation and explicit spread', () 
 });
 
 test('chord reduction records surviving source IDs instead of silently dropping notes', () => {
-  const alternatives = [{
+  const result = createArrangementAlternativeSet(source, [{
     alternativeId: 'reduce',
     strategyTags: ['INNER_VOICE_REDUCTION'],
     decisions: [
@@ -198,9 +196,8 @@ test('chord reduction records surviving source IDs instead of silently dropping 
       },
       preserved('reduce:d1', 'e4'),
     ],
-  }];
+  }]);
 
-  const result = createArrangementAlternativeSet(source, alternatives);
   assert.deepEqual(
     result.alternatives[0].decisions[0].target.survivingSourceEventIds,
     ['e1', 'e3'],

@@ -1,0 +1,144 @@
+{
+  "documentType": "GuitarArrangementA2BenchmarkReport",
+  "contractVersion": "1.0.0",
+  "productionAuthority": false,
+  "automaticProductionTransformationAuthority": false,
+  "learnedRankingAuthority": false,
+  "arrangementAlternativeSetVersion": "1.1.0",
+  "boundedGeneratorVersion": "1.0.0",
+  "sourceTruthMayExceedGuitarStringCount": true,
+  "supportedGeneratedTransforms": [
+    "CHORD_REDUCED",
+    "OCTAVE_DISPLACED"
+  ],
+  "scope": {
+    "staticSonorityOnly": true,
+    "singleTransformPerAlternativeResearchSlice": true,
+    "temporalArpeggiationGeneration": false,
+    "transformedCandidatesPhysicallyRevalidated": true
+  },
+  "summary": {
+    "caseCount": 3,
+    "completeGenerationCaseCount": 2,
+    "partialLimitCaseCount": 1,
+    "casesWithStrictInfeasibility": 3,
+    "casesWithFeasibleTransformedEvidence": 2
+  },
+  "cases": [
+    {
+      "caseId": "piano-eight-reduction",
+      "sourceEventCount": 8,
+      "sourceGroupEventCount": 8,
+      "allowedTransforms": [
+        "CHORD_REDUCED"
+      ],
+      "priorityEventIds": [
+        "e1",
+        "e6"
+      ],
+      "generationStatus": "COMPLETE",
+      "candidateSpaceComplete": true,
+      "emittedAlternativeCount": 16,
+      "candidateOrderIsPreferenceRank": false,
+      "strict": {
+        "status": "INFEASIBLE",
+        "reason": "ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT",
+        "realizedEventCount": 8
+      },
+      "validationStatusCounts": {
+        "FEASIBLE": 15,
+        "INFEASIBLE": 1,
+        "INDETERMINATE_LIMIT": 0,
+        "OTHER": 0
+      },
+      "decisionTypeCounts": {
+        "CHORD_REDUCED": 15,
+        "PRESERVED": 8
+      },
+      "evidence": {
+        "requiredReduction": {
+          "alternativeId": "a2:reduce:6:e1+e2+e3+e4+e5+e6",
+          "survivors": [
+            "e1",
+            "e2",
+            "e3",
+            "e4",
+            "e5",
+            "e6"
+          ],
+          "status": "FEASIBLE",
+          "reason": null,
+          "realizedEventCount": 6,
+          "sourceCoverageComplete": true,
+          "reviewRequired": true
+        }
+      }
+    },
+    {
+      "caseId": "low-pitch-octave-recovery",
+      "sourceEventCount": 2,
+      "sourceGroupEventCount": 2,
+      "allowedTransforms": [
+        "OCTAVE_DISPLACED"
+      ],
+      "priorityEventIds": [],
+      "generationStatus": "COMPLETE",
+      "candidateSpaceComplete": true,
+      "emittedAlternativeCount": 3,
+      "candidateOrderIsPreferenceRank": false,
+      "strict": {
+        "status": "INFEASIBLE",
+        "reason": "NO_EXACT_FRETBOARD_CANDIDATE",
+        "realizedEventCount": 2
+      },
+      "validationStatusCounts": {
+        "FEASIBLE": 1,
+        "INFEASIBLE": 2,
+        "INDETERMINATE_LIMIT": 0,
+        "OTHER": 0
+      },
+      "decisionTypeCounts": {
+        "OCTAVE_DISPLACED": 2,
+        "PRESERVED": 4
+      },
+      "evidence": {
+        "requiredAlternative": {
+          "alternativeId": "a2:octave:low-e:12",
+          "status": "FEASIBLE",
+          "reason": null,
+          "realizedEventCount": 2,
+          "hasWitness": true
+        }
+      }
+    },
+    {
+      "caseId": "candidate-limit-is-indeterminate",
+      "sourceEventCount": 8,
+      "sourceGroupEventCount": 8,
+      "allowedTransforms": [
+        "CHORD_REDUCED"
+      ],
+      "priorityEventIds": [],
+      "generationStatus": "PARTIAL_LIMIT",
+      "candidateSpaceComplete": false,
+      "emittedAlternativeCount": 2,
+      "candidateOrderIsPreferenceRank": false,
+      "strict": {
+        "status": "INFEASIBLE",
+        "reason": "ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT",
+        "realizedEventCount": 8
+      },
+      "validationStatusCounts": {
+        "FEASIBLE": 1,
+        "INFEASIBLE": 1,
+        "INDETERMINATE_LIMIT": 0,
+        "OTHER": 0
+      },
+      "decisionTypeCounts": {
+        "CHORD_REDUCED": 1,
+        "PRESERVED": 8
+      },
+      "evidence": {}
+    }
+  ]
+}
