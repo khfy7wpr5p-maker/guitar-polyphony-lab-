@@ -1,0 +1,86 @@
+{
+  "documentType": "GuitarPolyphonyV3AStrictFeasibilityBenchmarkReport",
+  "contractVersion": "1.0.0",
+  "productionAuthority": false,
+  "scope": {
+    "exactPitch": true,
+    "distinctStrings": true,
+    "sustainStringFretStable": true,
+    "leftHandFingering": false,
+    "barreFeasibility": false,
+    "ergonomicReach": false,
+    "arrangementTransforms": false
+  },
+  "summary": {
+    "caseCount": 5,
+    "feasibleCount": 2,
+    "infeasibleCount": 2,
+    "indeterminateLimitCount": 1,
+    "demonstratedGreedyFalseNegativeCount": 1
+  },
+  "cases": [
+    {
+      "caseId": "simple-open-four-note",
+      "expected": { "status": "FEASIBLE", "reason": null },
+      "oracle": {
+        "status": "FEASIBLE",
+        "reason": null,
+        "decisiveScope": null,
+        "stateCounts": [{ "pointId": "p0", "reachableStateCount": 1 }],
+        "witnessPointCount": 1
+      },
+      "legacyGreedy": null
+    },
+    {
+      "caseId": "greedy-dead-end-but-feasible",
+      "expected": { "status": "FEASIBLE", "reason": null },
+      "oracle": {
+        "status": "FEASIBLE",
+        "reason": null,
+        "decisiveScope": null,
+        "stateCounts": [
+          { "pointId": "p0", "reachableStateCount": 6 },
+          { "pointId": "p1", "reachableStateCount": 5 }
+        ],
+        "witnessPointCount": 2
+      },
+      "legacyGreedy": { "status": "BLOCKED", "reason": "NO_DISTINCT_STRING_ASSIGNMENT" }
+    },
+    {
+      "caseId": "sustained-path-impossible",
+      "expected": { "status": "INFEASIBLE", "reason": "NO_SUSTAINED_PATH" },
+      "oracle": {
+        "status": "INFEASIBLE",
+        "reason": "NO_SUSTAINED_PATH",
+        "decisiveScope": { "pointId": "held-conflict", "measureIndex": 0, "timeDivisions": 1 },
+        "stateCounts": [{ "pointId": "forced-open-stack", "reachableStateCount": 1 }],
+        "witnessPointCount": 0
+      },
+      "legacyGreedy": null
+    },
+    {
+      "caseId": "seven-note-hard-impossible",
+      "expected": { "status": "INFEASIBLE", "reason": "ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT" },
+      "oracle": {
+        "status": "INFEASIBLE",
+        "reason": "ACTIVE_NOTE_COUNT_EXCEEDS_STRING_COUNT",
+        "decisiveScope": { "pointId": "seven-notes", "measureIndex": 0, "timeDivisions": 0 },
+        "stateCounts": [],
+        "witnessPointCount": 0
+      },
+      "legacyGreedy": null
+    },
+    {
+      "caseId": "bounded-state-space",
+      "expected": { "status": "INDETERMINATE_LIMIT", "reason": "STATE_SPACE_LIMIT_EXCEEDED" },
+      "oracle": {
+        "status": "INDETERMINATE_LIMIT",
+        "reason": "STATE_SPACE_LIMIT_EXCEEDED",
+        "decisiveScope": { "pointId": "many-placements", "measureIndex": 0, "timeDivisions": 0 },
+        "stateCounts": [],
+        "witnessPointCount": 0
+      },
+      "legacyGreedy": null
+    }
+  ]
+}
