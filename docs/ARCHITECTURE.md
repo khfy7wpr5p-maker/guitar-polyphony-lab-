@@ -59,7 +59,7 @@ The Lab does not own production reduction policy, arrangement authority, sustain
 - **P2B** — bounded distinct-string sonority assignments
 - **V1A** — corpus provenance/licensing/expectation registry
 - **V1B** — Lab snapshot ↔ Engine `PolyphonicSourceModel 1.0.0` comparator
-- **V1C** — pinned external MusicXML capability regression with raw-input and semantic-probe observations
+- **V1C** — 22-case pinned external MusicXML capability regression with raw-input and semantic-probe observations
 - **configuration research** — Standard / Drop D / custom tuning / capo
 - **technique provenance** — metadata/source evidence with no automatic physical authority
 
@@ -113,13 +113,13 @@ Lab semantic snapshot              P2A candidates
                     v
        deterministic equality/mismatch
 
-PINNED EXTERNAL MusicXML 4.0 CORPUS
+PINNED EXTERNAL MusicXML CORPUS
                     |
           +---------+---------+
           |                   |
           v                   v
-  raw trust-boundary      offline DTD-free
-     observation          semantic probe
+  raw trust-boundary      offline semantic probe
+     observation          approved per-case transform
                               |
                     +---------+---------+
                     |                   |
@@ -134,6 +134,10 @@ PINNED EXTERNAL MusicXML 4.0 CORPUS
                     V1C capability report
                     local supported / unsupported
                     + semantic equality evidence
+                              |
+                              v
+                    V2 FAILURE INTELLIGENCE
+                    layer / scope / recovery reason
 ```
 
 ## V1B — closed reproducible slice
@@ -148,69 +152,63 @@ Pinned Engine commit:
 
 Evidence files are committed under `artifacts/v1b-engine/` with fixture hashes, Engine identity and artifact hashes. `test/v1bEngineArtifacts.test.js` requires semantic equality between each pinned Engine artifact and the Lab snapshot.
 
-CI additionally:
-
-```text
-checkout exact Engine SHA
-  -> run real Engine parser/projector
-  -> regenerate both artifacts
-  -> byte-for-byte diff against committed evidence
-  -> upload regenerated evidence
-```
-
-No Engine module is imported by the Lab runtime/package.
+CI additionally checks out the exact Engine SHA, regenerates both artifacts, requires byte-for-byte reproduction, and uploads the regenerated evidence. No Engine module is imported by the Lab runtime/package.
 
 V1B comparison covers source-note identity, written pitch, onset/duration divisions, voice, staff, tie evidence, active-sonority membership and peak polyphony. Cross-measure sustain joining, guitar string/fret state, arrangement decisions and Canonical TAB remain outside this comparator contract.
 
-## V1C — initial external capability baseline
+## V1C — 22-case external capability baseline
 
-V1C now has an initial 11-case baseline from `w3c-cg/musicxmlTestSuite`, pinned to external commit:
+V1C has a reproducible 22-case baseline from `w3c-cg/musicxmlTestSuite`, pinned to external commit:
 
 ```text
 77c19f7e819154c70ca1a1992e80dcda8ff82fea
 ```
 
-The selected upstream files carry the standard external MusicXML 4.0 DOCTYPE. V1C records raw-input rejection separately from musical-semantic capability. It does **not** relax P1A or the production Engine trust boundary.
+Raw-input rejection remains separate from musical-semantic capability and the raw P1A/Engine security boundaries remain unchanged. Offline probes use an explicit per-case transform allowlist. For DOCTYPE-bearing fixtures the transform accepts only one structurally verified Recordare MusicXML `score-partwise` declaration and rejects arbitrary/multiple declarations or entities.
 
-The offline CI-only probe:
+Pinned summary:
 
 ```text
-upstream bytes
-  -> verify commit/blob/raw SHA-256
-  -> remove exactly one pinned standard MusicXML 4.0 external DOCTYPE
-  -> verify transformed SHA-256
-  -> Lab semantic path
-  -> pinned Engine production compatibility normalization chain
-  -> local outcomes + semantic comparison
+cases:                    22
+probe Lab supported:      17
+probe Engine supported:    5
+semantic EQUAL:            5
+semantic MISMATCH:         0
+semantic NOT_COMPARABLE:  17
 ```
 
-The first baseline records 3 semantic-equality cases and no semantic mismatches. Eight cases remain locally unsupported/not-comparable on the pinned revisions. These are exact fixture observations, not general MusicXML support claims.
+The five equality fixtures are exact evidence for:
 
-CI requires pinned raw/probe hashes, exact expected local outcomes, and semantic equality with `artifacts/v1c/capability-report.json`.
+- backup/polyphony (`03b`);
+- basic chord (`21a`);
+- simple tie (`33b`);
+- piano/multistaff (`43a`);
+- single-voice multistaff staff-change (`43i`).
+
+These are fixture-specific observations, not general MusicXML support claims.
+
+Committed V1C report evidence is sharded and hash-verified. CI regenerates the full 22-case report from the pinned corpus and Engine revision, verifies exact expected local outcomes, verifies shard hashes, reconstructs the committed report, and requires semantic equality with the regenerated report.
 
 See `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
 
-## Current continuation point — broaden V1C, then V2
+## Current continuation point — V2 Failure Intelligence
 
 ```text
 V1B reproducible evidence loop ✅
         |
         v
-V1C initial 11-case external capability baseline ✅
+V1C 22-case external capability baseline ✅
+        |
+        +--> further corpus growth remains additive
+        |    (.mxl, transposition, microtones, more guitar metadata)
         |
         v
-V1C isolated capability expansion  <--- YOU ARE HERE
+V2 FAILURE INTELLIGENCE  <--- CURRENT NEXT STAGE
         |
-        +--> simple/advanced tuplets
-        +--> isolated grace subtypes
-        +--> isolated multivoice/presentation shapes
-        +--> repeat structure variants
-        +--> guitar/TAB staff-tuning and technical string/fret
-        +--> ties / octave shifts / directions
-        +--> .mxl transport boundary
-        |
-        v
-V2 failure intelligence
+        +--> stable localized failure/recovery taxonomy
+        +--> classify source / normalization / projection / search failures
+        +--> narrowest truthful scope
+        +--> preserve provisional downstream work where safe
         |
         v
 V3 independent strict feasibility oracle
@@ -222,34 +220,23 @@ explicit arrangement / N-best research
 V4 learned/ergonomic evidence in shadow mode
 ```
 
-V1C broadens evidence without weakening source-truth validation. Unsupported higher-level semantics are classified precisely and locally rather than automatically converted into whole-score failure.
+V1C broadens evidence without weakening source-truth validation. V2 must now convert that evidence into precise, local, machine-readable failure intelligence rather than turning unsupported musical details into whole-score blocking.
 
 ## P1 trust boundary
 
 P1A remains authoritative before XML parsing. It enforces bounded UTF-8 input, `score-partwise`, no DTD/entity/XInclude input, no NUL bytes, and explicit resource limits.
 
-V1C's DTD-free semantic transform is an offline regression probe only. It is not a production sanitization rule and must never bypass raw trust-boundary evidence.
+V1C semantic transforms are offline regression probes only. They are not production sanitization rules and must never bypass raw trust-boundary evidence.
 
 P1B extracts only bounded semantic facts required by the Lab. At this evidence layer, unsupported or malformed source shapes may fail closed rather than being guessed.
 
 ## P0 polyphony boundary
 
-P0 owns deterministic per-measure reference reconstruction:
-
-- cursor movement;
-- chord onset reuse;
-- backup/forward voice overlap;
-- note intervals;
-- active-sonority spans;
-- deterministic validation.
-
-P0 does not own production arrangement or final guitar realization.
+P0 owns deterministic per-measure reference reconstruction: cursor movement, chord onset reuse, backup/forward voice overlap, note intervals, active-sonority spans and deterministic validation. P0 does not own production arrangement or final guitar realization.
 
 ## P2 physical feasibility boundary
 
-P2A answers where a pitch can physically exist on the declared six-string configuration.
-
-P2B answers whether simultaneously active notes can occupy distinct strings and enumerates bounded assignments.
+P2A answers where a pitch can physically exist on the declared six-string configuration. P2B answers whether simultaneously active notes can occupy distinct strings and enumerates bounded assignments.
 
 Physical validity is a hard constraint. A future arrangement layer may transform the musical problem explicitly, but a soft score or ML provider may never relabel an impossible untransformed candidate as physically valid.
 
@@ -265,21 +252,11 @@ Future shared contracts should be able to represent at least:
 
 The narrowest truthful scope should be used: note, event, voice, measure, region, capability, export operation, part, or score. `REVIEW_REQUIRED` is not intended to be a global TAB lock.
 
-V1C currently records strict `SUPPORTED` or `UNSUPPORTED_LOCAL` evidence for exact fixtures. It does not yet authorize production `APPROXIMATE` or `REVIEW_REQUIRED` recovery behavior; those belong to later capability/recovery work backed by this evidence.
+V1C records strict `SUPPORTED` or `UNSUPPORTED_LOCAL` evidence for exact fixtures. V2 is the next layer that must classify why a capability failed and what recovery scope is safe. Production recovery behavior remains separately reviewed work.
 
 ## Arrangement direction
 
-Future arrangement work is allowed to create transformed alternatives while preserving original source facts separately. Candidate transformations include:
-
-- voice prioritization;
-- melody/bass preservation;
-- inner-voice reduction;
-- omission;
-- octave displacement;
-- register compression;
-- arpeggiation of impossible simultaneities;
-- N-best alternatives;
-- teacher/style/skill profiles.
+Future arrangement work is allowed to create transformed alternatives while preserving original source facts separately. Candidate transformations include voice prioritization, melody/bass preservation, inner-voice reduction, omission, octave displacement, register compression, arpeggiation, N-best alternatives and teacher/style/skill profiles.
 
 Every transformation must record before/after facts, reason, provider/policy and editability/reversibility. A transformation must never masquerade as original MusicXML truth.
 
@@ -306,8 +283,8 @@ A learned provider may eventually rank already-valid candidates or explicit arra
 
 - **V1A** corpus registry — ✅ initial slice
 - **V1B** real Engine/Lab semantic evidence — ✅ approved two-fixture reproducible slice
-- **V1C** external MusicXML capability classification — ✅ initial 11-case baseline; **isolated expansion next**
-- **V2** localized failure intelligence
+- **V1C** external MusicXML capability classification — ✅ 22-case pinned baseline; further expansion additive
+- **V2** localized failure intelligence — **NEXT**
 - **V3** independent feasibility oracle
 - **Arrangement / N-best** explicit transformed alternatives
 - **V4** ergonomic and learned evidence providers in shadow mode

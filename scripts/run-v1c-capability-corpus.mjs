@@ -19,7 +19,9 @@ import {
 
 const require = createRequire(import.meta.url);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PINNED_DOCTYPE = /<!DOCTYPE\s+score-partwise\s+PUBLIC\s+"-\/\/Recordare\/\/DTD MusicXML 4\.0 Partwise\/\/EN"\s+"http:\/\/www\.musicxml\.org\/dtds\/partwise\.dtd"\s*>\s*/g;
+const VERIFIED_MUSICXML_DOCTYPE = /<!DOCTYPE\s+score-partwise\s+PUBLIC\s+"-\/\/Recordare\/\/DTD MusicXML\s+[0-9]+(?:\.[0-9]+)*\s+Partwise\/\/EN"\s+"http:\/\/www\.musicxml\.org\/dtds\/partwise\.dtd"\s*>\s*/g;
+const ANY_DOCTYPE = /<!DOCTYPE\b/i;
+const ANY_ENTITY = /<!ENTITY\b/i;
 
 function fail(message) {
   throw new Error(message);
@@ -71,16 +73,34 @@ function requireEngineModule(engineRoot, relativePath) {
   return require(path.resolve(engineRoot, relativePath));
 }
 
-function createSemanticProbeXml(xml, caseId) {
-  const matches = [...xml.matchAll(PINNED_DOCTYPE)];
-  if (matches.length !== 1) {
-    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: expected exactly one pinned MusicXML 4.0 external DOCTYPE, observed ${matches.length}`);
+function createSemanticProbeXml(xml, item) {
+  if (ANY_ENTITY.test(xml)) {
+    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: entity declaration present`);
   }
-  const transformed = xml.replace(PINNED_DOCTYPE, '');
-  if (/<!DOCTYPE/i.test(transformed) || /<!ENTITY/i.test(transformed)) {
-    fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${caseId}: declaration remains after pinned transform`);
+
+  if (item.semanticProbeTransform === 'IDENTITY_NO_DOCTYPE') {
+    if (ANY_DOCTYPE.test(xml)) {
+      fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: identity transform requires no DOCTYPE`);
+    }
+    return xml;
   }
-  return transformed;
+
+  if (item.semanticProbeTransform === 'REMOVE_VERIFIED_MUSICXML_PARTWISE_EXTERNAL_DOCTYPE') {
+    if (!ANY_DOCTYPE.test(xml)) {
+      fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: verified DOCTYPE transform requires a DOCTYPE`);
+    }
+    const matches = [...xml.matchAll(VERIFIED_MUSICXML_DOCTYPE)];
+    if (matches.length !== 1) {
+      fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: DOCTYPE is not a single verified Recordare MusicXML partwise declaration`);
+    }
+    const transformed = xml.replace(VERIFIED_MUSICXML_DOCTYPE, '');
+    if (ANY_DOCTYPE.test(transformed) || ANY_ENTITY.test(transformed)) {
+      fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: declaration remains after verified transform`);
+    }
+    return transformed;
+  }
+
+  fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: unapproved transform ${item.semanticProbeTransform}`);
 }
 
 function labObservation(xml) {
@@ -179,7 +199,7 @@ function main() {
       projectParsedMusicXmlThroughPolyProductionCompatibilityChain,
     );
 
-    const probeXml = createSemanticProbeXml(xml, item.caseId);
+    const probeXml = createSemanticProbeXml(xml, item);
     const observedProbeSha256 = sha256(Buffer.from(probeXml, 'utf8'));
     if (item.semanticProbeSha256 !== observedProbeSha256) {
       fail(`SOURCE_PROVENANCE_MISMATCH ${item.caseId}: expected semantic probe SHA-256 ${item.semanticProbeSha256}, got ${observedProbeSha256}`);
@@ -210,7 +230,7 @@ function main() {
       featureTags: item.featureTags,
       rawInput: { lab: rawLab.summary, engine: rawEngine.summary },
       semanticProbe: {
-        transform: manifest.policy.semanticProbeTransform,
+        transform: item.semanticProbeTransform,
         transformedSha256: observedProbeSha256,
         lab: probeLab.summary,
         engine: probeEngine.summary,
@@ -223,7 +243,7 @@ function main() {
   const probeCount = (side, status) => cases.filter((item) => item.semanticProbe[side].status === status).length;
   const report = {
     documentType: 'GuitarPolyphonyV1CCapabilityReport',
-    contractVersion: '1.2.0',
+    contractVersion: '2.0.0',
     sourceRepository: manifest.source.repository,
     sourceCommitSha: manifest.source.commitSha,
     engineRepository: manifest.engine.repository,

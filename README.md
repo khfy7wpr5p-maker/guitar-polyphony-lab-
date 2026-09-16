@@ -28,7 +28,7 @@ See `handoffs/guitar_polyphony_lab_progressive_capability_developer_prompt_2026-
 - **P2B:** bounded distinct-string sonority assignment enumeration
 - **V1A:** corpus provenance/licensing/expectation registry
 - **V1B:** deterministic Lab ↔ production Engine semantic comparison with pinned real Engine evidence
-- **V1C:** pinned external MusicXML capability regression with local unsupported outcomes and separate raw/probe evidence
+- **V1C:** 22-case pinned external MusicXML capability regression with local unsupported outcomes and separate raw/probe evidence
 - **Tuning research:** immutable Standard, Drop D, custom six-string and capo configurations
 - **Technique research:** bounded source-provenance sidecars kept separate from physical authority
 
@@ -45,7 +45,8 @@ The Lab contains deterministic sustained/grace research verifiers, but productio
 | Sustained/grace physical verifiers | 🧪 EXPERIMENTAL | Deterministic research baselines, not production solvers |
 | Technique provenance sidecars | 🟡 PARTIAL | Metadata/source evidence only |
 | Engine/Lab semantic comparator | ✅ V1B SLICE COMPLETE | Real Engine artifacts pinned, hashed, compared, and reproducible in CI |
-| External real-world MusicXML corpus | ✅ V1C INITIAL SLICE | 11 pinned MIT-licensed MusicXML 4.0 cases; local outcomes and baseline report reproducible in CI |
+| External real-world MusicXML corpus | ✅ V1C BASELINE COMPLETE | 22 pinned MIT-licensed cases; local outcomes, hashed probe evidence and sharded committed report reproducible in CI |
+| Failure intelligence | 📋 V2 NEXT | Localized capability/recovery taxonomy and mismatch/failure classification |
 | Independent feasibility oracle | 📋 V3 PLANNED | Separate strict-physical oracle, not production runtime authority |
 | Arrangement/N-best alternatives | 📋 FUTURE CAPABILITY | Explicit transformed alternatives with provenance; not source truth |
 | Learned guitar evidence / FretNet / TabCNN | 📋 V4 RESEARCH | Future shadow evidence/ranking provider; no production runtime integration |
@@ -88,17 +89,17 @@ V1B compares source-note identity, written pitch, onset, duration, voice, staff,
 
 ## V1C external capability baseline
 
-V1C adds a pinned external evidence loop using 11 files from `w3c-cg/musicxmlTestSuite` at commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea`.
+V1C adds a pinned external evidence loop using 22 files from `w3c-cg/musicxmlTestSuite` at commit `77c19f7e819154c70ca1a1992e80dcda8ff82fea`.
 
-The selected upstream files contain the standard external MusicXML 4.0 DOCTYPE. Raw trust-boundary behavior is therefore recorded separately from musical capability. V1C does not weaken that security gate: raw files remain rejected, while an offline CI-only semantic probe removes exactly the pinned external DOCTYPE and hashes the transformed bytes before comparing Lab and production Engine behavior.
+The selected upstream files carry external MusicXML `DOCTYPE` declarations. Raw trust-boundary behavior is therefore recorded separately from musical capability. V1C does not weaken that security gate: raw files remain rejected, while an offline CI-only semantic probe accepts only an explicitly allowed transform, structurally verifies the expected Recordare MusicXML partwise declaration, removes it for semantic observation, and hashes the transformed bytes per case.
 
-The initial probe baseline records:
+The pinned probe baseline records:
 
-- 9/11 cases parsed by the Lab semantic path;
-- 3/11 cases supported by the pinned Engine production compatibility chain;
-- 3 semantic `EQUAL` cases: rhythm/backup polyphony, basic chord, and the selected piano/multistaff fixture;
+- 17/22 cases parsed by the Lab semantic path;
+- 5/22 cases supported by the pinned Engine production compatibility chain;
+- 5 semantic `EQUAL` cases: rhythm/backup polyphony, basic chord, simple tie, piano/multistaff, and single-voice multistaff staff-change;
 - 0 semantic mismatches;
-- 8 locally unsupported/not-comparable cases with pinned error codes.
+- 17 locally unsupported/not-comparable cases with pinned error codes.
 
 These counts describe only the exact pinned cases and revisions. They are not a general MusicXML conformance score. See `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md`.
 
@@ -137,7 +138,7 @@ Hard physical validity and source truth remain separate from preferences and lea
 
 - Development occurs on branches and through pull requests; `main` is protected-by-process even if repository rulesets do not enforce it.
 - P1A remains authoritative for bounded UTF-8 and hostile-XML rejection before Lab parsing.
-- V1C's DTD-free semantic probe is offline test evidence only and does not alter raw input security behavior.
+- V1C's semantic probe is offline test evidence only and does not alter raw input security behavior.
 - No Lab module is production authority for parsing, reduction, arrangement, fingering, sustained-path selection, Canonical TAB, writing, rendering, playback, or OMR.
 - Unsupported evidence contracts fail closed at the evidence/trust boundary.
 - Higher-level musical capability gaps should be localized rather than automatically interpreted as whole-score product failure.
@@ -149,11 +150,12 @@ Hard physical validity and source truth remain separate from preferences and lea
 - **V1 — Polyphony Verification Foundation**
   - V1A Corpus Registry ✅ initial slice
   - V1B Engine/Lab Semantic Comparator ✅ approved two-fixture reproducible slice
-  - V1C external MusicXML capability corpus ✅ initial 11-case pinned baseline; **next: broaden with more isolated capability fixtures**
-- **V2 — Failure Intelligence**
+  - V1C external MusicXML capability corpus ✅ 22-case pinned baseline; further corpus growth is additive
+- **V2 — Failure Intelligence** **NEXT**
   - localized capability/recovery reasons
-  - semantic mismatch classification
+  - semantic mismatch and failure-layer classification
   - reproducible failure fixtures
+  - narrowest truthful scope for review/recovery metadata
 - **V3 — Independent Feasibility Oracle**
   - distinguish true strict guitar infeasibility from production search failure
   - offline/CI evidence only

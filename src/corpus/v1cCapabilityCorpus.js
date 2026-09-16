@@ -1,9 +1,12 @@
-export const V1C_CAPABILITY_CORPUS_SCHEMA_VERSION = 1;
+export const V1C_CAPABILITY_CORPUS_SCHEMA_VERSION = 2;
 export const V1C_CAPABILITY_CORPUS_ERROR_CODE = 'INVALID_V1C_CAPABILITY_CORPUS';
 
 const EXPECTED_STATUSES = new Set(['SUPPORTED', 'UNSUPPORTED_LOCAL']);
 const SEMANTIC_EXPECTATIONS = new Set(['EQUAL', 'MISMATCH', 'NOT_COMPARABLE']);
-const SEMANTIC_PROBE_TRANSFORM = 'REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE';
+const SEMANTIC_PROBE_TRANSFORMS = new Set([
+  'IDENTITY_NO_DOCTYPE',
+  'REMOVE_VERIFIED_MUSICXML_PARTWISE_EXTERNAL_DOCTYPE',
+]);
 const SHA1 = /^[a-f0-9]{40}$/;
 const SHA256 = /^[a-f0-9]{64}$/;
 
@@ -120,9 +123,19 @@ export function validateV1CCapabilityManifest(rawManifest) {
       path: 'policy.corpusContinuesAfterCaseFailure',
     });
   }
-  if (rawManifest.policy.semanticProbeTransform !== SEMANTIC_PROBE_TRANSFORM) {
-    invalid('V1C semantic probe transform is not approved.', {
-      path: 'policy.semanticProbeTransform',
+  if (
+    !Array.isArray(rawManifest.policy.allowedSemanticProbeTransforms)
+    || rawManifest.policy.allowedSemanticProbeTransforms.length !== SEMANTIC_PROBE_TRANSFORMS.size
+    || new Set(rawManifest.policy.allowedSemanticProbeTransforms).size !== SEMANTIC_PROBE_TRANSFORMS.size
+    || rawManifest.policy.allowedSemanticProbeTransforms.some((value) => !SEMANTIC_PROBE_TRANSFORMS.has(value))
+  ) {
+    invalid('V1C semantic probe transform allowlist is not approved.', {
+      path: 'policy.allowedSemanticProbeTransforms',
+    });
+  }
+  if (rawManifest.policy.rejectOtherDeclarations !== true) {
+    invalid('V1C semantic probing must reject unapproved declarations.', {
+      path: 'policy.rejectOtherDeclarations',
     });
   }
   if (rawManifest.policy.rawInputSecurityPolicyRemainsUnchanged !== true) {
@@ -164,6 +177,12 @@ export function validateV1CCapabilityManifest(rawManifest) {
     if (!SHA256.test(item.semanticProbeSha256)) {
       invalid('semanticProbeSha256 must be a pinned lowercase SHA-256 digest.', {
         path: `${path}.semanticProbeSha256`,
+      });
+    }
+    if (!SEMANTIC_PROBE_TRANSFORMS.has(item.semanticProbeTransform)) {
+      invalid('Each V1C case must pin an approved semantic probe transform.', {
+        path: `${path}.semanticProbeTransform`,
+        value: item.semanticProbeTransform,
       });
     }
     assertText(item.category, `${path}.category`, 256);

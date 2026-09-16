@@ -1,14 +1,14 @@
 # Documentation audit
 
-Fresh-read classification against the current V1C branch source, tests, internal fixtures, committed V1B Engine evidence, pinned V1C external evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
+Fresh-read classification against the current V1C branch source, tests, internal fixtures, committed V1B Engine evidence, pinned 22-case V1C external evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
 
 | Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md` | CURRENT | project purpose, broad-capability direction, V1B closure, V1C initial baseline and continuation |
-| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, progressive capability states, V1C raw/probe evidence architecture, arrangement/ML direction |
+| `README.md` | CURRENT | project purpose, broad-capability direction, V1B closure, 22-case V1C baseline and V2 continuation |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, progressive capability states, V1C evidence architecture, V2/V3/arrangement/ML direction |
 | `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned V1B/V1C evidence, CI reality, exact current gaps |
 | `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible two-fixture V1B loop |
-| `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license, raw/probe distinction, 11-case local capability baseline and limitations |
+| `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license, raw/probe distinction, 22-case local capability baseline, sharded evidence and limitations |
 | active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents current verification boundaries from becoming permanent product capability ceilings |
 | `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence; not current runtime authority |
 | `docs/P1A-INPUT-GATE.md`, `docs/P1B-PARSER-ADAPTER.md`, `docs/P1C-COMPATIBILITY-MATRIX.md` | CURRENT | bounded input/parser/internal corpus behavior |
@@ -46,9 +46,9 @@ production Engine SHA
 + byte-for-byte reproduction check
 ```
 
-## V1C documentation baseline
+## V1C documentation closure
 
-V1C now has an initial external evidence slice instead of a planning-only continuation.
+V1C now has a reproducible 22-case external baseline rather than a planning/discovery-only continuation.
 
 Current V1C evidence includes:
 
@@ -56,24 +56,52 @@ Current V1C evidence includes:
 external repository: w3c-cg/musicxmlTestSuite
 external commit:     77c19f7e819154c70ca1a1992e80dcda8ff82fea
 license:             MIT
-cases:               11
+cases:               22
 
 + per-case Git blob SHA
 + per-case raw SHA-256
-+ per-case DTD-free semantic-probe SHA-256
++ per-case semantic-probe SHA-256
++ per-case approved transform
 + pinned raw Lab/Engine outcome
 + pinned probe Lab/Engine outcome
 + pinned semantic comparison outcome
-+ committed capability-report baseline
++ 4 hash-pinned committed evidence shards
 + CI expected-outcome drift gate
++ CI shard-hash verification and report reconstruction
 + CI regenerated-report comparison
 ```
 
-The selected upstream files contain an external MusicXML 4.0 DOCTYPE. Raw input rejection remains evidence and security behavior. The DTD-free transformation is explicitly CI-only semantic probing and must not be described as production sanitization.
+Raw input rejection remains evidence and security behavior. Semantic probe transforms are explicitly CI-only evidence operations. The transform allowlist supports already-safe identity probing and structurally verified Recordare MusicXML partwise DOCTYPE removal; arbitrary/multiple declarations and entities remain rejected. This must not be described as production sanitization.
 
-The initial baseline contains three exact semantic-equality cases and zero semantic mismatches. The other eight cases are locally unsupported/not-comparable on the pinned revisions. These counts are not a general MusicXML conformance percentage.
+Current pinned summary:
 
-The next architectural continuation is **broader isolated V1C capability coverage**, followed by V2 localized failure intelligence. It is not FretNet integration and not production-authoritative learned ranking.
+```text
+probe Lab supported:      17 / 22
+probe Engine supported:    5 / 22
+semantic EQUAL:            5
+semantic MISMATCH:         0
+semantic NOT_COMPARABLE:  17
+```
+
+The equality cases are the exact pinned backup/polyphony, basic-chord, simple-tie, piano/multistaff and single-voice staff-change fixtures. These counts are not a general MusicXML conformance percentage.
+
+The temporary discovery workflow has been removed after promotion. Further V1C corpus growth is additive and may include `.mxl`, transposition, microtones and additional guitar/presentation fixtures.
+
+The principal architectural continuation is now **V2 Failure Intelligence**, not another prerequisite V1C discovery cycle, not FretNet integration, and not production-authoritative learned ranking.
+
+## V2 documentation requirement
+
+The next maintained documentation must distinguish at least:
+
+- source-feature limitation;
+- normalization limitation;
+- semantic projection limitation;
+- search/path-selection limitation;
+- strict physical infeasibility;
+- recoverable approximation/review state;
+- true global trust/parse/invariant failure.
+
+Each failure/recovery record should use the narrowest truthful scope and preserve enough provenance to support later V3 feasibility evidence and arrangement/recovery contracts.
 
 ## Broad-capability interpretation rule
 
