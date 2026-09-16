@@ -1,16 +1,16 @@
 # Documentation audit
 
-Fresh-read classification against the current V3A branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A taxonomy evidence, committed V2B projection-refinement evidence, committed V3A strict-feasibility evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
+Fresh-read classification against the current V3B branch source, tests, pinned V1B Engine evidence, 22-case V1C external evidence, committed V2A/V2B failure evidence, committed V3A strict-feasibility evidence, committed V3B left-hand comparison evidence, package metadata, CI, and the 2026-09-16 progressive-capability directive.
 
 | Document set | Classification | Current meaning |
 |---|---|---|
-| `README.md` | CURRENT | project purpose, V1/V2 closure, V3A implementation and V3B continuation |
-| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V1/V2/V3A evidence layers and V3B/arrangement/V4 direction |
-| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned evidence, current CI and exact remaining physical-authority gap |
+| `README.md` | CURRENT | project purpose, V1/V2/V3 closure and arrangement-contract continuation |
+| `docs/ARCHITECTURE.md` | CURRENT | authority boundaries, completed V1–V3 evidence layers and arrangement/V4 direction |
+| `docs/REPOSITORY_REALITY.md` | CURRENT_BASELINE | implementation, pinned evidence, current CI and exact remaining work |
 | `docs/V1B-SEMANTIC-COMPARATOR.md` | CURRENT | real Engine artifact provenance and reproducible V1B loop |
 | `docs/V1C-EXTERNAL-CAPABILITY-CORPUS.md` | CURRENT | pinned external source/license and 22-case raw/probe evidence |
 | `docs/V2-FAILURE-INTELLIGENCE.md` | CURRENT | V2A taxonomy plus completed V2B cause/location refinement |
-| `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md` | CURRENT | V3A exhaustive exact-position oracle, benchmark, limits and V3B boundary |
+| `docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md` | CURRENT | V3A exact-position plus V3B left-hand independent physical evidence |
 | active progressive-capability handoff | CURRENT_PRIMARY_DIRECTIVE | prevents evidence-stage restrictions from becoming permanent product ceilings |
 | `docs/FRETNET_RESEARCH.md` | CURRENT_RESEARCH_RECORD | future V4 learned/audio evidence, not runtime authority |
 | P1/P2 stage documents | CURRENT_WITH_BOUNDARY_NOTE | bounded source/physical research contracts |
@@ -81,18 +81,7 @@ artifacts/v3a/strict-feasibility-baseline.json
 scripts/run-v3a-strict-feasibility-benchmark.mjs
 scripts/verify-v3a-strict-feasibility-report.mjs
 test/strictFeasibilityOracle.test.js
-docs/V3-INDEPENDENT-FEASIBILITY-ORACLE.md
 ```
-
-V3A proves exact feasibility only for:
-
-```text
-pitch on declared fretboard
-+ simultaneous distinct-string assignment
-+ sustained string/fret stability
-```
-
-It does not yet claim finger assignment, barre feasibility, hand reach, ergonomics, or arrangement authority.
 
 Pinned benchmark:
 
@@ -104,22 +93,56 @@ INDETERMINATE_LIMIT:                 1
 proven legacy greedy false-negative: 1
 ```
 
-The false-negative case is important architecture evidence: a greedy verifier can report `BLOCKED` even though an exact sustained path exists. Therefore a single-path solver failure cannot be treated as physical impossibility without independent reachability evidence.
+The false-negative case proves that a greedy verifier can report `BLOCKED` even though an exact sustained path exists. A single-path solver failure therefore cannot be treated as physical impossibility without independent reachability evidence.
 
-`INDETERMINATE_LIMIT` is explicitly separate from `INFEASIBLE` so computational/evidence bounds cannot masquerade as physical proof.
+## V3B closure
+
+V3B is implemented and reproducible.
+
+Core implementation/evidence:
+
+```text
+src/guitar/leftHandFeasibilityOracle.js
+fixtures/v3b/left-hand-benchmark.json
+artifacts/v3b/left-hand-benchmark-baseline.json
+scripts/run-v3b-left-hand-benchmark.mjs
+scripts/verify-v3b-left-hand-benchmark-report.mjs
+test/leftHandFeasibilityOracle.test.js
+```
+
+Declared static physical policy covers ordered fingers, barre legality, fret span, conservative extra reach, and bounded assignment enumeration.
+
+Pinned benchmark:
+
+```text
+cases:                       7
+Lab FEASIBLE:                3
+Lab INFEASIBLE:              3
+Lab INDETERMINATE_LIMIT:     1
+cross-repo comparable:       6
+pinned Engine status parity: 6 / 6
+```
+
+The Engine is comparison evidence only. The Lab implementation remains independent and does not inherit production authority.
+
+The assignment-limit case remains `INDETERMINATE_LIMIT`; computational/evidence exhaustion is not converted into physical impossibility.
 
 ## Broad-capability interpretation rule
 
 Strict evidence validation applies at the specific evidence/trust boundary. It is not a mandate for global product blocking. Known musical facts should be preserved, uncertainty localized, and provisional/editable output retained where production safety permits.
 
-V3A `FEASIBLE` means exact string/fret reachability exists within its declared scope. If production still rejects the material, the remaining question is stronger left-hand physics versus search/capability failure; V3A alone must not guess which one.
+V3B `FEASIBLE` means an admissible static left-hand shape exists within the declared policy. It does not mean the fingering is optimal, comfortable for every player, or musically preferred.
+
+V3B `INFEASIBLE` applies to the tested strict fixed-position realization under the declared policy. It does not authorize silent source alteration; recovery belongs to an explicit arrangement layer.
 
 ## Current continuation
 
-The principal next stage is **V3B Independent Left-Hand Physical Oracle + pinned Engine comparison**.
+The principal next stage is **provenance-tracked Arrangement / N-best contracts**.
 
-V3B should independently reproduce finger assignment, barre feasibility, hand-span/extra-reach constraints, then compare those facts with production Engine physical failures. Only after that layer is independent can an Engine rejection be promoted to a likely search/capability-gap classification.
+This layer should define explicit, reversible transformations such as omission, octave displacement, register compression, arpeggiation, and voice prioritization. Every alternative must preserve original source facts separately and record before/after facts, reason/policy, and transformation provenance.
 
-The two unresolved V2B harmony occurrence sets may be refined additively and do not block V3B.
+No learned ranking should become authoritative at this stage. V4 TabCNN/FretNet-style evidence remains shadow-only until benchmark/calibration/candidate-invariance gates are satisfied.
+
+The two unresolved V2B harmony occurrence sets may be refined additively and do not block arrangement-contract work.
 
 `CURRENT_RESEARCH_RECORD` means a document is accurate as a research/evidence record but is not a statement of production-engine authority.
