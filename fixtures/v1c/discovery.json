@@ -1,6 +1,6 @@
 {
   "documentType": "GuitarPolyphonyV1CDiscoverySet",
-  "contractVersion": "1.0.0",
+  "contractVersion": "1.1.0",
   "source": {
     "repository": "w3c-cg/musicxmlTestSuite",
     "commitSha": "77c19f7e819154c70ca1a1992e80dcda8ff82fea"
@@ -10,7 +10,11 @@
     "commitSha": "1d8ced644f544f7e991f7275eda77a2ce557774e"
   },
   "policy": {
-    "semanticProbeTransform": "REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE",
+    "allowedSemanticProbeTransforms": [
+      "IDENTITY_NO_DOCTYPE",
+      "REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE"
+    ],
+    "rejectOtherDeclarations": true,
     "discoveryOnly": true,
     "mustBePromotedBeforeRegressionUse": true
   },
