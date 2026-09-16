@@ -51,6 +51,9 @@ jobs:
       - name: Generate pinned real Engine V1B artifacts
         run: node scripts/generate-v1b-engine-artifacts.cjs --engine-root .v1b-engine --output-dir v1b-generated
 
+      - name: Verify committed V1B evidence reproduces byte-for-byte
+        run: diff -ru artifacts/v1b-engine v1b-generated
+
       - name: Upload V1B Engine evidence artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
