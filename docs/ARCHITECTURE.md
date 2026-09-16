@@ -2,7 +2,7 @@
 
 ## Project purpose
 
-`guitar-polyphony-lab` is an independent research and verification laboratory for guitar polyphony. It produces deterministic, reproducible evidence about MusicXML source facts, active polyphony, guitar feasibility, production/Lab semantic differences, localized capability failures, future arrangement alternatives, and future learned/ergonomic ranking evidence.
+`guitar-polyphony-lab` is an independent research and verification laboratory for guitar polyphony. It produces deterministic, reproducible evidence about MusicXML source facts, active polyphony, guitar feasibility, production/Lab semantic differences, localized capability failures, explicit arrangement alternatives, and future learned/ergonomic ranking evidence.
 
 The Lab does **not** own production TAB output. Production authority remains `musicxml-to-guitar-tab-engine`.
 
@@ -16,17 +16,18 @@ The product direction is broad-capability rather than safe-by-refusal. The archi
 4. failure intelligence;
 5. local approximation/review;
 6. explicit arrangement transformation;
-7. soft ranking/evidence;
-8. teacher edits;
-9. export readiness.
+7. transformed-candidate physical validation;
+8. soft ranking/evidence;
+9. teacher edits;
+10. export readiness.
 
 Trust-boundary or broken-evidence conditions may fail closed. A local musical capability gap must not automatically become a whole-score product block.
 
 ## Authority boundary
 
-The Lab must not become a production runtime dependency. It may produce fixtures, pinned production artifacts, semantic comparisons, capability reports, failure-intelligence reports, benchmarks, and independent feasibility evidence for separately reviewed production work.
+The Lab must not become a production runtime dependency. It may produce fixtures, pinned production artifacts, semantic comparisons, capability reports, failure-intelligence reports, benchmarks, independent feasibility evidence, and arrangement-contract research for separately reviewed production work.
 
-The Lab does not own production reduction policy, arrangement authority, final path selection, Canonical TAB, rendering, playback, OMR, or application UI.
+The Lab does not own production reduction policy, automatic arrangement authority, final path selection, Canonical TAB, rendering, playback, OMR, or application UI.
 
 ## Implemented architecture
 
@@ -43,6 +44,7 @@ The Lab does not own production reduction policy, arrangement authority, final p
 - **V2B** — live generic projection cause/location refinement
 - **V3A** — exhaustive exact pitch/string/sustain reachability oracle
 - **V3B** — independent left-hand finger/barre/reach feasibility oracle with pinned Engine comparison
+- **Arrangement A1** — provenance-tracked N-best alternative-set contract with exact source coverage
 - **configuration research** — Standard / Drop D / custom tuning / capo
 - **technique provenance** — source metadata sidecars without automatic physical authority
 
@@ -77,15 +79,20 @@ P0 source-polyphony facts
                                   |
                    +--------------+--------------+
                    |                             |
-             strict feasible              strict infeasible
+             strict feasible              strict infeasible /
+                   |                      explicit arrangement request
                    |                             |
-                   v                             v
-           candidate/N-best space      explicit recovery /
-                                      arrangement alternatives
-                   \____________________   __________________/
-                                        \ /
-                                         v
-                           provenance-tracked arrangement
+                   +--------------+--------------+
+                                  v
+                     A1 ARRANGEMENT ALTERNATIVE SET
+                 source-complete explicit provenance
+                                  |
+                                  v
+                   A2 BOUNDED CANDIDATE GENERATION
+                     + transformed-physical validation
+                                  |
+                                  v
+                  future ranking / teacher selection
 ```
 
 ## V1 evidence foundation
@@ -182,23 +189,7 @@ A configured search/evidence limit yields `INDETERMINATE_LIMIT`, never a false p
 
 V3B is implemented as `src/guitar/leftHandFeasibilityOracle.js` plus a pinned cross-repository benchmark.
 
-For already-fixed string/fret positions, V3B independently evaluates:
-
-- fretting fingers 1–4 and open-string finger 0;
-- one finger remaining on one fret inside a static shape;
-- ordered finger-to-fret relationships;
-- legal partial/full barre spans;
-- maximum static fret span;
-- conservative extra finger reach;
-- bounded assignment search.
-
-Result states remain:
-
-```text
-FEASIBLE
-INFEASIBLE
-INDETERMINATE_LIMIT
-```
+For already-fixed string/fret positions, V3B independently evaluates fretting fingers, ordered finger/fret use, barre legality, static fret span, conservative extra reach, and bounded assignment search.
 
 Pinned seven-case benchmark:
 
@@ -211,70 +202,125 @@ cross-repo comparable:         6
 pinned Engine status parity:   6 / 6
 ```
 
-The six comparable cases agree in normalized feasible/infeasible status with the pinned Engine physical layer. The Engine is used only as a comparison target; the Lab oracle is not implemented by calling the Engine physical validator.
+The Engine is used only as a comparison target; the Lab oracle remains independently implemented. Evidence/search exhaustion remains `INDETERMINATE_LIMIT`, never physical impossibility.
 
-The benchmark also preserves one deliberately bounded assignment-limit case as `INDETERMINATE_LIMIT`, proving that evidence exhaustion is not silently converted into physical impossibility.
+## Arrangement A1 — provenance-tracked N-best contract
 
-Committed evidence:
-
-```text
-fixtures/v3b/left-hand-benchmark.json
-artifacts/v3b/left-hand-benchmark-baseline.json
-scripts/run-v3b-left-hand-benchmark.mjs
-scripts/verify-v3b-left-hand-benchmark-report.mjs
-```
-
-CI regenerates the report from the exact pinned Engine revision, asserts fixture expectations, and requires deep equality with the committed baseline on stage and pull-request runs.
-
-### V3 authority limit
-
-V3A/V3B establish bounded strict-physical evidence, not complete human performance authority. They do not claim:
-
-- ergonomic preference or comfort;
-- hand-size/player-specific capability;
-- musical quality of a fingering;
-- production final-path authority;
-- arrangement authority;
-- learned ranking authority.
-
-Therefore a V3B `FEASIBLE` result means a strict shape exists within the declared physical policy, not that it is the best fingering for a player. A V3B `INFEASIBLE` result means the tested fixed-position strict shape has no admissible left-hand realization within the declared policy. A limit result remains indeterminate.
-
-## Current continuation point — Arrangement contracts / N-best
+A1 is implemented as:
 
 ```text
-V1B reproducible Engine evidence ✅
-        |
-V1C external capability baseline ✅
-        |
-V2A failure taxonomy ✅
-        |
-V2B cause/location refinement ✅
-        |
-V3A exact-position oracle ✅
-        |
-V3B left-hand physical oracle ✅
-        |
-        v
-PROVENANCE-TRACKED ARRANGEMENT CONTRACTS  <--- NEXT
-        |
-        +--> explicit omission
-        +--> octave displacement
-        +--> register compression
-        +--> arpeggiation
-        +--> voice prioritization
-        +--> N-best transformed alternatives
-        |
-        v
-V4 learned/ergonomic evidence in shadow mode
+src/arrangement/arrangementAlternativeSet.js
 ```
 
-The unresolved exact occurrence inside the two V2B harmony region sets may be refined additively and does not block arrangement-contract research.
+It defines:
+
+```text
+GuitarArrangementAlternativeSet 1.0.0
+```
+
+The decision vocabulary is aligned with the production arrangement contract:
+
+```text
+PRESERVED
+OMITTED
+OCTAVE_DISPLACED
+VOICE_REDISTRIBUTED
+CHORD_REDUCED
+REVOICED
+ARPEGGIATED
+```
+
+A1 adds independent Lab invariants around multiple candidate alternatives.
+
+### Exact source coverage
+
+Every source event must be referenced exactly once inside every alternative.
+
+Therefore:
+
+```text
+silent note loss -> invalid contract
+source event covered twice -> invalid contract
+unknown source event -> invalid contract
+```
+
+Explicit omission remains valid only because the omitted source event is still present in provenance as an `OMITTED` decision.
+
+### Exact group transformations
+
+`CHORD_REDUCED`, `REVOICED`, and `ARPEGGIATED` must reference one known source group and its exact canonical membership.
+
+A1 does not permit an implementation to fabricate a smaller source group merely because that smaller set is easier to play.
+
+### Explicit target facts
+
+V1 target facts include:
+
+- whole-octave `OCTAVE_DISPLACED` targets;
+- explicit `targetVoice` for `VOICE_REDISTRIBUTED`;
+- explicit surviving event IDs for `CHORD_REDUCED`;
+- pitch-class-preserving per-event target MIDI for `REVOICED`;
+- exact order and spread divisions for `ARPEGGIATED`.
+
+The V1 revoicing boundary is intentionally conservative: register may change by octaves, but pitch class may not be silently rewritten.
+
+### N-best semantics
+
+A1 is an alternative **set**, not a ranking authority.
+
+```text
+candidateOrderIsPreferenceRank = false
+qualityRankingNotImplied = true
+```
+
+Strategy tags such as `VOICE_PRIORITY`, `REGISTER_COMPRESSION`, and `MELODY_PRESERVATION` describe candidate intent. They do not mutate source truth and do not imply quality.
+
+### Consequential boundary
+
+A1 declares:
+
+```text
+productionAuthority = false
+automaticTransformationAuthority = false
+learnedRankingAuthority = false
+exportAuthority = false
+```
+
+Any non-`PRESERVED` alternative is review-required. This gives the architecture a language for broad-capability guitar arrangement without silently enabling note-changing production behavior.
+
+See `docs/ARRANGEMENT-NBEST-CONTRACT.md`.
+
+## Current continuation point — Arrangement A2
+
+```text
+V1 evidence ✅
+   |
+V2 failure intelligence ✅
+   |
+V3 independent physical evidence ✅
+   |
+A1 provenance-tracked N-best contract ✅
+   |
+   v
+A2 BOUNDED EXPLICIT-POLICY CANDIDATE GENERATION  <--- NEXT
+   |
+   +--> preserve melody/bass priorities explicitly
+   +--> propose omission/reduction alternatives explicitly
+   +--> propose octave/register alternatives explicitly
+   +--> propose arpeggiation alternatives explicitly
+   +--> re-run transformed candidates through physical validation
+   |
+   v
+later deterministic / teacher / learned ranking
+```
+
+Automatic content-changing behavior in the production Engine remains a separate consequential gate.
 
 ## Trust and physical boundaries
 
 P1A remains authoritative for bounded hostile-input rejection before Lab parsing. V1C semantic transforms remain offline regression probes only.
 
-P2A/P2B and V3A/V3B provide deterministic research evidence. Learned or preference evidence may not convert an impossible untransformed candidate into a physically valid one.
+P2A/P2B and V3A/V3B provide deterministic physical research evidence. A1 provides arrangement representation only. Learned or preference evidence may not convert an impossible untransformed candidate into a physically valid one, and arrangement intent may not overwrite source truth.
 
 ## Progressive capability states
 
@@ -314,5 +360,6 @@ source truth
 - **V2B** live bounded cause/location refinement — ✅
 - **V3A** exhaustive exact pitch/string/sustain reachability — ✅
 - **V3B** independent left-hand physical oracle + pinned Engine comparison — ✅
-- **Arrangement / N-best** explicit transformed alternatives — **NEXT**
+- **Arrangement A1** provenance-tracked N-best alternative contract — ✅
+- **Arrangement A2** bounded explicit-policy generation + transformed physical revalidation — **NEXT**
 - **V4** ergonomic and learned evidence providers in shadow mode
