@@ -70,8 +70,19 @@ jobs:
           path: .v1c-musicxml-tests
           persist-credentials: false
 
-      - name: Observe V1C external MusicXML capabilities
-        run: node scripts/run-v1c-capability-corpus.mjs --external-root .v1c-musicxml-tests --engine-root .v1b-engine --output v1c-generated/report.json
+      - name: Verify V1C external MusicXML capability baseline
+        run: >-
+          node scripts/run-v1c-capability-corpus.mjs
+          --external-root .v1c-musicxml-tests
+          --engine-root .v1b-engine
+          --output v1c-generated/report.json
+          --assert-expectations
+
+      - name: Verify committed V1C report reproduces semantically
+        run: >-
+          node -e "const fs=require('node:fs');const assert=require('node:assert/strict');
+          assert.deepStrictEqual(JSON.parse(fs.readFileSync('v1c-generated/report.json','utf8')),
+          JSON.parse(fs.readFileSync('artifacts/v1c/capability-report.json','utf8')));"
 
       - name: Upload V1C capability report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
