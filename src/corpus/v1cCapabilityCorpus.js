@@ -44,7 +44,7 @@ function assertHttps(value, path) {
   }
 }
 
-function assertExpectedOutcome(value, path) {
+function assertExpectedOutcomeShape(value, path) {
   assertRecord(value, path);
   if (!EXPECTED_STATUSES.has(value.status)) {
     invalid('V1C expected status is not supported.', { path: `${path}.status`, status: value.status });
@@ -149,8 +149,8 @@ export function validateV1CCapabilityManifest(rawManifest) {
       invalid('featureTags must be a bounded non-empty array.', { path: `${path}.featureTags` });
     }
     item.featureTags.forEach((tag, tagIndex) => assertText(tag, `${path}.featureTags[${tagIndex}]`, 128));
-    assertExpectedOutcome(item.expectedLab, `${path}.expectedLab`);
-    assertExpectedOutcome(item.expectedEngine, `${path}.expectedEngine`);
+    assertExpectedOutcomeShape(item.expectedLab, `${path}.expectedLab`);
+    assertExpectedOutcomeShape(item.expectedEngine, `${path}.expectedEngine`);
     if (!SEMANTIC_EXPECTATIONS.has(item.expectedSemanticComparison)) {
       invalid('V1C semantic comparison expectation is not supported.', {
         path: `${path}.expectedSemanticComparison`,
