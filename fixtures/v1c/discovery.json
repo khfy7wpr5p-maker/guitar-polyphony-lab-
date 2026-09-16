@@ -1,0 +1,96 @@
+{
+  "documentType": "GuitarPolyphonyV1CDiscoverySet",
+  "contractVersion": "1.0.0",
+  "source": {
+    "repository": "w3c-cg/musicxmlTestSuite",
+    "commitSha": "77c19f7e819154c70ca1a1992e80dcda8ff82fea"
+  },
+  "engine": {
+    "repository": "khfy7wpr5p-maker/musicxml-to-guitar-tab-engine",
+    "commitSha": "1d8ced644f544f7e991f7275eda77a2ce557774e"
+  },
+  "policy": {
+    "semanticProbeTransform": "REMOVE_PINNED_MUSICXML_4_0_EXTERNAL_DOCTYPE",
+    "discoveryOnly": true,
+    "mustBePromotedBeforeRegressionUse": true
+  },
+  "cases": [
+    {
+      "caseId": "w3c-23b-tuplet-styles",
+      "sourcePath": "xmlFiles/23b-Tuplets-Styles.musicxml",
+      "sourceBlobSha": "350beffbab50280a603ec49775b722062f22d362",
+      "category": "TUPLET_STYLES",
+      "featureTags": ["tuplet", "display-style", "time-modification"]
+    },
+    {
+      "caseId": "w3c-23d-nested-tuplets",
+      "sourcePath": "xmlFiles/23d-Tuplets-Nested.musicxml",
+      "sourceBlobSha": "8889f3c3653f8f58f09e5c788e226b5550f0f7b4",
+      "category": "NESTED_TUPLETS",
+      "featureTags": ["tuplet", "nested", "time-modification"]
+    },
+    {
+      "caseId": "w3c-24b-grace-chord",
+      "sourcePath": "xmlFiles/24b-ChordAsGraceNote.musicxml",
+      "sourceBlobSha": "ef2d46d6e45bbc805243f2484732e15df57cc85b",
+      "category": "GRACE_CHORD",
+      "featureTags": ["grace", "chord", "simultaneous-notes"]
+    },
+    {
+      "caseId": "w3c-24c-grace-measure-end",
+      "sourcePath": "xmlFiles/24c-GraceNote-MeasureEnd.musicxml",
+      "sourceBlobSha": "c3bef71325dfdad12148ab1177d5244209491e0d",
+      "category": "GRACE_MEASURE_END",
+      "featureTags": ["grace", "measure-boundary"]
+    },
+    {
+      "caseId": "w3c-24h-grace-simultaneous",
+      "sourcePath": "xmlFiles/24h-GraceNote-Simultaneous.musicxml",
+      "sourceBlobSha": "cee5aecf8e7a31f37bb5e39a7d82001be0e1152f",
+      "category": "GRACE_SIMULTANEOUS",
+      "featureTags": ["grace", "simultaneous", "polyphony"]
+    },
+    {
+      "caseId": "w3c-31c-metronome-marks",
+      "sourcePath": "xmlFiles/31c-MetronomeMarks.musicxml",
+      "sourceBlobSha": "6206934dfdf2d7ea1936888ded834a7ac42cc864",
+      "category": "METRONOME_DIRECTIONS",
+      "featureTags": ["direction", "metronome", "tempo"]
+    },
+    {
+      "caseId": "w3c-33b-simple-tie",
+      "sourcePath": "xmlFiles/33b-Spanners-Tie.musicxml",
+      "sourceBlobSha": "eb792f2c81c9b94edc87b1dfd723f92485c8a254",
+      "category": "SIMPLE_TIE",
+      "featureTags": ["tie", "tied", "spanner"]
+    },
+    {
+      "caseId": "w3c-33d-octave-shifts",
+      "sourcePath": "xmlFiles/33d-Spanners-OctaveShifts.musicxml",
+      "sourceBlobSha": "f872d463bc5a09e822e3dbec6b0a1cc2602b4d4b",
+      "category": "OCTAVE_SHIFTS",
+      "featureTags": ["direction", "octave-shift", "spanner"]
+    },
+    {
+      "caseId": "w3c-43i-single-voice-staff-change",
+      "sourcePath": "xmlFiles/43i-MultiStaff-StaffChange-SingleVoice.musicxml",
+      "sourceBlobSha": "e4ae9b29b58782c499d73a814d9505fbc48e1628",
+      "category": "SINGLE_VOICE_STAFF_CHANGE",
+      "featureTags": ["multistaff", "staff-change", "single-voice"]
+    },
+    {
+      "caseId": "w3c-45c-repeat-multiple-times",
+      "sourcePath": "xmlFiles/45c-RepeatMultipleTimes.musicxml",
+      "sourceBlobSha": "3a5df794f7f6e083419c7f15ef2172e622e72ae9",
+      "category": "REPEAT_MULTIPLE_TIMES",
+      "featureTags": ["repeat", "repeat-times", "barline"]
+    },
+    {
+      "caseId": "w3c-71d-fretboard-multistaff",
+      "sourcePath": "xmlFiles/71d-ChordsFrets-Multistaff.musicxml",
+      "sourceBlobSha": "5b6c7216284e23c40fd21295fd6f8ba1e6264c39",
+      "category": "FRETBOARD_FRAME_MULTISTAFF",
+      "featureTags": ["harmony", "fretboard-frame", "multistaff", "string", "fret"]
+    }
+  ]
+}
