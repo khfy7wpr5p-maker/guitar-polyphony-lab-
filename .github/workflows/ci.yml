@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout Lab
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
@@ -28,7 +28,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install locked dependencies
+      - name: Install locked Lab dependencies
         run: npm ci --ignore-scripts
 
       - name: Syntax check
@@ -36,3 +36,25 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Checkout pinned Engine source for V1B evidence generation
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: khfy7wpr5p-maker/musicxml-to-guitar-tab-engine
+          ref: 1d8ced644f544f7e991f7275eda77a2ce557774e
+          path: .v1b-engine
+          persist-credentials: false
+
+      - name: Install locked Engine dependencies
+        run: npm ci --ignore-scripts --prefix .v1b-engine
+
+      - name: Generate pinned real Engine V1B artifacts
+        run: node scripts/generate-v1b-engine-artifacts.cjs --engine-root .v1b-engine --output-dir .v1b-generated
+
+      - name: Upload V1B Engine evidence artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: v1b-engine-artifacts
+          path: .v1b-generated
+          if-no-files-found: error
+          retention-days: 7
