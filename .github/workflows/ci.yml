@@ -134,6 +134,11 @@ jobs:
           --output a2-generated/arrangement-generation-report.json
           --assert-expectations
 
+      - name: Verify committed A2 bounded arrangement baseline
+        run: >-
+          node scripts/verify-a2-arrangement-benchmark.mjs
+          --generated a2-generated/arrangement-generation-report.json
+
       - name: Upload A2 bounded arrangement benchmark
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
