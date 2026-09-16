@@ -79,32 +79,12 @@ jobs:
           --assert-expectations
 
       - name: Verify committed V1C report reproduces semantically
-        run: >-
-          node -e "const fs=require('node:fs');const assert=require('node:assert/strict');
-          assert.deepStrictEqual(JSON.parse(fs.readFileSync('v1c-generated/report.json','utf8')),
-          JSON.parse(fs.readFileSync('artifacts/v1c/capability-report.json','utf8')));"
-
-      - name: Discover isolated V1C expansion candidates
-        if: github.event_name == 'push'
-        run: >-
-          node scripts/run-v1c-discovery.mjs
-          --external-root .v1c-musicxml-tests
-          --engine-root .v1b-engine
-          --output v1c-discovery/report.json
+        run: node scripts/verify-v1c-committed-report.mjs --generated v1c-generated/report.json
 
       - name: Upload V1C capability report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: v1c-capability-report
           path: v1c-generated/report.json
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Upload V1C discovery report
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: v1c-discovery-report
-          path: v1c-discovery/report.json
           if-no-files-found: error
           retention-days: 7
