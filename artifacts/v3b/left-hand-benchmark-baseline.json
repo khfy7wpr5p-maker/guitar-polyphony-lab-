@@ -1,0 +1,71 @@
+{
+  "documentType": "GuitarPolyphonyV3BLeftHandBenchmarkReport",
+  "contractVersion": "1.0.0",
+  "productionAuthority": false,
+  "comparisonPolicy": {
+    "labImplementationIndependent": true,
+    "pinnedEngineUsedAsComparisonTargetOnly": true,
+    "engineCommitSha": "1d8ced644f544f7e991f7275eda77a2ce557774e",
+    "maximumStaticFretSpan": 4,
+    "maximumExtraFretReach": 1
+  },
+  "summary": {
+    "caseCount": 7,
+    "crossRepoComparableCaseCount": 6,
+    "crossRepoStatusParityCount": 6,
+    "labFeasibleCount": 3,
+    "labInfeasibleCount": 3,
+    "labIndeterminateLimitCount": 1
+  },
+  "cases": [
+    {
+      "caseId": "open-six-strings",
+      "compareWithEngine": true,
+      "lab": { "status": "FEASIBLE", "reason": null, "assignmentAttempts": 1, "structurallyValidShapeCount": 1, "policyRejectedShapeCount": 0, "witnessBarreCount": 0 },
+      "engine": { "normalizedStatus": "FEASIBLE", "shapeCandidateCount": 1, "playableShapeCount": 1, "rejectedShapeCount": 0, "rejectionReasons": [], "assignmentAttemptCount": 1 },
+      "statusParity": true
+    },
+    {
+      "caseId": "compact-c-major",
+      "compareWithEngine": true,
+      "lab": { "status": "FEASIBLE", "reason": null, "assignmentAttempts": 37, "structurallyValidShapeCount": 1, "policyRejectedShapeCount": 0, "witnessBarreCount": 0 },
+      "engine": { "normalizedStatus": "FEASIBLE", "shapeCandidateCount": 4, "playableShapeCount": 4, "rejectedShapeCount": 0, "rejectionReasons": [], "assignmentAttemptCount": 64 },
+      "statusParity": true
+    },
+    {
+      "caseId": "f-major-barre-shape",
+      "compareWithEngine": true,
+      "lab": { "status": "FEASIBLE", "reason": null, "assignmentAttempts": 657, "structurallyValidShapeCount": 1, "policyRejectedShapeCount": 0, "witnessBarreCount": 2 },
+      "engine": { "normalizedStatus": "FEASIBLE", "shapeCandidateCount": 10, "playableShapeCount": 10, "rejectedShapeCount": 0, "rejectionReasons": [], "assignmentAttemptCount": 4096 },
+      "statusParity": true
+    },
+    {
+      "caseId": "static-fret-span-exceeded",
+      "compareWithEngine": true,
+      "lab": { "status": "INFEASIBLE", "reason": "FRET_SPAN_EXCEEDED", "assignmentAttempts": 0, "structurallyValidShapeCount": 0, "policyRejectedShapeCount": 0, "witnessBarreCount": 0 },
+      "engine": { "normalizedStatus": "INFEASIBLE", "shapeCandidateCount": 6, "playableShapeCount": 0, "rejectedShapeCount": 6, "rejectionReasons": ["FINGER_REACH_EXCEEDED", "FRET_SPAN_EXCEEDED"], "assignmentAttemptCount": 16 },
+      "statusParity": true
+    },
+    {
+      "caseId": "five-distinct-fretted-frets",
+      "compareWithEngine": true,
+      "lab": { "status": "INFEASIBLE", "reason": "DISTINCT_FRET_COUNT_EXCEEDS_FINGER_COUNT", "assignmentAttempts": 0, "structurallyValidShapeCount": 0, "policyRejectedShapeCount": 0, "witnessBarreCount": 0 },
+      "engine": { "normalizedStatus": "INFEASIBLE", "shapeCandidateCount": 0, "playableShapeCount": 0, "rejectedShapeCount": 0, "rejectionReasons": [], "assignmentAttemptCount": 1024 },
+      "statusParity": true
+    },
+    {
+      "caseId": "explicit-finger-reach-exceeded",
+      "compareWithEngine": true,
+      "lab": { "status": "INFEASIBLE", "reason": "FINGER_REACH_EXCEEDED", "assignmentAttempts": 1, "structurallyValidShapeCount": 1, "policyRejectedShapeCount": 1, "witnessBarreCount": 0 },
+      "engine": { "normalizedStatus": "INFEASIBLE", "shapeCandidateCount": 1, "playableShapeCount": 0, "rejectedShapeCount": 1, "rejectionReasons": ["FINGER_REACH_EXCEEDED"], "assignmentAttemptCount": 1 },
+      "statusParity": true
+    },
+    {
+      "caseId": "lab-assignment-limit",
+      "compareWithEngine": false,
+      "lab": { "status": "INDETERMINATE_LIMIT", "reason": "LEFT_HAND_ASSIGNMENT_LIMIT_EXCEEDED", "assignmentAttempts": 2, "structurallyValidShapeCount": 0, "policyRejectedShapeCount": 0, "witnessBarreCount": 0 },
+      "engine": null,
+      "statusParity": null
+    }
+  ]
+}
