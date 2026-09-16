@@ -70,15 +70,36 @@ function boundedId(value, path) {
   return value;
 }
 
-function cloneTarget(target) {
-  if (target === null || target === undefined) return null;
-  const output = {};
-  for (const [key, value] of Object.entries(target)) {
-    if (Array.isArray(value)) output[key] = [...value];
-    else if (value && typeof value === 'object') output[key] = { ...value };
-    else output[key] = value;
+function rawTargetForDecision(decision) {
+  if (decision.target === null || decision.target === undefined) return null;
+
+  if (decision.decisionType === 'OCTAVE_DISPLACED') {
+    return { semitoneDelta: decision.target.semitoneDelta };
   }
-  return output;
+  if (decision.decisionType === 'VOICE_REDISTRIBUTED') {
+    return { targetVoice: decision.target.targetVoice };
+  }
+  if (decision.decisionType === 'CHORD_REDUCED') {
+    return { survivingSourceEventIds: [...decision.target.survivingSourceEventIds] };
+  }
+  if (decision.decisionType === 'REVOICED') {
+    return {
+      targetMidiBySourceEventId: { ...decision.target.targetMidiBySourceEventId },
+    };
+  }
+  if (decision.decisionType === 'ARPEGGIATED') {
+    return {
+      orderedSourceEventIds: [...decision.target.orderedSourceEventIds],
+      spreadDivisions: decision.target.spreadDivisions,
+    };
+  }
+  if (decision.decisionType === 'OMITTED' || decision.decisionType === 'PRESERVED') {
+    return null;
+  }
+
+  fail('UNSUPPORTED_A2B_COMPOSITION_TRANSFORM', 'Unsupported decision type in A2B composition.', {
+    decisionType: decision.decisionType,
+  });
 }
 
 function preserve(alternativeId, sourceEventId, ordinal) {
@@ -191,7 +212,7 @@ export function composeDisjointArrangementTransforms(
     decisionType: decision.decisionType,
     sourceEventIds: [...decision.sourceEventIds],
     sourceGroupId: decision.sourceGroupId ?? null,
-    target: cloneTarget(decision.target),
+    target: rawTargetForDecision(decision),
     reasonCode: `DISJOINT_COMPOSITION:${decision.reasonCode}`,
   }));
 
