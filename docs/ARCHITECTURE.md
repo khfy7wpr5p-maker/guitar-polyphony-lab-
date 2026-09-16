@@ -1,177 +1,247 @@
 # Architecture
 
+## Project purpose
+
+`guitar-polyphony-lab` is an **independent research and verification laboratory for guitar polyphony**.
+
+Its job is to answer, with deterministic and reproducible evidence:
+
+- what polyphonic facts a MusicXML source actually contains;
+- which notes are active at the same time;
+- which guitar string/fret realizations are physically possible under a declared tuning/capo;
+- whether bounded sonorities have valid distinct-string assignments;
+- whether production `musicxml-to-guitar-tab-engine` semantics agree with an independent reference model;
+- whether a reported production failure is a true physical/musical impossibility or a production-search limitation;
+- later, which physically valid realizations are more plausible/ergonomic according to research evidence.
+
+The Lab does **not** own production TAB output. It produces verification evidence that may justify separately reviewed production changes.
+
 ## Authority boundary
 
-`guitar-polyphony-lab` is a research and verification repository. It does not own production TAB output, production MusicXML projection, reduction policy, sustained path selection, Canonical TAB contracts, or MusicXML/TAB writing.
+The production polyphony/TAB authority is `musicxml-to-guitar-tab-engine`.
 
-The production polyphony authority is `musicxml-to-guitar-tab-engine`.
+The Lab must not become a runtime dependency of the production Engine. Evidence moves from the Lab to production only through:
 
-The Lab must not become a runtime dependency of the production Engine. Evidence moves from the Lab into production only through fixtures, benchmark results, deterministic mismatch reports, failure reproductions, research evidence, and separately reviewed production PRs.
+- licensed/internal fixtures;
+- semantic snapshots;
+- deterministic mismatch reports;
+- benchmark results;
+- failure reproductions;
+- independent feasibility evidence;
+- separately reviewed production PRs.
+
+The Lab does not own production reduction policy, sustained-path selection, Canonical TAB contracts, writer behavior, rendering, playback, OMR, MIDI transcription, or application UI.
 
 ## Existing Lab modules and bounded roles
 
-Existing work is retained rather than deleted, but its role is explicitly non-production:
+- **P0 measure timeline / sonority semantics** — reference semantic oracle
+- **P1A bounded MusicXML input gate** — security / hostile-input validation
+- **P1B parser adapter** — differential parser oracle
+- **P1C compatibility corpus** — corpus / regression foundation
+- **P2A fretboard candidate generation** — deterministic physical candidate oracle
+- **P2B distinct-string sonority assignment** — bounded sonority feasibility oracle
+- **V1A corpus registry** — provenance, hashes, licensing and expected semantic facts
+- **V1B semantic comparator** — Lab snapshot ↔ Engine `PolyphonicSourceModel 1.0.0` evidence comparison
+- **configuration-aware research verification** — Standard / Drop D / custom tuning / capo plus sustained and grace verifiers
+- **technique provenance** — metadata-only source evidence with an explicit physical-semantics gate
 
-- **P0 measure timeline / sonority semantics:** reference semantic oracle
-- **P1A bounded MusicXML input gate:** security and hostile-input validation
-- **P1B parser adapter:** differential parser oracle
-- **P1C compatibility corpus:** corpus / regression foundation
-- **P2A fretboard candidate generation:** fretboard reference/oracle
-- **P2B distinct-string sonority assignment:** sonority-assignment reference/oracle
-- **V1B semantic comparator:** Lab snapshot ↔ Engine `PolyphonicSourceModel 1.0.0` evidence comparison
-- **configuration-aware research verification:** immutable tuning/capo facts plus sustained and grace verifiers
-- **technique provenance:** metadata-only source evidence with an explicit physical-semantics gate
+These modules may challenge production behavior, but none becomes production authority merely because equivalent behavior exists in the Lab.
 
-These modules may be compared with production behavior. They must not be promoted to production authority merely because equivalent behavior exists in the Lab.
-
-## Current verification layer map
+## Current architecture map
 
 ```text
-UNTRUSTED / LICENSED FIXTURE INPUT
-MusicXML bytes/string
-    |
-    | P1A — size / UTF-8 / root / security gate
-    v
-bounded score-partwise XML
-    |
-    | P1B — exact-pinned parser adapter
-    v
-Lab reference semantic events
-    |
-    | P0
-    v
-reference note intervals / sonority spans
-    |
-    | buildLabSemanticSnapshot()
-    v
-Lab semantic snapshot ------------------------------+
-                                                    |
-                                                    | same source part
-musicxml-to-guitar-tab-engine                       |
-parser / projector authority                        |
-    |                                               |
-    v                                               |
-Engine-produced PolyphonicSourceModel 1.0.0         |
-    |                                               |
-    | adaptEnginePolyphonicSourceModel()            |
-    v                                               |
-Engine semantic snapshot ---------------------------+
-                    |
-                    | V1B compareSemanticSnapshots()
-                    v
-          deterministic mismatch report
-                    |
-                    v
-        reviewed production PR
+                           GUITAR POLYPHONY LAB
+
+LICENSED / INTERNAL MusicXML FIXTURE
+                |
+                v
+        +-------------------+
+        | P1A INPUT GATE    |  size / UTF-8 / hostile XML
+        +---------+---------+
+                  |
+                  v
+        +-------------------+
+        | P1B PARSER        |  note / rest / voice / staff / tie
+        +---------+---------+
+                  |
+                  v
+        +-------------------+
+        | P0 POLYPHONY      |  timeline / overlap / sonority spans
+        +----+---------+----+
+             |         |
+             |         +-------------------------------+
+             |                                         |
+             v                                         v
+ +-----------------------+                    +----------------------+
+ | Lab semantic snapshot |                    | P2A fret candidates  |
+ +-----------+-----------+                    +----------+-----------+
+             |                                           |
+             |                                           v
+             |                                +----------------------+
+             |                                | P2B assignments      |
+             |                                | distinct strings     |
+             |                                +----------+-----------+
+             |                                           |
+             |                                           v
+             |                                research feasibility /
+             |                                sustained/grace evidence
+             |
+             |                  SAME SOURCE FIXTURE
+             |                          |
+             |                          v
+             |             musicxml-to-guitar-tab-engine
+             |                  parser / projector
+             |                          |
+             |                          v
+             |             Engine PolyphonicSourceModel
+             |                          |
+             +-------------+------------+
+                           |
+                           v
+                  +-------------------+
+                  | V1B COMPARATOR    |
+                  +---------+---------+
+                            |
+                            v
+                deterministic mismatch report
+                            |
+                            v
+                  reviewed production PR
 ```
 
-The Lab does not import Engine runtime code. V1B consumes Engine-produced data only.
+## Current continuation point — YOU ARE HERE
 
-P2A/P2B may provide independent reference facts for fretboard feasibility and bounded sonority assignment. They accept the Lab's immutable Standard, Drop D, custom-tuning, and capo configurations. They do not extend into a Lab-owned production path solver.
+V1B comparator core is implemented. The deterministic verification loop is **not yet closed** because approved compatibility fixtures do not yet have pinned, real Engine-generated `PolyphonicSourceModel 1.0.0` artifacts consumed by Lab CI.
 
-## Production sustained-path authority
+The next implementation slice is therefore:
 
-The Lab does not implement a second production P3 sustained path solver. It does include an explicit deterministic sustained research verifier and a grace-transition verifier. Their lexicographic policies are research baselines only and do not become production ranking authority.
+```text
+V1B comparator core ✅
+        |
+        v
+1. select approved existing compatibility fixtures
+        |
+        v
+2. generate PolyphonicSourceModel 1.0.0 in production Engine
+        |
+        v
+3. pin artifacts + Engine commit SHA + fixture hash
+        |
+        v
+4. validate artifact shape/version/provenance fail-closed
+        |
+        v
+5. compare Lab snapshot vs Engine artifact in Lab CI
+        |
+        v
+6. deterministic mismatch/equality evidence
+        |
+        v
+V1B COMPLETE
+```
 
-Production sustained polyphony remains in `musicxml-to-guitar-tab-engine`, including its PS-1 through PS-6 pipeline and PS-5 sustained path selection. Lab research may challenge or verify production results, but it may not silently replace or override that authority.
-
-An independent feasibility oracle may be researched later under V3, including a possible offline/CI constraint solver. Such an oracle is evidence only and must remain independent of the production Node runtime.
+Do not skip this step in order to start learned ranking or a new solver. Closing this loop creates the evidence foundation for the later roadmap.
 
 ## P1A trust boundary
 
-P1A remains authoritative inside the Lab before its XML library executes. It enforces:
+P1A remains authoritative before XML parsing. It enforces bounded UTF-8 input, a `score-partwise` root, no DOCTYPE/entity/XInclude input, no NUL bytes, and explicit resource limits.
 
-- UTF-8 string/byte input;
-- bounded input size;
-- `score-partwise` root;
-- no DOCTYPE;
-- no entity declarations;
-- no XInclude;
-- no NUL bytes.
+P1B must not weaken or bypass P1A.
 
-P1B must not weaken or bypass this gate.
+## P1B parser boundary
 
-## P1B parser adapter
+P1B extracts only the bounded semantic facts required by the Lab. It supports pitched notes, duration, voice, staff, chord membership, rests as provenance-carrying cursor movement, backup/forward, tie/tied evidence and inherited divisions.
 
-P1B uses an isolated SAX-style parser to verify well-formed XML and extract only the semantic fields needed by the Lab reference model. Raw parser objects are not part of the Lab data contract.
+Unsupported timing/pitch/XML forms fail closed instead of inventing musical meaning.
 
-The adapter produces per-part, per-measure ordered events and preserves `divisions` separately. It supports:
+## P0 polyphony boundary
 
-- pitched notes;
-- duration;
-- voice;
-- staff;
-- chord membership;
-- rests as `forward` cursor movement with `sourceKind=rest` provenance;
-- backup/forward cursor movement;
-- tie/tied evidence;
-- inherited divisions across measures.
+P0 owns deterministic per-measure reference reconstruction:
 
-It fails closed for currently unsupported grace, cue, unpitched, non-integer microtonal alteration, XML 1.1, missing required timing fields, excessive semantic depth, or malformed XML.
+- cursor movement;
+- chord onset reuse;
+- overlapping voices through backup/forward;
+- note intervals;
+- active-sonority spans;
+- deterministic validation.
 
-## Parser dependency boundary
+It does not own cross-measure production tie joining, grace duration invention, tuplets/ornaments, final string/fret choice, production fingering, TAB serialization, rendering or playback.
 
-`saxes@6.0.0` is exact-pinned and is used only behind P1A. Its event stream is normalized into project-owned reference semantic objects.
+## P2 physical feasibility boundary
 
-The upstream repository is archived, so this dependency is not permanent architecture authority. Replacement must remain possible without changing the meaning of P0 or downstream verification evidence.
+P2A answers: **where can this pitch physically exist on this declared six-string guitar configuration?**
 
-## P0 contract
+P2B answers: **can the simultaneously active notes be assigned to distinct strings, and what bounded assignments exist?**
 
-P0 receives one measure at a time as ordered semantic events.
-
-Supported event types:
-
-- `note`
-- `backup`
-- `forward`
-
-A `note` can carry `chord=true`, `voice`, `staff`, and tie evidence. Rest provenance may be carried on a `forward` event; P0 consumes only its cursor semantics.
-
-P0 is responsible for deterministic measure cursor movement, chord onset reuse, voice-overlap reconstruction through `backup`, gap/rest cursor movement, note interval production, sonority-span production, and fail-closed validation.
-
-P0 is not responsible for production XML syntax authority, cross-measure production tie joining, grace timing, tuplets, ornaments, final fret/string assignment, production fingering optimization, TAB serialization, rendering, or playback.
+Hard physical validity remains deterministic. A future learned component is never allowed to create candidates that P2A rejects.
 
 ## Configuration and technique boundaries
 
-`src/guitar/tuningConfiguration.js` is the single Lab configuration contract for six strings and optional capo. Candidate generation, research verifiers, MusicXML staff-tuning serialization, and configuration authority resolution all consume the same normalized facts. A conflict between explicit user and MusicXML configurations is returned as a conflict, not silently resolved.
+`src/guitar/tuningConfiguration.js` is the Lab configuration authority for six strings and optional capo. Standard, Drop D and bounded custom tuning research use the same normalized contract.
 
-`src/musicxml/guitarTechniqueProvenance.js` deliberately keeps guitar technique data in a sidecar. The LAB-TECH-04 benchmark verifies that approved `SAFE_METADATA_ONLY` records do not change source musical facts, candidate sets, assignment ordering, or sustained results. The LAB-TECH-05 gate authorizes zero techniques to affect physical behavior.
+Technique provenance remains a sidecar. Current research authorizes zero guitar techniques to alter candidate generation, assignment ranking or sustained-path behavior. Physical technique semantics require a separate reviewed gate.
 
-## V1 corpus and comparator boundary
+## V1B comparator boundary
 
-V1A records corpus provenance and expectations. External fixtures require source and license metadata before they are eligible for registry promotion.
+`src/verification/semanticComparator.js` compares a versioned Lab semantic snapshot with Engine-produced `PolyphonicSourceModel 1.0.0` evidence supplied as data.
 
-V1B now implements a deterministic, versioned comparison surface in `src/verification/semanticComparator.js`. Current compared facts are:
+Current comparison surface includes:
 
-- source-note identity as `partId + measureIndex + sourceNoteIndex`;
+- source-note identity: `partId + measureIndex + sourceNoteIndex`;
 - written pitch;
-- onset in divisions;
-- duration in divisions;
+- onset/duration in divisions;
 - voice;
 - staff;
 - tie start/stop evidence;
 - active-sonority membership;
 - peak polyphony.
 
-Source rests count in `sourceNoteIndex` ordering even though P0 does not create note intervals for rests. This keeps Lab and Engine source identity aligned.
+The Lab does not import Engine runtime code. Unsupported Engine evidence contracts fail closed. Cross-measure sustain-chain comparison remains outside the current contract.
 
-Cross-measure sustain-chain membership is **not** part of the implemented V1B contract because the Lab does not currently own a cross-measure tie-joining contract. That comparison remains fail-closed until both sides expose a compatible reviewed representation.
+## Future independent feasibility oracle — V3
 
-The comparator accepts Engine `PolyphonicSourceModel 1.0.0` evidence as data. It does not import the Engine or call Engine runtime code. A mismatch report is evidence. It does not itself authorize a production behavior change.
+After V1/V2 verification infrastructure is mature, an offline/CI independent constraint solver such as CP-SAT may answer:
 
-The remaining V1B integration work is to pin real Engine-generated source-model artifacts for approved compatibility fixtures and run those artifacts through the comparator in Lab CI.
+> Is this guitar realization truly impossible, or did the production search fail to find a valid path?
+
+Such an oracle is evidence only. It must not become a production runtime dependency or silently replace the production solver.
+
+## FretNet / learned evidence boundary — V4
+
+FretNet research is documented in `docs/FRETNET_RESEARCH.md`.
+
+The authoritative academic reference inspected is `cwitkowitz/guitar-transcription-continuous` (ICASSP 2023). It provides audio-driven string-aware tablature and continuous pitch evidence.
+
+FretNet-style evidence fits the Lab only as a future **shadow research ranking/evidence layer**:
+
+```text
+P2A deterministic valid candidates --------+
+                                            |
+P2B deterministic valid assignments -------+----> SHADOW RANKER
+                                            |          |
+audio -> FretNet-style evidence ------------+          v
+                                               benchmark report
+```
+
+Authority rule:
+
+```text
+hard physical constraints > learned ranking/evidence
+```
+
+A learned layer may eventually score or rank already-valid candidates. It may not alter source musical truth, tuning/capo facts, candidate validity, or production authority.
+
+The separate 2026 `HansYap/FretNet` repository is research inspiration only; it is not the authoritative ICASSP implementation and no repository license was observed during review.
 
 ## Evidence-to-production boundary
-
-The intended direction is one-way evidence promotion rather than repository import coupling:
 
 ```text
 guitar-polyphony-lab
     |
-    | fixture / benchmark / semantic expectation
+    | fixture / benchmark / comparator report
     | failure reproduction / oracle evidence
     v
-reviewed production change
+separately reviewed production change
     |
     v
 musicxml-to-guitar-tab-engine
@@ -180,26 +250,27 @@ musicxml-to-guitar-tab-engine
 production CI + Canonical / writer gates
 ```
 
-No Lab module should be imported by the production runtime. Any production adoption must be implemented and tested inside the Engine under its own authority and release gates.
+No Lab module should be imported by the production runtime.
 
-## Research roadmap
+## Roadmap
 
 - **V1 — Polyphony Verification Foundation**
-  - V1A Corpus Registry
-  - V1B Engine/Lab Semantic Comparator
-  - V1C External MusicXML Polyphony Compatibility Corpus
+  - V1A Corpus Registry ✅ initial slice
+  - V1B Engine/Lab Semantic Comparator 🟡 core implemented; real Engine artifact CI integration is next
+  - V1C External MusicXML Polyphony Compatibility Corpus 📋 after licensing/provenance verification
 - **V2 — Failure Intelligence**
-  - semantic mismatch classifier
+  - mismatch classification
   - unplayable-reason analysis
   - regression classification
   - reproducible failure fixtures
 - **V3 — Independent Feasibility Oracle**
-  - possible CP-SAT or equivalent independent constraint oracle
-  - offline / CI / research only
-  - no production runtime dependency
+  - CP-SAT or equivalent offline/CI oracle
+  - distinguish true infeasibility from production search limitations
 - **V4 — Guitar Research**
-  - ergonomic benchmark
-  - alternate tuning / capo / future guitar profiles
-  - technique-aware sustain corpus
+  - ergonomic benchmarks
+  - alternate tuning/capo/future guitar profiles
+  - technique-aware sustain corpora
   - N-best fingering research
-  - learned ranking research, never authority over hard physical constraints
+  - FretNet-style audio evidence
+  - learned candidate/assignment ranking in shadow mode only
+  - learned evidence never overrides hard physical constraints
