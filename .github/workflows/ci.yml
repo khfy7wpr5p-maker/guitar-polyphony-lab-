@@ -88,6 +88,11 @@ jobs:
           --output v2-generated/failure-intelligence-report.json
           --assert-covered
 
+      - name: Verify committed V2 failure intelligence baseline
+        run: >-
+          node scripts/verify-v2-failure-intelligence-report.mjs
+          --generated v2-generated/failure-intelligence-report.json
+
       - name: Upload V1C capability report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
