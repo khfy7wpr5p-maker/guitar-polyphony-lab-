@@ -25,7 +25,8 @@ Verification-stage strictness is an evidence boundary, not the permanent product
 | Arrangement A1 explicit N-best contract | COMPLETE | exact source coverage + transform provenance |
 | Arrangement A2 bounded generation | COMPLETE — INITIAL STATIC SLICE | reduction + octave generation; every static candidate physically revalidated |
 | Arrangement A2B temporal/composition | COMPLETE — ABSTRACT TEMPORAL SLICE | arpeggio exact-position sequence validation + disjoint transform composition |
-| Arrangement A2C timeline-bearing generation | NEXT | real onset/duration evidence where available + explicit same-event transform pipelines |
+| Arrangement A2C timeline-backed generation | COMPLETE — INITIAL NO-LOSS SLICE | P0 onset/duration evidence + 8-note no-loss arpeggio generation |
+| Arrangement A3 real-corpus/integration gate | NEXT | broaden piano/non-guitar evidence, then define production Engine integration contract |
 | V4 learned evidence | FUTURE | TabCNN/FretNet-style shadow evidence only |
 
 ## Pinned evidence revisions
@@ -57,15 +58,7 @@ semantic MISMATCH:         0
 semantic NOT_COMPARABLE:  17
 ```
 
-V2A classifies 66 unsupported observations with zero unclassified. V2B refines the six formerly generic Engine projection failures into:
-
-```text
-direction          3
-harmony            2
-notation:dynamics  1
-```
-
-Semantic capability gaps remain localized evidence; they do not become automatic `BLOCKED_GLOBAL` decisions.
+V2A classifies 66 unsupported observations with zero unclassified. V2B refines the six formerly generic Engine projection failures into direction, harmony and notation:dynamics families. Semantic capability gaps remain localized evidence; they do not become automatic `BLOCKED_GLOBAL` decisions.
 
 ## V3 summary
 
@@ -82,7 +75,7 @@ artifacts/v3b/left-hand-benchmark-baseline.json
 
 ## Arrangement A1 — explicit N-best provenance
 
-A1 defines `GuitarArrangementAlternativeSet`. Decision vocabulary is aligned with the production arrangement language:
+A1 defines `GuitarArrangementAlternativeSet` with:
 
 ```text
 PRESERVED
@@ -94,129 +87,76 @@ REVOICED
 ARPEGGIATED
 ```
 
-Every alternative must account for every source event exactly once. Silent note loss is invalid. Content-changing candidates remain review-required and have no production/export authority.
+Every alternative must account for every source event exactly once. Silent note loss is invalid. Source groups are independent from the guitar's six-string target capacity, so piano sonorities may contain more than six source events.
 
-A2 exposed one important A1 contract mistake: **source groups must not be limited by the guitar's six strings**. A piano sonority may contain more than six events. The contract is therefore now `1.1.0`, with source groups independent from target-guitar string count.
+## Arrangement A2 — bounded static generation
 
-## Arrangement A2 — bounded generation + physical revalidation
+A2 generates explicit `CHORD_REDUCED` and `OCTAVE_DISPLACED` candidates and revalidates each static realization through fretboard, distinct-string assignment and the independent V3B left-hand oracle.
 
-A2 implements the first explicit-policy arrangement generator:
-
-```text
-src/arrangement/boundedArrangementGenerator.js
-```
-
-Initial generated transforms:
-
-```text
-CHORD_REDUCED
-OCTAVE_DISPLACED
-```
-
-Every emitted static candidate is revalidated through:
-
-```text
-realized pitch set
- -> fretboard candidates
- -> distinct-string assignment
- -> independent V3B left-hand oracle
-```
-
-A2 policy can declare priority source events that reduction candidates are forbidden to remove. Candidate enumeration is deterministic, but **candidate order is not quality/preference ranking**.
-
-A candidate bound returns:
-
-```text
-PARTIAL_LIMIT
-candidateSpaceComplete = false
-```
-
-not physical impossibility.
-
-### Pinned A2 benchmark
-
-```text
-cases:                                   3
-complete generation cases:               2
-partial-limit cases:                      1
-cases with strict infeasibility:          3
-cases with feasible transformed evidence: 2
-```
-
-The most important case starts with an **8-note piano source sonority**. Strict realization fails because only six guitar strings exist, but source truth remains all eight notes. Under explicit reduction policy A2 emits 15 six-note alternatives; in the pinned benchmark all 15 are physically feasible.
-
-A second case proves an out-of-range MIDI 28 source note can remain preserved in source facts while an explicit `+12` octave candidate becomes physically feasible.
-
-Committed evidence:
-
-```text
-fixtures/a2/benchmark.json
-artifacts/a2/arrangement-generation-baseline.json
-scripts/run-a2-arrangement-benchmark.mjs
-scripts/verify-a2-arrangement-benchmark.mjs
-```
-
-See `docs/ARRANGEMENT-A2-BOUNDED-GENERATION.md`.
+The pinned A2 benchmark includes an 8-note piano sonority: strict simultaneous realization is infeasible on six strings, while explicit reduction produces physically feasible six-note alternatives. Candidate exhaustion returns `PARTIAL_LIMIT`, never physical impossibility.
 
 ## Arrangement A2B — abstract temporal validation + safe composition
 
-A2B adds:
+A2B validates an explicit `ARPEGGIATED` decision as an exact-pitch ordered guitar-position path while keeping:
 
 ```text
-src/arrangement/temporalArpeggiationValidator.js
-src/arrangement/disjointTransformComposition.js
-```
-
-An explicit `ARPEGGIATED` decision can now be validated as an exact-pitch ordered guitar-position path. Because A1 source events do not yet carry full onset/duration facts, A2B deliberately labels this evidence:
-
-```text
-sequenceSemantics = ABSTRACT_SPREAD_SEQUENCE
 timingAuthority = false
-sourceOnsetsAvailable = false
-sourceDurationsAvailable = false
+sequenceSemantics = ABSTRACT_SPREAD_SEQUENCE
 ```
 
-`spreadDivisions` and source-event order are preserved, but no real MusicXML playback timeline is invented. Every selected arpeggio step has an exact fretboard position and an independent per-step left-hand check.
-
-A2B also composes multiple transforms when their source-event scopes are disjoint. The composed candidate is rebuilt and passed through A1 again, so exact source coverage remains mandatory.
-
-If two transforms touch the same source event, A2B does not silently decide an order. It returns:
-
-```text
-OVERLAPPING_SCOPE
-SOURCE_EVENT_TRANSFORMED_MORE_THAN_ONCE
-```
-
-This local result is not a global product block; it marks the need for a richer explicit ordered transform pipeline.
-
-### Pinned A2B benchmark
-
-```text
-cases:                    3
-abstract temporal FEASIBLE: 1
-disjoint COMPOSED:           1
-overlapping scope:           1
-```
+It also composes transforms when source-event scopes are disjoint. Same-event overlap returns `OVERLAPPING_SCOPE`; transform order is never silently guessed.
 
 Committed evidence:
 
 ```text
 artifacts/a2b/temporal-composition-baseline.json
-scripts/run-a2b-temporal-composition-benchmark.mjs
-scripts/verify-a2b-temporal-composition-benchmark.mjs
 ```
 
-See `docs/ARRANGEMENT-A2B-TEMPORAL-COMPOSITION.md`.
+## Arrangement A2C — real source timeline + no-loss arpeggio generation
+
+A2C binds arrangement source events to the timing facts already produced by the Lab parser and P0 timeline model:
+
+```text
+MusicXML duration/voice/staff/tie
+        -> P0 onset/end
+        -> ArrangementTimelineSidecar
+```
+
+The match is exact identity or an explicit source-to-P0 map. Pitch-only guessing is forbidden. MIDI, voice and staff facts must agree.
+
+A2C then generates bounded `ARPEGGIATED` alternatives only when the source group is proven simultaneous. `spreadDivisions` must be explicit policy; target timing is not inferred from source duration.
+
+The pinned A2C case contains an **8-note simultaneous piano sonority**. Two unique deterministic arpeggio orders are generated and both preserve all 8 source events while producing physically feasible exact-pitch guitar sequences.
+
+```text
+source events:                 8
+feasible no-loss candidates:   2
+sourceNoteLossAllowed:          false
+sourceTimingAuthority:          true
+targetTimingAuthority:          false
+```
+
+Reduction therefore remains an option, but it is no longer the only recovery path when a source sonority exceeds six simultaneous notes.
+
+Committed evidence:
+
+```text
+artifacts/a2c/timeline-arrangement-baseline.json
+scripts/run-a2c-timeline-arrangement-benchmark.mjs
+scripts/verify-a2c-timeline-arrangement-benchmark.mjs
+```
+
+See `docs/ARRANGEMENT-A2C-TIMELINE-GENERATION.md`.
 
 ## Authority boundaries
 
 - No Lab arrangement module changes production runtime behavior.
-- A2/A2B have `automaticProductionTransformationAuthority = false`.
-- Content-changing alternatives remain review-required.
+- A2/A2B/A2C have no automatic production transformation authority.
 - Source events may not silently disappear.
 - `INDETERMINATE_LIMIT` / `PARTIAL_LIMIT` are not impossibility.
-- A2B arpeggio feasibility is exact-position sequence evidence, not real timing/performance proof.
-- Overlapping same-event transforms require explicit ordered provenance before composition is allowed.
+- A2C has source timing authority only where P0 evidence is complete.
+- A2C does not infer target arpeggio speed, sustain policy, ergonomic preference or ranking.
+- Overlapping same-event transforms still require an explicit ordered transform pipeline.
 - Learned ranking remains below source truth and hard physical validity.
 
 ## Architecture direction
@@ -244,18 +184,25 @@ V3 exact + left-hand physical evidence
             A2 bounded static generation
                     |
                     v
-       physical revalidation of every candidate
-                    |
-                    v
        A2B abstract temporal validation
-       + disjoint transform composition
+       + safe disjoint composition
                     |
                     v
-       A2C timeline-bearing generation
-       + ordered same-event transform pipeline
+       A2C P0-backed source timeline
+       + no-loss arpeggio generation
                     |
                     v
-       future ranking / teacher selection
+       A3 real piano/non-guitar corpus validation
+                    |
+                    v
+       ARRANGEMENT_CONTRACT_STABLE
+                    |
+          =====================
+          PRODUCTION INTEGRATION GATE
+          =====================
+                    |
+                    v
+       musicxml-to-guitar-tab-engine
 ```
 
 ## Roadmap
@@ -264,9 +211,10 @@ V3 exact + left-hand physical evidence
 - V2A/V2B — complete
 - V3A/V3B — complete
 - Arrangement A1 — complete
-- Arrangement A2 initial static generator — complete
-- Arrangement A2B abstract temporal validator + disjoint composition — complete
-- **Arrangement A2C timeline-bearing arpeggiation generation + ordered same-event transform pipeline — NEXT**
+- Arrangement A2 — complete initial static generator
+- Arrangement A2B — complete abstract temporal/composition slice
+- Arrangement A2C — complete initial P0-backed no-loss timeline slice
+- **Arrangement A3 real piano/non-guitar corpus validation + production integration contract — NEXT**
 - V4 learned/ergonomic providers — later, shadow-only until benchmark/calibration gates
 
 ## Commands
@@ -290,5 +238,6 @@ Node.js 22 or newer is required.
 - `docs/ARRANGEMENT-NBEST-CONTRACT.md`
 - `docs/ARRANGEMENT-A2-BOUNDED-GENERATION.md`
 - `docs/ARRANGEMENT-A2B-TEMPORAL-COMPOSITION.md`
+- `docs/ARRANGEMENT-A2C-TIMELINE-GENERATION.md`
 - `docs/FRETNET_RESEARCH.md`
 - `SECURITY.md`
