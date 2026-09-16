@@ -2,165 +2,111 @@
 
 ## Status
 
-V2A establishes the first deterministic failure-intelligence layer on top of the completed V1C 22-case capability baseline.
-
-It is evidence-only. It does not change production Engine behavior, authorize automatic recovery, or turn Lab classifications into runtime authority.
+V2A and V2B are complete as evidence-only Lab stages on top of the pinned 22-case V1C baseline. They do not change production Engine behavior, authorize automatic recovery, or make Lab classifications runtime authority.
 
 Pinned evidence inputs:
 
-```text
-V1C cases: 22
-external corpus: w3c-cg/musicxmlTestSuite
-external commit: 77c19f7e819154c70ca1a1992e80dcda8ff82fea
-Engine commit: 1d8ced644f544f7e991f7275eda77a2ce557774e
-```
+- V1C cases: 22
+- external corpus: `w3c-cg/musicxmlTestSuite`
+- external commit: `77c19f7e819154c70ca1a1992e80dcda8ff82fea`
+- Engine commit: `1d8ced644f544f7e991f7275eda77a2ce557774e`
 
-## Purpose
+## V2A — taxonomy foundation
 
-V1C records exact supported/unsupported outcomes. V2 adds a stable interpretation layer so an error is not treated as a single undifferentiated `BLOCKED` condition.
+V2A classifies all 66 unsupported observations in the pinned V1C baseline by provider, phase, failure family, architecture layer, scope class, handling class, progressive-state candidate, refinement requirement, and source-code anchors.
 
-Each mapped failure receives:
-
-- provider (`LAB` or `ENGINE`);
-- phase (`RAW_INPUT` or `SEMANTIC_PROBE`);
-- error code;
-- failure family;
-- architecture layer;
-- narrowest reliable scope class available from the current evidence;
-- handling/recovery class;
-- candidate progressive state;
-- refinement requirement;
-- code-emission source anchors.
-
-The classification does not rewrite source truth.
-
-## Current evidence summary
-
-The 22-case V1C baseline contains 66 unsupported observations:
+Pinned V2A summary:
 
 | Class | Count |
 |---|---:|
 | Raw input trust-boundary failures | 44 |
 | Semantic-probe capability failures | 22 |
-| Semantic failures classified as review candidates | 16 |
-| Semantic failures retained as local unsupported pending refinement | 6 |
+| Semantic review candidates before V2B | 16 |
+| Generic projection cases sent to V2B | 6 |
 | Unclassified observed failures | 0 |
 
-Current failure-family counts:
+Raw trust-boundary failures are the only current `BLOCKED_GLOBAL` candidates. Semantic capability evidence is forbidden from becoming `BLOCKED_GLOBAL` in the Lab taxonomy.
 
-| Failure family | Count |
+Committed baseline: `artifacts/v2/failure-intelligence-baseline.json`.
+
+## V2B — generic projection refinement
+
+V2B re-runs the six V1C cases whose Engine semantic-probe outcome is `UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` through the exact pinned production compatibility chain.
+
+Refinement is based on live Engine `error.details` and exact source occurrence evidence. Fixture names and feature tags remain context only and are not treated as causal proof.
+
+Observed Engine feature split:
+
+| Engine feature | Cases |
 |---|---:|
-| `INPUT_SECURITY` | 44 |
-| `GENERIC_PROJECTION_CAPABILITY` | 6 |
-| `ORNAMENT_COMPATIBILITY` | 5 |
-| `SOURCE_SEMANTIC_CAPABILITY` | 4 |
-| `PLAYBACK_STRUCTURE` | 3 |
-| `RHYTHM_COMPATIBILITY` | 2 |
-| `SOURCE_SELECTION` | 1 |
-| `PRESENTATION_COMPATIBILITY` | 1 |
+| `direction` | 3 |
+| `harmony` | 2 |
+| `notation:dynamics` | 1 |
 
-These numbers describe the exact pinned corpus and revisions only.
+Refined scope split:
 
-## Taxonomy policy
+| Scope | Cases | Evidence meaning |
+|---|---:|---|
+| `MEASURE_CHILD` | 3 | Engine supplied measure/child location and the matching source occurrence is exact |
+| `NOTE_EVENT` | 1 | Engine identified `notation:dynamics` and the pinned source has one matching note occurrence |
+| `FEATURE_REGION_SET` | 2 | Engine identified `harmony`, but multiple matching source occurrences remain |
 
-### Raw trust boundary
+Pinned V2B summary:
 
-`DOCTYPE_NOT_ALLOWED` and `UNSAFE_XML_DECLARATION` are classified as:
+- cases: 6
+- exact local scope: 4
+- remaining location refinement required: 2
+- `REVIEW_REQUIRED` architecture candidates: 6
+- `UNSUPPORTED_LOCAL` after V2B refinement: 0
+- semantic `BLOCKED_GLOBAL`: 0
 
-```text
-failureFamily: INPUT_SECURITY
-layer: TRUST_BOUNDARY
-scopeClass: SCORE_INPUT
-handlingClass: GLOBAL_TRUST_REJECT
-progressiveStateCandidate: BLOCKED_GLOBAL
-```
+Refined families:
 
-This is the intentionally narrow global-block exception: unsafe raw input may be rejected as an import operation.
+- `DIRECTION_COMPATIBILITY`: 3
+- `HARMONY_COMPATIBILITY`: 2
+- `NOTATION_DYNAMICS_COMPATIBILITY`: 1
 
-### Semantic capability failures
+The direction cases preserve exact source subtype context such as `direction-type/dynamics`, `direction-type/metronome`, and `direction-type/octave-shift`. These shapes do not replace the Engine-emitted cause `direction`.
 
-Semantic-probe failures are forbidden from being promoted to `BLOCKED_GLOBAL` by the V2 taxonomy.
+The notation-dynamics case is localized to one note event in measure 85 of the pinned source because the Engine cause is `notation:dynamics` and exactly one matching source occurrence exists.
 
-Current exact mappings include:
-
-- `PART_SELECTION_REQUIRED` → source selection / `PART_SET` / `REVIEW_REQUIRED` candidate;
-- `UNSUPPORTED_GRACE_NOTE` → Lab semantic extraction / `EVENT` / local semantic defer;
-- `UNSUPPORTED_POLYPHONIC_TRIPLET_TIME_MODIFICATION` → rhythm compatibility / rhythmic event region;
-- `UNSUPPORTED_POLYPHONIC_GRACE_ORNAMENT` → ornament compatibility / ornament event region;
-- `UNSUPPORTED_POLYPHONIC_REPEAT_BARLINE` → playback structure / measure region;
-- `UNSUPPORTED_POLYPHONIC_TIME_SIGNATURE_DISPLAY` → presentation compatibility / measure display.
-
-These are recovery candidates, not automatic recovery authorization.
-
-## Generic projection rule
-
-`UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE` is intentionally not assigned a fabricated precise cause.
-
-It is classified as:
-
-```text
-failureFamily: GENERIC_PROJECTION_CAPABILITY
-layer: PROJECTION_OR_COMPATIBILITY
-scopeClass: UNKNOWN_LOCAL
-handlingClass: NEEDS_FEATURE_REFINEMENT
-progressiveStateCandidate: UNSUPPORTED_LOCAL
-refinementRequired: true
-```
-
-Six current V1C cases fall into this group. Their category/feature-tag metadata is context only; it is not treated as proof of the causal unsupported feature.
-
-This is the main V2B continuation target.
+The two harmony cases deliberately remain `FEATURE_REGION_SET`. The Engine identifies `harmony` but does not identify which individual harmony occurrence caused the first failure, so V2B does not invent that location.
 
 ## Reproducibility
 
-`src/failures/v2FailureIntelligence.js` contains the deterministic taxonomy.
+V2A implementation:
 
-`scripts/run-v2-failure-intelligence.mjs`:
+- `src/failures/v2FailureIntelligence.js`
+- `scripts/run-v2-failure-intelligence.mjs`
+- `scripts/verify-v2-failure-intelligence-report.mjs`
+- `artifacts/v2/failure-intelligence-baseline.json`
 
-1. reads the hash-pinned V1C report shards;
-2. verifies the pinned Engine checkout identity;
-3. classifies every unsupported observation;
-4. verifies each mapped code against its Lab/Engine source-emission anchor;
-5. rejects unclassified observed codes when `--assert-covered` is enabled;
-6. forbids semantic-probe global blocking;
-7. emits the full contextual V2 report.
+V2B implementation:
 
-`artifacts/v2/failure-intelligence-baseline.json` commits the stable regression projection. Context-only feature tags are intentionally excluded from the baseline projection.
+- `src/failures/v2bProjectionRefinement.js`
+- `scripts/run-v2b-projection-refinement-discovery.mjs`
+- `scripts/run-v2b-projection-refinement.mjs`
+- `scripts/verify-v2b-projection-refinement-report.mjs`
+- `artifacts/v2b/projection-refinement-baseline.json`
 
-`scripts/verify-v2-failure-intelligence-report.mjs` requires regenerated evidence to match the committed baseline exactly.
+The V2B report generator verifies exact external and Engine revisions, captures bounded live error evidence, locates matching source occurrences, applies the deterministic refinement contract, forbids semantic global blocking, and emits reproducible evidence. CI regenerates V1B, V1C, V2A, and V2B evidence from pinned sources and requires the committed V2B baseline to match.
 
 ## Authority boundary
 
-V2A does not:
+V2 does not:
 
-- change `musicxml-to-guitar-tab-engine`;
-- change the status returned by production runtime;
+- modify `musicxml-to-guitar-tab-engine`;
+- change production runtime status;
 - make `REVIEW_REQUIRED` operational in production;
-- create provisional TAB itself;
-- authorize approximation or arrangement transforms;
-- infer exact event/measure locations when current V1C artifacts do not carry them;
-- infer physical guitar infeasibility;
+- authorize automatic approximation or recovery;
+- create arrangement transformations;
+- decide strict physical guitar feasibility;
 - use learned evidence.
 
-The `progressiveStateCandidate` field is architecture evidence for future reviewed product changes, not a production decision.
+All progressive-state fields are architecture evidence for future separately reviewed production changes.
 
-## Next — V2B
+## Next — V3 independent feasibility oracle
 
-The next V2 slice should refine the six generic projection cases by collecting bounded live error details and source locations from the pinned Engine compatibility chain.
+The two unresolved harmony occurrence sets may be refined additively if later Engine evidence exposes an exact location. They do not block the next principal research stage.
 
-V2B acceptance target:
-
-```text
-UNSUPPORTED_POLYPHONIC_PROJECTION_FEATURE
-        |
-        v
-bounded error.name / error.details / location evidence
-        |
-        +--> exact feature family where proven
-        +--> narrowest reliable measure/event/region scope
-        +--> otherwise remain UNKNOWN_LOCAL
-```
-
-No classification may become more specific only because a fixture name or feature tag suggests a cause.
-
-After V2 failure causes and locations are sufficiently refined, V3 can compare production-search failures against an independent strict physical-feasibility oracle.
+V3 should independently distinguish true untransformed guitar impossibility from production search/capability failure. The oracle remains offline/CI evidence and must not become production runtime authority.
