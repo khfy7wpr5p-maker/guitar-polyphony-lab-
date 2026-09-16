@@ -93,6 +93,23 @@ jobs:
           node scripts/verify-v2-failure-intelligence-report.mjs
           --generated v2-generated/failure-intelligence-report.json
 
+      - name: Discover V2B generic projection cause/location evidence
+        if: github.event_name == 'push' && github.ref == 'refs/heads/stage/v2b-live-cause-location-refinement'
+        run: >-
+          node scripts/run-v2b-projection-refinement-discovery.mjs
+          --external-root .v1c-musicxml-tests
+          --engine-root .v1b-engine
+          --output v2b-discovery/projection-refinement.json
+
+      - name: Upload V2B projection refinement discovery
+        if: github.event_name == 'push' && github.ref == 'refs/heads/stage/v2b-live-cause-location-refinement'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: v2b-projection-refinement-discovery
+          path: v2b-discovery/projection-refinement.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload V1C capability report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
