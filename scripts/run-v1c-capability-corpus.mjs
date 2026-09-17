@@ -73,6 +73,56 @@ function requireEngineModule(engineRoot, relativePath) {
   return require(path.resolve(engineRoot, relativePath));
 }
 
+function readResolvedManifest() {
+  const manifestPath = path.join(repoRoot, 'fixtures/v1c/manifest.json');
+  const expansionPath = path.join(repoRoot, 'fixtures/v1c/capability-expansions-a3.json');
+  const rawManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const overlay = JSON.parse(fs.readFileSync(expansionPath, 'utf8'));
+
+  if (
+    overlay.documentType !== 'V1CCapabilityExpansionOverlay'
+    || overlay.contractVersion !== '1.0.0'
+    || overlay.stage !== 'A3'
+    || overlay.authorityBoundary?.rawInputSecurityUnchanged !== true
+    || overlay.authorityBoundary?.productionEngineExpectationUnchanged !== true
+    || overlay.authorityBoundary?.targetGraceTimingAuthority !== false
+    || overlay.authorityBoundary?.reviewRequired !== true
+    || !Array.isArray(overlay.overrides)
+    || overlay.overrides.length !== 4
+  ) {
+    fail('INVALID_V1C_CAPABILITY_EXPANSION_OVERLAY');
+  }
+
+  const manifest = structuredClone(rawManifest);
+  const seen = new Set();
+  for (const override of overlay.overrides) {
+    if (
+      !override
+      || typeof override !== 'object'
+      || typeof override.caseId !== 'string'
+      || override.field !== 'expectedProbeLab'
+      || seen.has(override.caseId)
+    ) {
+      fail('INVALID_V1C_CAPABILITY_EXPANSION_OVERRIDE');
+    }
+    seen.add(override.caseId);
+    const target = manifest.cases.find((item) => item.caseId === override.caseId);
+    if (!target) fail(`UNKNOWN_V1C_CAPABILITY_EXPANSION_CASE ${override.caseId}`);
+    if (
+      JSON.stringify(target.expectedProbeLab) !== JSON.stringify(override.from)
+      || override.from?.status !== 'UNSUPPORTED_LOCAL'
+      || override.from?.errorCode !== 'UNSUPPORTED_GRACE_NOTE'
+      || override.to?.status !== 'SUPPORTED'
+      || override.to?.errorCode !== null
+    ) {
+      fail(`V1C_CAPABILITY_EXPANSION_PRECONDITION_MISMATCH ${override.caseId}`);
+    }
+    target.expectedProbeLab = structuredClone(override.to);
+  }
+
+  return validateV1CCapabilityManifest(manifest);
+}
+
 function createSemanticProbeXml(xml, item) {
   if (ANY_ENTITY.test(xml)) {
     fail(`SEMANTIC_PROBE_TRANSFORM_REJECTED ${item.caseId}: entity declaration present`);
@@ -151,9 +201,7 @@ function semanticObservation(lab, engine) {
 
 function main() {
   const options = parseArgs(process.argv.slice(2));
-  const manifest = validateV1CCapabilityManifest(JSON.parse(
-    fs.readFileSync(path.join(repoRoot, 'fixtures/v1c/manifest.json'), 'utf8'),
-  ));
+  const manifest = readResolvedManifest();
   const externalRoot = path.resolve(options.externalRoot);
   const engineRoot = path.resolve(options.engineRoot);
 
