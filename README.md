@@ -26,7 +26,7 @@ Verification-stage strictness is an evidence boundary, not the permanent product
 | Arrangement A2 bounded generation | COMPLETE — INITIAL STATIC SLICE | reduction + octave generation; every static candidate physically revalidated |
 | Arrangement A2B temporal/composition | COMPLETE — ABSTRACT TEMPORAL SLICE | arpeggio exact-position sequence validation + disjoint transform composition |
 | Arrangement A2C timeline-backed generation | COMPLETE — INITIAL NO-LOSS SLICE | P0 onset/duration evidence + 8-note no-loss arpeggio generation |
-| Arrangement A3 real-corpus/integration gate | NEXT | broaden piano/non-guitar evidence, then define production Engine integration contract |
+| Arrangement A3 real-corpus/integration gate | COMPLETE — COMMITTED BASELINE + PRODUCTION CONTRACT | 5/5 pinned real-piano support; CI-reproduced baseline; Engine migration contract pinned to current production main |
 | V4 learned evidence | FUTURE | TabCNN/FretNet-style shadow evidence only |
 
 ## Pinned evidence revisions
@@ -214,7 +214,7 @@ V3 exact + left-hand physical evidence
 - Arrangement A2 — complete initial static generator
 - Arrangement A2B — complete abstract temporal/composition slice
 - Arrangement A2C — complete initial P0-backed no-loss timeline slice
-- **Arrangement A3 real piano/non-guitar corpus validation + production integration contract — NEXT**
+- Arrangement A3 real piano/non-guitar corpus validation + production integration contract — complete in Lab; production migration is next
 - V4 learned/ergonomic providers — later, shadow-only until benchmark/calibration gates
 
 ## Commands
@@ -239,5 +239,6 @@ Node.js 22 or newer is required.
 - `docs/ARRANGEMENT-A2-BOUNDED-GENERATION.md`
 - `docs/ARRANGEMENT-A2B-TEMPORAL-COMPOSITION.md`
 - `docs/ARRANGEMENT-A2C-TIMELINE-GENERATION.md`
+- `docs/ARRANGEMENT-A3-PRODUCTION-INTEGRATION-CONTRACT.md`
 - `docs/FRETNET_RESEARCH.md`
 - `SECURITY.md`

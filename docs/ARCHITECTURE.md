@@ -184,15 +184,21 @@ A2B ✅
 A2C initial P0-backed no-loss slice ✅
         |
         v
-A3 REAL PIANO / NON-GUITAR CORPUS VALIDATION  <--- NEXT
+A3 REAL PIANO / NON-GUITAR CORPUS BASELINE ✅
         |
-        +--> broaden no-loss/reduction/octave evidence
-        +--> quantify coverage and local review outcomes
-        +--> define explicit ordered same-event transform pipeline
-        +--> stabilize Lab -> production integration contract
+        +--> 5/5 pinned real-piano cases supported
+        +--> committed deterministic CI baseline
+        +--> let-ring preserved as non-continuity notation evidence
         |
         v
-PRODUCTION INTEGRATION GATE
+A3 PRODUCTION INTEGRATION CONTRACT ✅
+        |
+        +--> production Engine remains canonical authority
+        +--> no-loss arpeggiation before reduction for contracted review recovery
+        +--> transformed output remains REVIEW_REQUIRED / non-exportable
+        |
+        v
+PRODUCTION MIGRATION  <--- NEXT
         |
         v
 musicxml-to-guitar-tab-engine
