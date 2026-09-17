@@ -360,6 +360,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
         alter: undefined,
         tieStart: false,
         tieStop: false,
+        letRing: false,
       };
       return;
     }
@@ -413,6 +414,8 @@ export function parseMusicXmlPartwise(input, options = {}) {
       else if (type === 'continue') {
         currentNote.tieStart = true;
         currentNote.tieStop = true;
+      } else if (type === 'let-ring') {
+        currentNote.letRing = true;
       } else {
         fail('UNSUPPORTED_TIED_TYPE', 'Unsupported MusicXML tied type.', {
           ...context(),
@@ -485,6 +488,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
           chord: currentNote.chord,
           tieStart: currentNote.tieStart,
           tieStop: currentNote.tieStop,
+          ...(currentNote.letRing ? { letRing: true } : {}),
           declaredDurationDivisions: currentNote.duration ?? null,
           timingAuthority: false,
           reviewRequired: true,
@@ -532,6 +536,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
             chord: currentNote.chord,
             tieStart: currentNote.tieStart,
             tieStop: currentNote.tieStop,
+          ...(currentNote.letRing ? { letRing: true } : {}),
           });
         }
       }
