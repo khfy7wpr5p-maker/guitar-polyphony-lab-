@@ -29,8 +29,8 @@
     "rawLabUnsupportedLocal": 22,
     "rawEngineSupported": 0,
     "rawEngineUnsupportedLocal": 22,
-    "probeLabSupported": 17,
-    "probeLabUnsupportedLocal": 5,
+    "probeLabSupported": 20,
+    "probeLabUnsupportedLocal": 2,
     "probeEngineSupported": 5,
     "probeEngineUnsupportedLocal": 17,
     "semanticEqual": 5,
@@ -42,7 +42,7 @@
     {
       "path": "artifacts/v1c/cases-01.json",
       "caseCount": 6,
-      "sha256": "2135c0c6461189298b42ec04946d67861b934f4399c2395415b8ced48e2ee977"
+      "sha256": "6b5a5feec3b1e792e9b913ce00f65c0fab68b2fb76b7d69d01e3a966cbad46ad"
     },
     {
       "path": "artifacts/v1c/cases-02.json",
@@ -52,7 +52,7 @@
     {
       "path": "artifacts/v1c/cases-03.json",
       "caseCount": 5,
-      "sha256": "7ef9eb239e51087e983d9366224f34703183cc2341c8af729ba1bcbeb63061bd"
+      "sha256": "1023216ff5f1eae003ac85091b228c6901a2e0f2ae9084fea4f5b702663046e3"
     },
     {
       "path": "artifacts/v1c/cases-04.json",
