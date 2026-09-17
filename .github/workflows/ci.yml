@@ -78,6 +78,21 @@ jobs:
           path: .a3-piano-corpus
           persist-credentials: false
 
+      - name: Generate observed V1C capability report
+        run: >-
+          node scripts/run-v1c-capability-corpus.mjs
+          --external-root .v1c-musicxml-tests
+          --engine-root .v1b-engine
+          --output v1c-observed/report.json
+
+      - name: Upload observed V1C capability report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: v1c-capability-observed
+          path: v1c-observed/report.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Verify V1C external MusicXML capability baseline
         run: >-
           node scripts/run-v1c-capability-corpus.mjs
@@ -85,14 +100,6 @@ jobs:
           --engine-root .v1b-engine
           --output v1c-generated/report.json
           --assert-expectations
-
-      - name: Upload generated V1C report before committed verification
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: v1c-capability-report-preverify
-          path: v1c-generated/report.json
-          if-no-files-found: error
-          retention-days: 7
 
       - name: Verify committed V1C report reproduces semantically
         run: node scripts/verify-v1c-committed-report.mjs --generated v1c-generated/report.json
