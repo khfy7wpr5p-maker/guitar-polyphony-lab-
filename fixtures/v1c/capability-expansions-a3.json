@@ -1,0 +1,38 @@
+{
+  "documentType": "V1CCapabilityExpansionOverlay",
+  "contractVersion": "1.0.0",
+  "stage": "A3",
+  "reason": "Grace notes are now preserved as untimed review evidence instead of rejecting the whole semantic probe.",
+  "authorityBoundary": {
+    "rawInputSecurityUnchanged": true,
+    "productionEngineExpectationUnchanged": true,
+    "targetGraceTimingAuthority": false,
+    "reviewRequired": true
+  },
+  "overrides": [
+    {
+      "caseId": "w3c-24a-grace-notes",
+      "field": "expectedProbeLab",
+      "from": { "status": "UNSUPPORTED_LOCAL", "errorCode": "UNSUPPORTED_GRACE_NOTE" },
+      "to": { "status": "SUPPORTED", "errorCode": null }
+    },
+    {
+      "caseId": "w3c-24b-grace-chord",
+      "field": "expectedProbeLab",
+      "from": { "status": "UNSUPPORTED_LOCAL", "errorCode": "UNSUPPORTED_GRACE_NOTE" },
+      "to": { "status": "SUPPORTED", "errorCode": null }
+    },
+    {
+      "caseId": "w3c-24c-grace-measure-end",
+      "field": "expectedProbeLab",
+      "from": { "status": "UNSUPPORTED_LOCAL", "errorCode": "UNSUPPORTED_GRACE_NOTE" },
+      "to": { "status": "SUPPORTED", "errorCode": null }
+    },
+    {
+      "caseId": "w3c-24h-grace-simultaneous",
+      "field": "expectedProbeLab",
+      "from": { "status": "UNSUPPORTED_LOCAL", "errorCode": "UNSUPPORTED_GRACE_NOTE" },
+      "to": { "status": "SUPPORTED", "errorCode": null }
+    }
+  ]
+}
