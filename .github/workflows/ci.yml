@@ -195,6 +195,11 @@ jobs:
           node scripts/verify-a3-real-piano-corpus-report.mjs
           --generated a3-generated/real-piano-corpus-discovery.json
 
+      - name: Verify A3 production integration contract
+        run: >-
+          node scripts/verify-a3-production-integration-contract.mjs
+          --engine-root .v1b-engine
+
       - name: Upload A3 real piano corpus discovery
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
