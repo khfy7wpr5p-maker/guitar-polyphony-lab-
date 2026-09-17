@@ -1,0 +1,156 @@
+{
+  "documentType": "A3ProductionIntegrationContract",
+  "contractVersion": "1.0.0",
+  "authority": {
+    "labProductionAuthority": false,
+    "canonicalTabAuthority": "MUSICXML_TO_GUITAR_TAB_ENGINE_ONLY",
+    "firstSliceResultStatus": "REVIEW_REQUIRED",
+    "firstSliceExportAllowed": false,
+    "firstSliceCanonicalTabAvailable": false,
+    "provisionalTabRequiredWhenSafe": true,
+    "sourceMutationAllowed": false
+  },
+  "labEvidence": {
+    "repository": "khfy7wpr5p-maker/guitar-polyphony-lab-",
+    "baselineCommitSha": "7a74008c2293fe4a30c07f8da9b7dd80df1475b8",
+    "baselinePath": "artifacts/a3/real-piano-corpus-baseline.json",
+    "requiredCaseCount": 5,
+    "requiredSupportedCount": 5,
+    "requiredUnsupportedCount": 0,
+    "sourceNoteLossAllowed": false,
+    "targetTimingAuthority": false
+  },
+  "productionTarget": {
+    "repository": "khfy7wpr5p-maker/musicxml-to-guitar-tab-engine",
+    "commitSha": "1d8ced644f544f7e991f7275eda77a2ce557774e",
+    "mainProtected": true,
+    "requiredSeams": [
+      "src/core/internalPolyphonicConversionPipelineV2.js",
+      "src/music/polyphonicSourceModel.js",
+      "src/music/simultaneousEventModel.js",
+      "src/app/partialGuitarArrangement.js",
+      "src/app/reviewRequiredCapabilityContract.js",
+      "src/tab/canonicalTabResultV2.js",
+      "src/writers/canonicalTabMusicXmlWriterV2.js"
+    ],
+    "existingContracts": {
+      "polyphonicSourceModel": "1.0.0",
+      "partialGuitarTabArrangement": "1.0.0",
+      "reviewEditableTabProjection": "1.1.0",
+      "reviewRequiredCapabilityContract": "1.3.0",
+      "musicXmlUploadResultSchema": "1.5.0"
+    }
+  },
+  "identityMapping": {
+    "sourceEventIdAuthority": "PRODUCTION_POLYPHONIC_SOURCE_MODEL",
+    "sourceEventIdFormat": "<partId>:measure:<measureIndex>:note:<noteIndex>",
+    "sourceGroupAuthority": "PRODUCTION_SIMULTANEOUS_EVENT_MODEL",
+    "sourceGroupIdFormat": "<measureId>:simultaneous:<onsetDivisions>",
+    "pitchOnlyMatchingForbidden": true,
+    "filenameSpecificBehaviorForbidden": true,
+    "sourceShaSpecificBehaviorForbidden": true
+  },
+  "notationCompatibility": {
+    "letRing": {
+      "sourceShape": "<notations><tied type=\"let-ring\"/></notations>",
+      "productionStatusAtPinnedCommit": "UNSUPPORTED",
+      "requiredFirstMigrationBehavior": "ADMIT_AS_NON_CONTINUITY_NOTATION_EVIDENCE",
+      "setTieStart": false,
+      "setTieStop": false,
+      "mayCreateSustainTieChain": false,
+      "sourceArtifactMustRemainImmutable": true,
+      "reviewIssueAllowed": true,
+      "reviewIssueMustNotClaimOrdinaryTieContinuity": true
+    }
+  },
+  "transformAdoption": {
+    "PRESERVED": {
+      "state": "EXISTING_PRODUCTION_SEMANTICS",
+      "silentSourceLossAllowed": false
+    },
+    "OCTAVE_DISPLACED": {
+      "state": "EXISTING_BOUNDED_PRODUCTION_SEMANTICS",
+      "firstSliceRewriteExistingPolicy": false
+    },
+    "CHORD_REDUCED": {
+      "state": "EXISTING_REVIEW_ONLY_FALLBACK",
+      "productionRepresentation": "UNASSIGNED_BOUNDED_GUITAR_REDUCTION",
+      "firstSliceRewriteExistingPolicy": false
+    },
+    "ARPEGGIATED": {
+      "state": "FIRST_SLICE_NEW_REVIEW_ONLY_CAPABILITY",
+      "sourceGroupMustBeProvenSimultaneous": true,
+      "allSourceEventsMustBeCovered": true,
+      "sourceNoteLossAllowed": false,
+      "spreadDivisions": 1,
+      "spreadAuthority": "EXPLICIT_PROVISIONAL_PRESENTATION_POLICY",
+      "targetTimingAuthority": false,
+      "physicalRevalidationRequired": true,
+      "candidateOrderIsPreferenceRank": false,
+      "automaticCanonicalAuthority": false
+    }
+  },
+  "firstMigrationSlice": {
+    "name": "A3_NO_LOSS_ARPEGGIATION_REVIEW_RECOVERY",
+    "productionBoundary": "APPLICATION_INTERNAL_POLY_V2_ONLY",
+    "entryCondition": {
+      "safeParseRequired": true,
+      "polyphonicProjectionRequired": true,
+      "sourceGroupMustBeProvenSimultaneous": true,
+      "ordinaryStrictSelectionAttemptedFirst": true,
+      "recoverablePhysicalFailureRequired": true
+    },
+    "orderedRecoveryPolicy": [
+      "STRICT_CANONICAL_SELECTION",
+      "NO_LOSS_ARPEGGIATION_REVIEW_RECOVERY",
+      "EXISTING_BOUNDED_REDUCTION_REVIEW_FALLBACK"
+    ],
+    "provisionalSelectionPolicy": "SOURCE_ORDER_IF_FEASIBLE_ELSE_FIRST_DETERMINISTIC_FEASIBLE",
+    "provisionalSelectionIsMusicalRanking": false,
+    "result": {
+      "status": "REVIEW_REQUIRED",
+      "canonicalTabResult": null,
+      "arrangementArtifactRequired": true,
+      "provisionalMusicXmlRequired": true,
+      "generateTab": true,
+      "export": false,
+      "playback": "APPROXIMATE_WHEN_TRANSFORM_AFFECTS_TIMELINE",
+      "teacherEditRequired": true
+    }
+  },
+  "hardBlockBoundary": {
+    "wholeScoreBlockReservedFor": [
+      "UNSAFE_INPUT",
+      "UNPARSEABLE_XML_AFTER_BOUNDED_COMPATIBILITY",
+      "UNRESOLVED_GLOBAL_STRUCTURE",
+      "UNAUTHENTICATED_OR_UNSAFE_REVIEW_SOURCE",
+      "PROCESSING_DEADLINE_OR_CANCELLATION"
+    ],
+    "localArrangementFailureMustNotAutomaticallyBecomeGlobalBlock": true,
+    "boundedCandidateExhaustionIsPhysicalImpossibility": false
+  },
+  "acceptanceGates": {
+    "labA3BaselineMustRemainGreen": true,
+    "productionExistingCiMatrixMustRemainGreen": [
+      "Node.js 18",
+      "Node.js 20",
+      "Node.js 22",
+      "Tests, alphaTab import and SVG render / Node.js 18",
+      "Tests, alphaTab import and SVG render / Node.js 20",
+      "Tests, alphaTab import and SVG render / Node.js 22",
+      "Runtime staging browser E2E / Node.js 22"
+    ],
+    "realPianoCorpusMustNotRegressBelowSupportedCount": 5,
+    "immutableSourceRegressionRequired": true,
+    "provisionalTabVisibilityRegressionRequired": true,
+    "exportMustRemainDisabledForReviewRequired": true
+  },
+  "deferred": [
+    "AUTOMATIC_MUSICAL_RANKING_OF_ARPEGGIO_ORDERS",
+    "TARGET_PERFORMANCE_TIMING_AUTHORITY",
+    "LET_RING_PHYSICAL_SUSTAIN_AUTHORITY",
+    "SAME_EVENT_MULTI_TRANSFORM_ORDERING_BEYOND_EXPLICITLY_CONTRACTED_CASES",
+    "LEARNED_TAB_RANKING",
+    "PACKAGE_ROOT_API_EXPANSION"
+  ]
+}
