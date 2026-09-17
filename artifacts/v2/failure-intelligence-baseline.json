@@ -10,11 +10,11 @@
     "engineCommitSha": "1d8ced644f544f7e991f7275eda77a2ce557774e"
   },
   "summary": {
-    "failureObservationCount": 66,
+    "failureObservationCount": 63,
     "rawInputFailureCount": 44,
-    "semanticProbeFailureCount": 22,
+    "semanticProbeFailureCount": 19,
     "globalTrustRejectCount": 44,
-    "semanticReviewCandidateCount": 16,
+    "semanticReviewCandidateCount": 13,
     "semanticUnsupportedLocalCount": 6,
     "refinementRequiredCount": 6,
     "unclassifiedCount": 0,
@@ -25,8 +25,7 @@
       "PLAYBACK_STRUCTURE": 3,
       "PRESENTATION_COMPATIBILITY": 1,
       "RHYTHM_COMPATIBILITY": 2,
-      "SOURCE_SELECTION": 1,
-      "SOURCE_SEMANTIC_CAPABILITY": 4
+      "SOURCE_SELECTION": 2
     }
   },
   "groups": [
@@ -139,22 +138,8 @@
       "progressiveStateCandidate": "REVIEW_REQUIRED",
       "refinementRequired": false,
       "evidencePrecision": "EXACT_CODE",
-      "caseIds": ["w3c-71e-tab-staves"],
-      "observationCount": 1
-    },
-    {
-      "provider": "LAB",
-      "phase": "SEMANTIC_PROBE",
-      "errorCode": "UNSUPPORTED_GRACE_NOTE",
-      "failureFamily": "SOURCE_SEMANTIC_CAPABILITY",
-      "layer": "LAB_SEMANTIC_EXTRACTION",
-      "scopeClass": "EVENT",
-      "handlingClass": "LOCAL_SEMANTIC_DEFER",
-      "progressiveStateCandidate": "REVIEW_REQUIRED",
-      "refinementRequired": false,
-      "evidencePrecision": "EXACT_CODE_WITH_LOCATION_CAPABLE_ERROR",
-      "caseIds": ["w3c-24a-grace-notes","w3c-24b-grace-chord","w3c-24c-grace-measure-end","w3c-24h-grace-simultaneous"],
-      "observationCount": 4
+      "caseIds": ["w3c-24h-grace-simultaneous","w3c-71e-tab-staves"],
+      "observationCount": 2
     }
   ]
 }
