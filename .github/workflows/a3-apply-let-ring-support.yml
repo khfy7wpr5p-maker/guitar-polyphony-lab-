@@ -1,0 +1,83 @@
+name: A3 apply let-ring support
+
+on:
+  push:
+    branches:
+      - 'stage/a3-fur-elise-tied-capability'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Lab
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Apply minimal let-ring preservation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/musicxml/partwiseParser.js')
+          source = path.read_text(encoding='utf-8')
+
+          if "else if (type === 'let-ring')" in source:
+              print('let-ring support already present; no parser patch needed')
+              raise SystemExit(0)
+
+          initialization = """        tieStart: false,\n        tieStop: false,\n      };"""
+          initialization_replacement = """        tieStart: false,\n        tieStop: false,\n        letRing: false,\n      };"""
+          if source.count(initialization) != 1:
+              raise SystemExit('expected one currentNote tie initialization block')
+          source = source.replace(initialization, initialization_replacement, 1)
+
+          unsupported = """      } else {\n        fail('UNSUPPORTED_TIED_TYPE', 'Unsupported MusicXML tied type.', {"""
+          let_ring = """      } else if (type === 'let-ring') {\n        currentNote.letRing = true;\n      } else {\n        fail('UNSUPPORTED_TIED_TYPE', 'Unsupported MusicXML tied type.', {"""
+          if source.count(unsupported) != 1:
+              raise SystemExit('expected one unsupported tied-type branch')
+          source = source.replace(unsupported, let_ring, 1)
+
+          emitted_tie_stop = "          tieStop: currentNote.tieStop,\n"
+          if source.count(emitted_tie_stop) != 2:
+              raise SystemExit('expected timed and grace note tieStop emission sites')
+          source = source.replace(
+              emitted_tie_stop,
+              emitted_tie_stop + "          ...(currentNote.letRing ? { letRing: true } : {}),\n",
+          )
+
+          path.write_text(source, encoding='utf-8')
+          PY
+
+      - name: Verify focused regression
+        run: node --test test/partwiseParserLetRing.test.js
+
+      - name: Verify full test suite before commit
+        run: npm test
+
+      - name: Commit parser support when changed
+        shell: bash
+        run: |
+          if git diff --quiet -- src/musicxml/partwiseParser.js; then
+            echo 'No parser changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/musicxml/partwiseParser.js
+          git commit -m 'A3 parser: preserve MusicXML let-ring notation'
+          git push origin HEAD:stage/a3-fur-elise-tied-capability
