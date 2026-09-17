@@ -1,0 +1,111 @@
+name: A3 contract apply
+
+on:
+  push:
+    branches:
+      - 'stage/a3-production-integration-contract'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Lab
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true
+
+      - name: Apply contract gate and stage documentation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          ci = Path('.github/workflows/ci.yml')
+          text = ci.read_text(encoding='utf-8')
+          if 'Verify A3 production integration contract' not in text:
+              anchor = '''      - name: Verify committed A3 real piano corpus baseline
+        run: >-
+          node scripts/verify-a3-real-piano-corpus-report.mjs
+          --generated a3-generated/real-piano-corpus-discovery.json
+'''
+              addition = anchor + '''
+      - name: Verify A3 production integration contract
+        run: >-
+          node scripts/verify-a3-production-integration-contract.mjs
+          --engine-root .v1b-engine
+'''
+              if text.count(anchor) != 1:
+                  raise SystemExit('A3 baseline CI anchor not found exactly once')
+              text = text.replace(anchor, addition, 1)
+              ci.write_text(text, encoding='utf-8')
+
+          readme = Path('README.md')
+          text = readme.read_text(encoding='utf-8')
+          old = '| Arrangement A3 real-corpus/integration gate | NEXT | broaden piano/non-guitar evidence, then define production Engine integration contract |'
+          new = '| Arrangement A3 real-corpus/integration gate | COMPLETE — COMMITTED BASELINE + PRODUCTION CONTRACT | 5/5 pinned real-piano support; CI-reproduced baseline; Engine migration contract pinned to current production main |'
+          if old in text:
+              text = text.replace(old, new, 1)
+          old_roadmap = '- **Arrangement A3 real piano/non-guitar corpus validation + production integration contract — NEXT**'
+          new_roadmap = '- Arrangement A3 real piano/non-guitar corpus validation + production integration contract — complete in Lab; production migration is next'
+          if old_roadmap in text:
+              text = text.replace(old_roadmap, new_roadmap, 1)
+          maintained_anchor = '- `docs/ARRANGEMENT-A2C-TIMELINE-GENERATION.md`\n'
+          maintained_addition = maintained_anchor + '- `docs/ARRANGEMENT-A3-PRODUCTION-INTEGRATION-CONTRACT.md`\n'
+          if maintained_anchor in text and 'ARRANGEMENT-A3-PRODUCTION-INTEGRATION-CONTRACT.md`' not in text:
+              text = text.replace(maintained_anchor, maintained_addition, 1)
+          readme.write_text(text, encoding='utf-8')
+
+          architecture = Path('docs/ARCHITECTURE.md')
+          text = architecture.read_text(encoding='utf-8')
+          old_block = '''A3 REAL PIANO / NON-GUITAR CORPUS VALIDATION  <--- NEXT
+        |
+        +--> broaden no-loss/reduction/octave evidence
+        +--> quantify coverage and local review outcomes
+        +--> define explicit ordered same-event transform pipeline
+        +--> stabilize Lab -> production integration contract
+        |
+        v
+PRODUCTION INTEGRATION GATE
+        |
+        v
+musicxml-to-guitar-tab-engine'''
+          new_block = '''A3 REAL PIANO / NON-GUITAR CORPUS BASELINE ✅
+        |
+        +--> 5/5 pinned real-piano cases supported
+        +--> committed deterministic CI baseline
+        +--> let-ring preserved as non-continuity notation evidence
+        |
+        v
+A3 PRODUCTION INTEGRATION CONTRACT ✅
+        |
+        +--> production Engine remains canonical authority
+        +--> no-loss arpeggiation before reduction for contracted review recovery
+        +--> transformed output remains REVIEW_REQUIRED / non-exportable
+        |
+        v
+PRODUCTION MIGRATION  <--- NEXT
+        |
+        v
+musicxml-to-guitar-tab-engine'''
+          if old_block not in text:
+              raise SystemExit('Architecture continuation block not found')
+          text = text.replace(old_block, new_block, 1)
+          architecture.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit updates
+        shell: bash
+        run: |
+          if git diff --quiet -- .github/workflows/ci.yml README.md docs/ARCHITECTURE.md; then
+            echo 'No updates required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/ci.yml README.md docs/ARCHITECTURE.md
+          git commit -m 'A3 contract: gate CI and mark Lab contract stable'
+          git push origin HEAD:stage/a3-production-integration-contract
