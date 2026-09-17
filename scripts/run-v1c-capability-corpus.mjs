@@ -108,12 +108,16 @@ function readResolvedManifest() {
     seen.add(override.caseId);
     const target = manifest.cases.find((item) => item.caseId === override.caseId);
     if (!target) fail(`UNKNOWN_V1C_CAPABILITY_EXPANSION_CASE ${override.caseId}`);
+
+    const supportedTarget = override.to?.status === 'SUPPORTED' && override.to?.errorCode === null;
+    const residualPartSelectionTarget = override.caseId === 'w3c-24h-grace-simultaneous'
+      && override.to?.status === 'UNSUPPORTED_LOCAL'
+      && override.to?.errorCode === 'PART_SELECTION_REQUIRED';
     if (
       JSON.stringify(target.expectedProbeLab) !== JSON.stringify(override.from)
       || override.from?.status !== 'UNSUPPORTED_LOCAL'
       || override.from?.errorCode !== 'UNSUPPORTED_GRACE_NOTE'
-      || override.to?.status !== 'SUPPORTED'
-      || override.to?.errorCode !== null
+      || (!supportedTarget && !residualPartSelectionTarget)
     ) {
       fail(`V1C_CAPABILITY_EXPANSION_PRECONDITION_MISMATCH ${override.caseId}`);
     }
