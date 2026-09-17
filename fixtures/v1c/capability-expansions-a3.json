@@ -32,7 +32,7 @@
       "caseId": "w3c-24h-grace-simultaneous",
       "field": "expectedProbeLab",
       "from": { "status": "UNSUPPORTED_LOCAL", "errorCode": "UNSUPPORTED_GRACE_NOTE" },
-      "to": { "status": "SUPPORTED", "errorCode": null }
+      "to": { "status": "UNSUPPORTED_LOCAL", "errorCode": "PART_SELECTION_REQUIRED" }
     }
   ]
 }
