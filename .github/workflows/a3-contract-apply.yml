@@ -27,17 +27,8 @@ jobs:
           ci = Path('.github/workflows/ci.yml')
           text = ci.read_text(encoding='utf-8')
           if 'Verify A3 production integration contract' not in text:
-              anchor = '''      - name: Verify committed A3 real piano corpus baseline
-        run: >-
-          node scripts/verify-a3-real-piano-corpus-report.mjs
-          --generated a3-generated/real-piano-corpus-discovery.json
-'''
-              addition = anchor + '''
-      - name: Verify A3 production integration contract
-        run: >-
-          node scripts/verify-a3-production-integration-contract.mjs
-          --engine-root .v1b-engine
-'''
+              anchor = "      - name: Verify committed A3 real piano corpus baseline\n        run: >-\n          node scripts/verify-a3-real-piano-corpus-report.mjs\n          --generated a3-generated/real-piano-corpus-discovery.json\n"
+              addition = anchor + "\n      - name: Verify A3 production integration contract\n        run: >-\n          node scripts/verify-a3-production-integration-contract.mjs\n          --engine-root .v1b-engine\n"
               if text.count(anchor) != 1:
                   raise SystemExit('A3 baseline CI anchor not found exactly once')
               text = text.replace(anchor, addition, 1)
@@ -61,36 +52,8 @@ jobs:
 
           architecture = Path('docs/ARCHITECTURE.md')
           text = architecture.read_text(encoding='utf-8')
-          old_block = '''A3 REAL PIANO / NON-GUITAR CORPUS VALIDATION  <--- NEXT
-        |
-        +--> broaden no-loss/reduction/octave evidence
-        +--> quantify coverage and local review outcomes
-        +--> define explicit ordered same-event transform pipeline
-        +--> stabilize Lab -> production integration contract
-        |
-        v
-PRODUCTION INTEGRATION GATE
-        |
-        v
-musicxml-to-guitar-tab-engine'''
-          new_block = '''A3 REAL PIANO / NON-GUITAR CORPUS BASELINE ✅
-        |
-        +--> 5/5 pinned real-piano cases supported
-        +--> committed deterministic CI baseline
-        +--> let-ring preserved as non-continuity notation evidence
-        |
-        v
-A3 PRODUCTION INTEGRATION CONTRACT ✅
-        |
-        +--> production Engine remains canonical authority
-        +--> no-loss arpeggiation before reduction for contracted review recovery
-        +--> transformed output remains REVIEW_REQUIRED / non-exportable
-        |
-        v
-PRODUCTION MIGRATION  <--- NEXT
-        |
-        v
-musicxml-to-guitar-tab-engine'''
+          old_block = "A3 REAL PIANO / NON-GUITAR CORPUS VALIDATION  <--- NEXT\n        |\n        +--> broaden no-loss/reduction/octave evidence\n        +--> quantify coverage and local review outcomes\n        +--> define explicit ordered same-event transform pipeline\n        +--> stabilize Lab -> production integration contract\n        |\n        v\nPRODUCTION INTEGRATION GATE\n        |\n        v\nmusicxml-to-guitar-tab-engine"
+          new_block = "A3 REAL PIANO / NON-GUITAR CORPUS BASELINE ✅\n        |\n        +--> 5/5 pinned real-piano cases supported\n        +--> committed deterministic CI baseline\n        +--> let-ring preserved as non-continuity notation evidence\n        |\n        v\nA3 PRODUCTION INTEGRATION CONTRACT ✅\n        |\n        +--> production Engine remains canonical authority\n        +--> no-loss arpeggiation before reduction for contracted review recovery\n        +--> transformed output remains REVIEW_REQUIRED / non-exportable\n        |\n        v\nPRODUCTION MIGRATION  <--- NEXT\n        |\n        v\nmusicxml-to-guitar-tab-engine"
           if old_block not in text:
               raise SystemExit('Architecture continuation block not found')
           text = text.replace(old_block, new_block, 1)
