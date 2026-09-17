@@ -130,18 +130,38 @@ test('preserves tie and tied evidence including continue', () => {
   assert.equal(event.tieStop, true);
 });
 
-test('fails closed on grace notes instead of inventing duration', () => {
+test('preserves grace notes as untimed review evidence without advancing the P0 cursor', () => {
   const xml = score(
     part(`
       <measure number="1">
         <attributes><divisions>4</divisions></attributes>
         <note><grace/><pitch><step>E</step><octave>4</octave></pitch><voice>1</voice></note>
+        <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice></note>
       </measure>`),
   );
 
-  assert.throws(
-    () => parseMusicXmlPartwise(xml),
-    (error) => error instanceof MusicXmlParseError && error.code === 'UNSUPPORTED_GRACE_NOTE',
+  const measure = parseMusicXmlPartwise(xml).parts[0].measures[0];
+  assert.deepEqual(measure.graceNotes, [
+    {
+      type: 'grace-note',
+      id: 'p1-m1-n1',
+      pitch: 'E4',
+      voice: '1',
+      staff: 1,
+      chord: false,
+      tieStart: false,
+      tieStop: false,
+      declaredDurationDivisions: null,
+      timingAuthority: false,
+      reviewRequired: true,
+      sourceKind: 'grace',
+    },
+  ]);
+
+  const timeline = buildMeasureTimeline(measure.events);
+  assert.deepEqual(
+    timeline.notes.map(({ id, pitch, onset, end }) => ({ id, pitch, onset, end })),
+    [{ id: 'p1-m1-n2', pitch: 'C4', onset: 0, end: 4 }],
   );
 });
 
