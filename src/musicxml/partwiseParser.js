@@ -131,6 +131,7 @@ function freezeResult(parts, byteLength, version) {
   for (const part of parts) {
     for (const measure of part.measures) {
       Object.freeze(measure.events);
+      Object.freeze(measure.graceNotes);
       Object.freeze(measure);
     }
     Object.freeze(part.measures);
@@ -197,17 +198,33 @@ export function parseMusicXmlPartwise(input, options = {}) {
     target[field] = value;
   }
 
-  function appendEvent(event) {
-    if (!currentMeasure) {
-      fail('EVENT_OUTSIDE_MEASURE', 'Timed MusicXML event occurred outside a measure.');
-    }
-    if (currentMeasure.events.length >= MAX_EVENTS_PER_MEASURE) {
-      fail('MEASURE_EVENT_LIMIT_EXCEEDED', 'Parsed measure event limit exceeded.', {
+  function semanticEventCount() {
+    return (currentMeasure?.events.length ?? 0) + (currentMeasure?.graceNotes.length ?? 0);
+  }
+
+  function requireMeasureCapacity() {
+    if (semanticEventCount() >= MAX_EVENTS_PER_MEASURE) {
+      fail('MEASURE_EVENT_LIMIT_EXCEEDED', 'Parsed measure semantic event limit exceeded.', {
         ...context(),
         limit: MAX_EVENTS_PER_MEASURE,
       });
     }
+  }
+
+  function appendEvent(event) {
+    if (!currentMeasure) {
+      fail('EVENT_OUTSIDE_MEASURE', 'Timed MusicXML event occurred outside a measure.');
+    }
+    requireMeasureCapacity();
     currentMeasure.events.push(event);
+  }
+
+  function appendGraceNote(event) {
+    if (!currentMeasure) {
+      fail('EVENT_OUTSIDE_MEASURE', 'Grace MusicXML event occurred outside a measure.');
+    }
+    requireMeasureCapacity();
+    currentMeasure.graceNotes.push(Object.freeze(event));
   }
 
   function finishCapture(name) {
@@ -315,6 +332,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
             : requireBoundedText(sourceNumber, 'measure.number'),
         divisions: null,
         events: [],
+        graceNotes: [],
         noteOrdinal: 0,
       };
       return;
@@ -436,46 +454,25 @@ export function parseMusicXmlPartwise(input, options = {}) {
 
     if (name === 'note' && currentNote) {
       const details = context();
-      if (currentNote.grace) {
-        fail('UNSUPPORTED_GRACE_NOTE', 'P1B does not assign duration to grace notes.', details);
-      }
       if (currentNote.cue) {
         fail('UNSUPPORTED_CUE_NOTE', 'P1B does not support cue notes.', details);
       }
       if (currentNote.unpitched) {
         fail('UNSUPPORTED_UNPITCHED_NOTE', 'P1B supports pitched or rest notes only.', details);
       }
-      if (!currentNote.duration) {
-        fail('MISSING_DURATION', 'Timed note/rest requires a positive duration.', details);
-      }
 
       const voice = currentNote.voice ?? '1';
       const staff = currentNote.staff ?? 1;
 
-      if (currentNote.rest) {
-        if (
-          currentNote.step !== undefined ||
-          currentNote.octave !== undefined ||
-          currentNote.alter !== undefined
-        ) {
-          fail('REST_WITH_PITCH', 'Rest note may not also carry pitch semantics.', details);
+      if (currentNote.grace) {
+        if (currentNote.rest) {
+          fail('UNSUPPORTED_GRACE_REST', 'Grace rests are not supported in the current reviewable slice.', details);
         }
-        if (currentNote.chord) {
-          fail('REST_CHORD_NOT_SUPPORTED', 'A rest cannot be emitted as a chord member.', details);
-        }
-        appendEvent({
-          type: 'forward',
-          duration: currentNote.duration,
-          sourceKind: 'rest',
-          voice,
-          staff,
-        });
-      } else {
         if (currentNote.step === undefined || currentNote.octave === undefined) {
-          fail('MISSING_PITCH', 'Pitched note requires step and octave.', details);
+          fail('MISSING_PITCH', 'Grace note requires step and octave.', details);
         }
-        appendEvent({
-          type: 'note',
+        appendGraceNote({
+          type: 'grace-note',
           id: `p${currentPart.index}-m${currentMeasure.index}-n${currentNote.ordinal}`,
           pitch: formatPitch(
             currentNote.step,
@@ -485,11 +482,58 @@ export function parseMusicXmlPartwise(input, options = {}) {
           ),
           voice,
           staff,
-          duration: currentNote.duration,
           chord: currentNote.chord,
           tieStart: currentNote.tieStart,
           tieStop: currentNote.tieStop,
+          declaredDurationDivisions: currentNote.duration ?? null,
+          timingAuthority: false,
+          reviewRequired: true,
+          sourceKind: 'grace',
         });
+      } else {
+        if (!currentNote.duration) {
+          fail('MISSING_DURATION', 'Timed note/rest requires a positive duration.', details);
+        }
+
+        if (currentNote.rest) {
+          if (
+            currentNote.step !== undefined ||
+            currentNote.octave !== undefined ||
+            currentNote.alter !== undefined
+          ) {
+            fail('REST_WITH_PITCH', 'Rest note may not also carry pitch semantics.', details);
+          }
+          if (currentNote.chord) {
+            fail('REST_CHORD_NOT_SUPPORTED', 'A rest cannot be emitted as a chord member.', details);
+          }
+          appendEvent({
+            type: 'forward',
+            duration: currentNote.duration,
+            sourceKind: 'rest',
+            voice,
+            staff,
+          });
+        } else {
+          if (currentNote.step === undefined || currentNote.octave === undefined) {
+            fail('MISSING_PITCH', 'Pitched note requires step and octave.', details);
+          }
+          appendEvent({
+            type: 'note',
+            id: `p${currentPart.index}-m${currentMeasure.index}-n${currentNote.ordinal}`,
+            pitch: formatPitch(
+              currentNote.step,
+              currentNote.alter ?? 0,
+              currentNote.octave,
+              details,
+            ),
+            voice,
+            staff,
+            duration: currentNote.duration,
+            chord: currentNote.chord,
+            tieStart: currentNote.tieStart,
+            tieStop: currentNote.tieStop,
+          });
+        }
       }
       currentNote = null;
     } else if ((name === 'backup' || name === 'forward') && currentMove?.kind === name) {
@@ -522,6 +566,7 @@ export function parseMusicXmlPartwise(input, options = {}) {
         number: currentMeasure.number,
         divisions: currentMeasure.divisions,
         events: currentMeasure.events,
+        graceNotes: currentMeasure.graceNotes,
       });
       currentMeasure = null;
     } else if (name === 'part' && currentPart) {
