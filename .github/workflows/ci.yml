@@ -70,6 +70,14 @@ jobs:
           path: .v1c-musicxml-tests
           persist-credentials: false
 
+      - name: Checkout pinned real piano corpus
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: musetrainer/library
+          ref: 9128876f6164d96997c877a2be843349a32bdabb
+          path: .a3-piano-corpus
+          persist-credentials: false
+
       - name: Verify V1C external MusicXML capability baseline
         run: >-
           node scripts/run-v1c-capability-corpus.mjs
@@ -160,6 +168,20 @@ jobs:
         run: >-
           node scripts/verify-a2c-timeline-arrangement-benchmark.mjs
           --generated a2c-generated/timeline-arrangement-report.json
+
+      - name: Generate A3 real piano corpus discovery
+        run: >-
+          node scripts/run-a3-real-piano-corpus-discovery.mjs
+          --external-root .a3-piano-corpus
+          --output a3-generated/real-piano-corpus-discovery.json
+
+      - name: Upload A3 real piano corpus discovery
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: a3-real-piano-corpus-discovery
+          path: a3-generated/real-piano-corpus-discovery.json
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Upload A2C timeline arrangement benchmark
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
