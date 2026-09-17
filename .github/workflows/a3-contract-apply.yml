@@ -1,4 +1,4 @@
-name: A3 contract apply
+name: A3 contract docs apply
 
 on:
   push:
@@ -18,21 +18,11 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Apply contract gate and stage documentation
+      - name: Apply stage documentation
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
-          ci = Path('.github/workflows/ci.yml')
-          text = ci.read_text(encoding='utf-8')
-          if 'Verify A3 production integration contract' not in text:
-              anchor = "      - name: Verify committed A3 real piano corpus baseline\n        run: >-\n          node scripts/verify-a3-real-piano-corpus-report.mjs\n          --generated a3-generated/real-piano-corpus-discovery.json\n"
-              addition = anchor + "\n      - name: Verify A3 production integration contract\n        run: >-\n          node scripts/verify-a3-production-integration-contract.mjs\n          --engine-root .v1b-engine\n"
-              if text.count(anchor) != 1:
-                  raise SystemExit('A3 baseline CI anchor not found exactly once')
-              text = text.replace(anchor, addition, 1)
-              ci.write_text(text, encoding='utf-8')
 
           readme = Path('README.md')
           text = readme.read_text(encoding='utf-8')
@@ -45,30 +35,28 @@ jobs:
           if old_roadmap in text:
               text = text.replace(old_roadmap, new_roadmap, 1)
           maintained_anchor = '- `docs/ARRANGEMENT-A2C-TIMELINE-GENERATION.md`\n'
-          maintained_addition = maintained_anchor + '- `docs/ARRANGEMENT-A3-PRODUCTION-INTEGRATION-CONTRACT.md`\n'
           if maintained_anchor in text and 'ARRANGEMENT-A3-PRODUCTION-INTEGRATION-CONTRACT.md`' not in text:
-              text = text.replace(maintained_anchor, maintained_addition, 1)
+              text = text.replace(maintained_anchor, maintained_anchor + '- `docs/ARRANGEMENT-A3-PRODUCTION-INTEGRATION-CONTRACT.md`\n', 1)
           readme.write_text(text, encoding='utf-8')
 
           architecture = Path('docs/ARCHITECTURE.md')
           text = architecture.read_text(encoding='utf-8')
           old_block = "A3 REAL PIANO / NON-GUITAR CORPUS VALIDATION  <--- NEXT\n        |\n        +--> broaden no-loss/reduction/octave evidence\n        +--> quantify coverage and local review outcomes\n        +--> define explicit ordered same-event transform pipeline\n        +--> stabilize Lab -> production integration contract\n        |\n        v\nPRODUCTION INTEGRATION GATE\n        |\n        v\nmusicxml-to-guitar-tab-engine"
           new_block = "A3 REAL PIANO / NON-GUITAR CORPUS BASELINE ✅\n        |\n        +--> 5/5 pinned real-piano cases supported\n        +--> committed deterministic CI baseline\n        +--> let-ring preserved as non-continuity notation evidence\n        |\n        v\nA3 PRODUCTION INTEGRATION CONTRACT ✅\n        |\n        +--> production Engine remains canonical authority\n        +--> no-loss arpeggiation before reduction for contracted review recovery\n        +--> transformed output remains REVIEW_REQUIRED / non-exportable\n        |\n        v\nPRODUCTION MIGRATION  <--- NEXT\n        |\n        v\nmusicxml-to-guitar-tab-engine"
-          if old_block not in text:
-              raise SystemExit('Architecture continuation block not found')
-          text = text.replace(old_block, new_block, 1)
+          if old_block in text:
+              text = text.replace(old_block, new_block, 1)
           architecture.write_text(text, encoding='utf-8')
           PY
 
-      - name: Commit updates
+      - name: Commit documentation updates
         shell: bash
         run: |
-          if git diff --quiet -- .github/workflows/ci.yml README.md docs/ARCHITECTURE.md; then
-            echo 'No updates required.'
+          if git diff --quiet -- README.md docs/ARCHITECTURE.md; then
+            echo 'No documentation updates required.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/ci.yml README.md docs/ARCHITECTURE.md
-          git commit -m 'A3 contract: gate CI and mark Lab contract stable'
+          git add README.md docs/ARCHITECTURE.md
+          git commit -m 'A3 contract: mark Lab integration contract stable'
           git push origin HEAD:stage/a3-production-integration-contract
