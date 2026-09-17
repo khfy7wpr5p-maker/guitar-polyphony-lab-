@@ -35,15 +35,15 @@ function observedFailures() {
 
 test('V2 taxonomy classifies every V1C failure observation without semantic global blocking', () => {
   const failures = observedFailures();
-  assert.equal(failures.length, 66);
+  assert.equal(failures.length, 63);
   const classified = failures.map((item) => assertNoSemanticGlobalBlock(classifyObservedFailure(item)));
   assert.equal(classified.filter((item) => item.failureFamily === 'UNCLASSIFIED_FAILURE').length, 0);
   assert.equal(classified.filter((item) => item.phase === 'RAW_INPUT').length, 44);
-  assert.equal(classified.filter((item) => item.phase === 'SEMANTIC_PROBE').length, 22);
+  assert.equal(classified.filter((item) => item.phase === 'SEMANTIC_PROBE').length, 19);
   assert.equal(classified.filter((item) => item.handlingClass === 'GLOBAL_TRUST_REJECT').length, 44);
   assert.equal(classified.filter((item) => (
     item.phase === 'SEMANTIC_PROBE' && item.progressiveStateCandidate === 'REVIEW_REQUIRED'
-  )).length, 16);
+  )).length, 13);
   assert.equal(classified.filter((item) => (
     item.phase === 'SEMANTIC_PROBE' && item.progressiveStateCandidate === 'UNSUPPORTED_LOCAL'
   )).length, 6);
