@@ -55,7 +55,7 @@ jobs:
         run: diff -ru artifacts/v1b-engine v1b-generated
 
       - name: Upload V1B Engine evidence artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: v1b-engine-artifacts
           path: v1b-generated
@@ -162,7 +162,7 @@ jobs:
           --generated a2c-generated/timeline-arrangement-report.json
 
       - name: Upload A2C timeline arrangement benchmark
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: a2c-timeline-arrangement-report
           path: a2c-generated/timeline-arrangement-report.json
@@ -170,7 +170,7 @@ jobs:
           retention-days: 7
 
       - name: Upload A2B temporal composition benchmark
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: a2b-temporal-composition-report
           path: a2b-generated/temporal-composition-report.json
@@ -178,7 +178,7 @@ jobs:
           retention-days: 7
 
       - name: Upload A2 bounded arrangement benchmark
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: a2-arrangement-generation-report
           path: a2-generated/arrangement-generation-report.json
@@ -186,7 +186,7 @@ jobs:
           retention-days: 7
 
       - name: Upload V3B left-hand comparison benchmark
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: v3b-left-hand-benchmark-report
           path: v3b-generated/left-hand-benchmark-report.json
@@ -194,7 +194,7 @@ jobs:
           retention-days: 7
 
       - name: Upload V3A strict feasibility benchmark
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: v3a-strict-feasibility-report
           path: v3a-generated/strict-feasibility-report.json
@@ -202,7 +202,7 @@ jobs:
           retention-days: 7
 
       - name: Upload V2B projection refinement report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: v2b-projection-refinement-report
           path: v2b-generated/projection-refinement-report.json
@@ -210,7 +210,7 @@ jobs:
           retention-days: 7
 
       - name: Upload V1C capability report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: v1c-capability-report
           path: v1c-generated/report.json
@@ -218,7 +218,7 @@ jobs:
           retention-days: 7
 
       - name: Upload V2 failure intelligence report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: v2-failure-intelligence-report
           path: v2-generated/failure-intelligence-report.json
